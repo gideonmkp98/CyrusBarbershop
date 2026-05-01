@@ -1,0 +1,323 @@
+- generic [ref=e2]:
+  - banner [ref=e3]:
+    - navigation [ref=e4]:
+      - link "Cyrus Barbershop CYRUS" [ref=e5] [cursor=pointer]:
+        - /url: /
+        - img "Cyrus Barbershop" [ref=e6]
+        - generic [ref=e7]: CYRUS
+      - generic [ref=e8]:
+        - link "Home" [ref=e9] [cursor=pointer]:
+          - /url: /#hero
+        - link "Heritage" [ref=e10] [cursor=pointer]:
+          - /url: /#heritage
+        - link "Services" [ref=e11] [cursor=pointer]:
+          - /url: /#services
+        - link "Book" [ref=e12] [cursor=pointer]:
+          - /url: /#booking
+        - link "Contact" [ref=e13] [cursor=pointer]:
+          - /url: /#contact
+      - link "Book Now" [ref=e15] [cursor=pointer]:
+        - /url: /booking
+  - main [ref=e16]:
+    - generic [ref=e17]:
+      - img "Cyrus Barbershop interior" [ref=e19]
+      - generic [ref=e21]:
+        - img "Cyrus Barbershop" [ref=e23]
+        - heading "C Y R U S B A R B E R S H O P" [level=1] [ref=e24]:
+          - generic [ref=e25]: C
+          - generic [ref=e26]: "Y"
+          - generic [ref=e27]: R
+          - generic [ref=e28]: U
+          - generic [ref=e29]: S
+          - generic [ref=e30]: B
+          - generic [ref=e31]: A
+          - generic [ref=e32]: R
+          - generic [ref=e33]: B
+          - generic [ref=e34]: E
+          - generic [ref=e35]: R
+          - generic [ref=e36]: S
+          - generic [ref=e37]: H
+          - generic [ref=e38]: O
+          - generic [ref=e39]: P
+        - paragraph [ref=e40]: Precision Cuts. Timeless Style.
+        - generic [ref=e42]:
+          - link "Book an Appointment" [ref=e43] [cursor=pointer]:
+            - /url: /#booking
+          - link "View Services" [ref=e44] [cursor=pointer]:
+            - /url: /#services
+    - generic [ref=e49]:
+      - generic [ref=e50]:
+        - generic [ref=e51]: ESTABLISHED 1994
+        - heading "Heritage of Craftsmanship" [level=2] [ref=e52]:
+          - text: Heritage of
+          - text: Craftsmanship
+        - paragraph [ref=e53]: At Cyrus Barbershop, we believe that a haircut is more than a service—it's a ritual. Our master barbers combine decades of traditional techniques with contemporary styling to ensure every client leaves with a profile of absolute precision.
+        - blockquote [ref=e54]: "\"Every cut is a signature. Every service is an experience in refinement.\" — Cyrus, Founder"
+      - img "Cyrus Barbershop interior" [ref=e57]
+    - generic [ref=e60]:
+      - generic [ref=e61]:
+        - generic [ref=e62]: THE SERVICE MENU
+        - heading "Precision Grooming" [level=2] [ref=e63]
+      - generic [ref=e65]:
+        - generic [ref=e66]:
+          - generic [ref=e67]:
+            - paragraph [ref=e68]: We blend traditional techniques with modern precision. Each service includes a consultation to tailor the result to your lifestyle.
+            - generic [ref=e69]:
+              - generic [ref=e70]:
+                - generic [ref=e71]: ✂
+                - generic [ref=e72]: Precision Cutting
+              - generic [ref=e73]:
+                - generic [ref=e74]: ◇
+                - generic [ref=e75]: Premium Products
+              - generic [ref=e76]:
+                - generic [ref=e77]: ◈
+                - generic [ref=e78]: Relaxed Atmosphere
+          - img "Barber chair" [ref=e80]
+        - generic [ref=e81]:
+          - generic [ref=e82]:
+            - heading "01 Hair Services" [level=3] [ref=e83]:
+              - generic [ref=e84]: "01"
+              - generic [ref=e86]: Hair Services
+            - generic [ref=e87]:
+              - generic [ref=e88] [cursor=pointer]:
+                - generic [ref=e91]:
+                  - heading "Haircut & Style" [level=4] [ref=e92]
+                  - generic [ref=e94]: $35
+                - paragraph [ref=e95]: A precise tailored cut involving scissor work, clippers, and a detailed finish. Includes a wash and style.
+              - generic [ref=e96] [cursor=pointer]:
+                - generic [ref=e99]:
+                  - heading "Skin Fade" [level=4] [ref=e100]
+                  - generic [ref=e102]: $45
+                - paragraph [ref=e103]: Expertly blended transition from skin to hair. High, mid, or low fade options with razor refinement.
+              - generic [ref=e104] [cursor=pointer]:
+                - generic [ref=e107]:
+                  - heading "The Classic Cut" [level=4] [ref=e108]
+                  - generic [ref=e110]: $45
+                - paragraph [ref=e111]: Traditional scissor or clipper cut including neck shave and hot towel finish. The timeless standard.
+          - generic [ref=e112]:
+            - heading "02 Beard & Face" [level=3] [ref=e113]:
+              - generic [ref=e114]: "02"
+              - generic [ref=e116]: Beard & Face
+            - generic [ref=e117]:
+              - generic [ref=e118] [cursor=pointer]:
+                - generic [ref=e121]:
+                  - heading "Beard Trim & Shape" [level=4] [ref=e122]
+                  - generic [ref=e124]: $25
+                - paragraph [ref=e125]: Shaping and lining the beard to complement your facial structure. Finished with premium beard oil.
+              - generic [ref=e126] [cursor=pointer]:
+                - generic [ref=e129]:
+                  - heading "Hot Towel Shave" [level=4] [ref=e130]
+                  - generic [ref=e132]: $40
+                - paragraph [ref=e133]: The ultimate traditional experience. Multi-step ritual including steam, lather, and double-edge razor precision.
+              - generic [ref=e134] [cursor=pointer]:
+                - generic [ref=e137]:
+                  - heading "Beard Sculpting" [level=4] [ref=e138]
+                  - generic [ref=e140]: $30
+                - paragraph [ref=e141]: Precision shaping, straight-razor lineup, and nourishing oil treatment for the distinguished gentleman.
+          - generic [ref=e142]:
+            - generic [ref=e143]: ★
+            - generic [ref=e144]: EXECUTIVE EXPERIENCE
+            - generic [ref=e145]:
+              - heading "The Signature" [level=4] [ref=e146]
+              - generic [ref=e148]: $75
+            - paragraph [ref=e149]: The complete overhaul. Includes a premium skin fade or haircut, beard sculpting or hot towel shave, and a rejuvenating facial massage. Our most requested package.
+            - link "Select Package" [ref=e150] [cursor=pointer]:
+              - /url: /#booking
+    - generic [ref=e152]:
+      - generic [ref=e153]:
+        - generic [ref=e154]: THE ATMOSPHERE
+        - heading "Inside the Shop" [level=2] [ref=e155]
+      - generic [ref=e157]:
+        - img "Vintage barber chair" [ref=e159]
+        - img "Barbershop workspace" [ref=e161]
+        - img "Classic barber interior" [ref=e163]
+        - img "Barbershop from behind" [ref=e165]
+    - generic [ref=e167]:
+      - generic [ref=e168]:
+        - generic [ref=e169]: RESERVE YOUR EXPERIENCE
+        - heading "Book an Appointment" [level=1] [ref=e170]
+        - paragraph [ref=e171]: Step into the legacy of precision. Select your preferred service and time below to confirm your visit.
+      - generic [ref=e172]:
+        - generic [ref=e173]: "01"
+        - generic [ref=e175]: "02"
+        - generic [ref=e177]: "03"
+      - generic [ref=e178]:
+        - generic [ref=e179]:
+          - generic [ref=e180]:
+            - heading "Choose Service" [level=3] [ref=e181]
+            - generic [ref=e182]:
+              - button "Haircut & Style $35 A precise tailored cut involving scissor work, clippers, and a detailed finish. Includes a wash and style. ○" [ref=e183] [cursor=pointer]:
+                - generic [ref=e184]:
+                  - generic [ref=e185]:
+                    - generic [ref=e186]:
+                      - heading "Haircut & Style" [level=4] [ref=e187]
+                      - generic [ref=e189]: $35
+                    - paragraph [ref=e190]: A precise tailored cut involving scissor work, clippers, and a detailed finish. Includes a wash and style.
+                  - generic [ref=e191]: ○
+              - button "Skin Fade $45 Expertly blended transition from skin to hair. High, mid, or low fade options with razor refinement. ○" [ref=e192] [cursor=pointer]:
+                - generic [ref=e193]:
+                  - generic [ref=e194]:
+                    - generic [ref=e195]:
+                      - heading "Skin Fade" [level=4] [ref=e196]
+                      - generic [ref=e198]: $45
+                    - paragraph [ref=e199]: Expertly blended transition from skin to hair. High, mid, or low fade options with razor refinement.
+                  - generic [ref=e200]: ○
+              - button "The Classic Cut $45 Traditional scissor or clipper cut including neck shave and hot towel finish. The timeless standard. ○" [ref=e201] [cursor=pointer]:
+                - generic [ref=e202]:
+                  - generic [ref=e203]:
+                    - generic [ref=e204]:
+                      - heading "The Classic Cut" [level=4] [ref=e205]
+                      - generic [ref=e207]: $45
+                    - paragraph [ref=e208]: Traditional scissor or clipper cut including neck shave and hot towel finish. The timeless standard.
+                  - generic [ref=e209]: ○
+              - button "Beard Trim & Shape $25 Shaping and lining the beard to complement your facial structure. Finished with premium beard oil. ○" [ref=e210] [cursor=pointer]:
+                - generic [ref=e211]:
+                  - generic [ref=e212]:
+                    - generic [ref=e213]:
+                      - heading "Beard Trim & Shape" [level=4] [ref=e214]
+                      - generic [ref=e216]: $25
+                    - paragraph [ref=e217]: Shaping and lining the beard to complement your facial structure. Finished with premium beard oil.
+                  - generic [ref=e218]: ○
+              - button "Hot Towel Shave $40 The ultimate traditional experience. Multi-step ritual including steam, lather, and double-edge razor precision. ○" [ref=e219] [cursor=pointer]:
+                - generic [ref=e220]:
+                  - generic [ref=e221]:
+                    - generic [ref=e222]:
+                      - heading "Hot Towel Shave" [level=4] [ref=e223]
+                      - generic [ref=e225]: $40
+                    - paragraph [ref=e226]: The ultimate traditional experience. Multi-step ritual including steam, lather, and double-edge razor precision.
+                  - generic [ref=e227]: ○
+              - 'button "The Signature $75 Full service: haircut, beard, facial massage ○" [ref=e228] [cursor=pointer]':
+                - generic [ref=e229]:
+                  - generic [ref=e230]:
+                    - generic [ref=e231]:
+                      - heading "The Signature" [level=4] [ref=e232]
+                      - generic [ref=e234]: $75
+                    - paragraph [ref=e235]: "Full service: haircut, beard, facial massage"
+                  - generic [ref=e236]: ○
+          - button "Continue" [ref=e238] [cursor=pointer]
+        - complementary [ref=e239]:
+          - generic [ref=e240]:
+            - heading "Summary" [level=3] [ref=e241]
+            - generic [ref=e242]:
+              - generic [ref=e243]:
+                - generic [ref=e244]: SERVICE
+                - generic [ref=e245]: —
+              - generic [ref=e246]:
+                - generic [ref=e247]: DATE
+                - generic [ref=e248]: —
+              - generic [ref=e249]:
+                - generic [ref=e250]: TIME
+                - generic [ref=e251]: —
+              - generic [ref=e252]:
+                - generic [ref=e253]: TOTAL
+                - generic [ref=e254]: $0
+            - button "CONFIRM BOOKING" [disabled] [ref=e255] [cursor=pointer]
+            - paragraph [ref=e256]: By confirming, you agree to our 24-hour cancellation policy. A confirmation email will be sent shortly.
+    - generic [ref=e258]:
+      - generic [ref=e259]:
+        - generic [ref=e260]:
+          - generic [ref=e261]: GET IN TOUCH
+          - heading "Contact Us" [level=2] [ref=e262]
+        - paragraph [ref=e263]: Experience the pinnacle of grooming. Reach out to schedule your transformation or visit us for a consultation.
+      - generic [ref=e264]:
+        - generic [ref=e265]:
+          - generic [ref=e266]:
+            - generic [ref=e267]:
+              - generic [ref=e268]: ⛆
+              - generic [ref=e269]:
+                - generic [ref=e270]: Phone
+                - paragraph [ref=e271]: +1 (555) 234-8901
+            - generic [ref=e272]:
+              - generic [ref=e273]: ✉
+              - generic [ref=e274]:
+                - generic [ref=e275]: Email
+                - paragraph [ref=e276]: hello@cyrusbarber.com
+            - generic [ref=e277]:
+              - generic [ref=e278]: ⌖
+              - generic [ref=e279]:
+                - generic [ref=e280]: Location
+                - paragraph [ref=e281]:
+                  - text: 842 Heritage Ave
+                  - text: Downtown, LC 90210
+          - generic [ref=e282]:
+            - heading "Opening Hours" [level=3] [ref=e283]
+            - generic [ref=e284]:
+              - generic [ref=e285]:
+                - generic [ref=e286]: Monday — Friday
+                - generic [ref=e288]: 09am — 08pm
+              - generic [ref=e289]:
+                - generic [ref=e290]: Saturday
+                - generic [ref=e292]: 10am — 06pm
+              - generic [ref=e293]:
+                - generic [ref=e294]: Sunday
+                - generic [ref=e296]: Closed
+        - generic [ref=e298]:
+          - heading "Send an Inquiry" [level=3] [ref=e299]
+          - generic [ref=e300]:
+            - generic [ref=e301]:
+              - textbox "Name" [ref=e302]:
+                - /placeholder: " "
+              - generic: Name
+            - generic [ref=e303]:
+              - textbox "Email Address" [ref=e304]:
+                - /placeholder: " "
+              - generic: Email Address
+            - generic [ref=e305]:
+              - textbox "Message" [ref=e306]:
+                - /placeholder: " "
+              - generic: Message
+            - button "Send Message" [ref=e308] [cursor=pointer]
+      - generic [ref=e309]:
+        - heading "Connect With The Craft" [level=3] [ref=e310]
+        - generic [ref=e311]:
+          - link "IG Instagram" [ref=e312] [cursor=pointer]:
+            - /url: "#"
+            - generic [ref=e314]: IG
+            - generic [ref=e315]: Instagram
+          - link "FB Facebook" [ref=e316] [cursor=pointer]:
+            - /url: "#"
+            - generic [ref=e318]: FB
+            - generic [ref=e319]: Facebook
+          - link "✂ Journal" [ref=e320] [cursor=pointer]:
+            - /url: "#"
+            - generic [ref=e322]: ✂
+            - generic [ref=e323]: Journal
+    - generic [ref=e325]:
+      - heading "Ready for the Cyrus Experience?" [level=2] [ref=e326]
+      - paragraph [ref=e327]: Walk-ins are welcome, but appointments are highly recommended to ensure the time your cut deserves.
+      - generic [ref=e328]:
+        - link "Book Your Chair" [ref=e329] [cursor=pointer]:
+          - /url: /#booking
+        - link "View Services" [ref=e330] [cursor=pointer]:
+          - /url: /#services
+  - contentinfo [ref=e331]:
+    - generic [ref=e333]:
+      - generic [ref=e334]:
+        - generic [ref=e335]:
+          - img "Cyrus Barbershop" [ref=e336]
+          - generic [ref=e337]: CYRUS BARBERSHOP
+        - paragraph [ref=e338]: © 2024 CYRUS BARBERSHOP. PRECISION & HERITAGE.
+      - generic [ref=e339]:
+        - generic [ref=e340]:
+          - generic [ref=e341]: HOURS
+          - 'link "Mon–Fri: 9–8" [ref=e342] [cursor=pointer]':
+            - /url: /#contact
+          - 'link "Sat: 10–6" [ref=e343] [cursor=pointer]':
+            - /url: /#contact
+        - generic [ref=e344]:
+          - generic [ref=e345]: VISIT
+          - link "Location" [ref=e346] [cursor=pointer]:
+            - /url: /#contact
+          - link "Book Online" [ref=e347] [cursor=pointer]:
+            - /url: /#booking
+        - generic [ref=e348]:
+          - generic [ref=e349]: SOCIAL
+          - link "Instagram" [ref=e350] [cursor=pointer]:
+            - /url: "#"
+          - link "Facebook" [ref=e351] [cursor=pointer]:
+            - /url: "#"
+      - generic [ref=e352]:
+        - generic [ref=e353]: STAY SHARP
+        - generic [ref=e354]:
+          - textbox "YOUR EMAIL" [ref=e355]
+          - button "→" [ref=e356]

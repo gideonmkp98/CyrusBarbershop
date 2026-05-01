@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "mysql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1777274858564,
+      "tag": "0000_nappy_molten_man",
+      "breakpoints": true
+    }
+  ]
+}

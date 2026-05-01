@@ -1,0 +1,33 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run *)",
+      "mcp__plugin_playwright_playwright__browser_navigate",
+      "mcp__plugin_playwright_playwright__browser_take_screenshot",
+      "mcp__plugin_playwright_playwright__browser_evaluate",
+      "mcp__plugin_playwright_playwright__browser_console_messages",
+      "mcp__plugin_playwright_playwright__browser_wait_for",
+      "mcp__plugin_playwright_playwright__browser_snapshot",
+      "mcp__plugin_playwright_playwright__browser_close",
+      "Bash(curl -s http://localhost:5174)",
+      "Bash(curl -s http://localhost:5174/about)",
+      "Bash(npm install *)",
+      "Bash(curl -s http://localhost:5174 -o /dev/null)",
+      "Bash(npm list *)",
+      "Bash(curl -s http://localhost:5174/_app/version.json)",
+      "Bash(pkill -f \"vite\")",
+      "Bash(curl -s http://localhost:5173/admin/login -o /dev/null -w \"%{http_code}\")",
+      "Bash(Get-Content *)",
+      "Bash(curl -v http://localhost:5173/admin/login)",
+      "Bash(curl http://localhost:5173/__sveltekit-health)",
+      "Bash(curl -s http://localhost:5177/admin/login)",
+      "Bash(curl -s http://localhost:5177/admin-login)",
+      "Bash(curl -s http://localhost:5177/admin)",
+      "Bash(curl -sI http://localhost:5177/admin)",
+      "Bash(curl -sI http://localhost:5177/admin-login)",
+      "Bash(npx tsx *)",
+      "Bash(dir .env*)",
+      "Bash(node *)"
+    ]
+  }
+}
