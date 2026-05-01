@@ -31,7 +31,7 @@ try {
 // Run seed
 console.log('🌱 Running database seed...');
 try {
-  execSync('npm run db:seed', { stdio: 'inherit' });
+  execSync('node scripts/seed-standalone.js', { stdio: 'inherit' });
   console.log('✓ Seed completed\n');
 } catch (error) {
   // Seed might fail if data already exists, which is okay
