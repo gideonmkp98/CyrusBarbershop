@@ -4,27 +4,5 @@
   "buildCommand": "npm run vercel-build",
   "devCommand": "npm run dev",
   "installCommand": "npm install",
-  "regions": ["fra1"],
-  "env": {
-    "DATABASE_URL": {
-      "type": "secret",
-      "target": ["production", "preview"]
-    },
-    "SESSION_SECRET": {
-      "type": "secret",
-      "target": ["production", "preview"]
-    },
-    "MASTER_EMAIL": {
-      "type": "secret",
-      "target": ["production", "preview"]
-    },
-    "MASTER_PASSWORD": {
-      "type": "secret",
-      "target": ["production", "preview"]
-    },
-    "PUBLIC_SITE_URL": {
-      "type": "secret",
-      "target": ["production", "preview"]
-    }
-  }
+  "regions": ["fra1"]
 }
