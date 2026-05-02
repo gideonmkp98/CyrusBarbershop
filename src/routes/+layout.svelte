@@ -1,7 +1,9 @@
 <script lang="ts">
+  import { page } from '$app/state';
   import '../app.css';
   import { onMount } from 'svelte';
   import { scrollStore } from '$lib/stores/scroll';
+  import { showGlobalNav, showGlobalFooter } from '$lib/stores/layout';
   import GrainOverlay from '$lib/components/GrainOverlay.svelte';
   import Loader from '$lib/components/Loader.svelte';
   import ScrollProgress from '$lib/components/ScrollProgress.svelte';
@@ -21,11 +23,16 @@
 <GrainOverlay />
 <Loader bind:loaderHidden />
 <ScrollProgress />
-<Navbar />
-<MobileMenu />
+
+{#if $showGlobalNav}
+  <Navbar />
+  <MobileMenu />
+{/if}
 
 <main>
   <slot />
 </main>
 
-<Footer onNewsletterSubmit={handleNewsletterSubmit} />
+{#if $showGlobalFooter}
+  <Footer onNewsletterSubmit={handleNewsletterSubmit} />
+{/if}

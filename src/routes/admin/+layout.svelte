@@ -1,8 +1,19 @@
 <script lang="ts">
   import { page } from '$app/state';
   import { goto } from '$app/navigation';
+  import { showGlobalNav, showGlobalFooter } from '$lib/stores/layout';
 
   let { children } = $props();
+
+  // Hide global navbar/footer on admin routes
+  $effect(() => {
+    showGlobalNav.set(false);
+    showGlobalFooter.set(false);
+    return () => {
+      showGlobalNav.set(true);
+      showGlobalFooter.set(true);
+    };
+  });
 
   const navItems = [
     { href: '/admin', label: 'Dashboard' },

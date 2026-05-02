@@ -30,7 +30,10 @@
       "Bash(node *)",
       "Bash(Select-String -Pattern \"error|Error\")",
       "Bash(Select-Object -First 10)",
-      "PowerShell(npm run *)"
+      "PowerShell(npm run *)",
+      "Bash(Select-String -Pattern \"error|Error\" -CaseSensitive)",
+      "Bash(timeout 2)",
+      "PowerShell(Stop-Process *)"
     ]
   }
 }
