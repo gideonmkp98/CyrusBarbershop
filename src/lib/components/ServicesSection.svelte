@@ -1,6 +1,26 @@
 <script lang="ts">
   import { reveal } from '$lib/actions/reveal';
   import ServiceItem from './ServiceItem.svelte';
+
+  interface Service {
+    id: number;
+    name: string;
+    slug: string;
+    description: string | null;
+    price: string;
+    duration: number;
+    category: string;
+    isSignature: boolean;
+    displayOrder: number;
+    isActive: boolean;
+  }
+
+  export let services: Service[] = [];
+
+  // Group services by category
+  const hairServices = services.filter(s => s.category === 'hair');
+  const beardServices = services.filter(s => s.category === 'beard');
+  const signatureServices = services.filter(s => s.isSignature);
 </script>
 
 <section id="services" class="py-section bg-surface-low">
@@ -29,7 +49,7 @@
             </div>
             <div class="flex items-center gap-4 group">
               <span class="text-gold-500 text-2xl">&#9672;</span>
-              <span class="font-body text-label text-bone-warm group-hover:text-gold-400 transition-colors">Ontspannde Atmosfeer</span>
+              <span class="font-body text-label text-bone-warm group-hover:text-gold-400 transition-colors">Ontspannen Atmosfeer</span>
             </div>
           </div>
         </div>
@@ -41,47 +61,67 @@
       <!-- Service List -->
       <div class="lg:col-span-8 space-y-16">
         <!-- Hair Services -->
-        <div>
-          <h3 use:reveal class="font-body text-label text-bone-muted uppercase tracking-[0.3em] mb-10 flex items-center gap-4">
-            <span>01</span>
-            <span class="h-px bg-bone-muted/20 flex-grow"></span>
-            <span>Haarwerk</span>
-          </h3>
-          <div class="space-y-2">
-            <ServiceItem name="Haarknippen" price={35} description="Een vakkundige snit op maat. Schaarwerk, tondeuse en styling. Inclusief wassen en föhnen." revealOpts={{ delay: 1 }} />
-            <ServiceItem name="Fade" price={45} description="Vloeiende overgang van huid naar haar. Verschillende fademogelijkheden met scheermesafwerking." revealOpts={{ delay: 2 }} />
-            <ServiceItem name="De Klassieke" price={45} description="Gerespecteerd klassiek werk. Hals netjes afgewerkt met warme handdoek. De standaard." revealOpts={{ delay: 3 }} />
+        {#if hairServices.length > 0}
+          <div>
+            <h3 use:reveal class="font-body text-label text-bone-muted uppercase tracking-[0.3em] mb-10 flex items-center gap-4">
+              <span>01</span>
+              <span class="h-px bg-bone-muted/20 flex-grow"></span>
+              <span>Haarwerk</span>
+            </h3>
+            <div class="space-y-2">
+              {#each hairServices as service, i}
+                <ServiceItem
+                  name={service.name}
+                  price={+service.price}
+                  description={service.description ?? undefined}
+                  revealOpts={{ delay: i + 1 }}
+                />
+              {/each}
+            </div>
           </div>
-        </div>
+        {/if}
 
         <!-- Beard & Face -->
-        <div>
-          <h3 use:reveal class="font-body text-label text-bone-muted uppercase tracking-[0.3em] mb-10 flex items-center gap-4">
-            <span>02</span>
-            <span class="h-px bg-bone-muted/20 flex-grow"></span>
-            <span>Baardverzorging</span>
-          </h3>
-          <div class="space-y-2">
-            <ServiceItem name="Baardtrim &amp; Vorm" price={25} description="Vakkundig trimmen en vormen naar je gezichtsstructuur. Afgewerkt met premium baardolie." revealOpts={{ delay: 1 }} />
-            <ServiceItem name="Warme Scheerbeurt" price={40} description="Klassieke scheerervaring. Stoom, zeep en scheermeswerk met de nodige finesse." revealOpts={{ delay: 2 }} />
-            <ServiceItem name="Baard Design" price={30} description="Fijne vorming en linenwerk. Voor wie waarde hecht aan perfecte details en vakwerk." revealOpts={{ delay: 3 }} />
+        {#if beardServices.length > 0}
+          <div>
+            <h3 use:reveal class="font-body text-label text-bone-muted uppercase tracking-[0.3em] mb-10 flex items-center gap-4">
+              <span>02</span>
+              <span class="h-px bg-bone-muted/20 flex-grow"></span>
+              <span>Baardverzorging</span>
+            </h3>
+            <div class="space-y-2">
+              {#each beardServices as service, i}
+                <ServiceItem
+                  name={service.name}
+                  price={+service.price}
+                  description={service.description ?? undefined}
+                  revealOpts={{ delay: i + 1 }}
+                />
+              {/each}
+            </div>
           </div>
-        </div>
+        {/if}
 
-        <!-- Signature Package -->
-        <div use:reveal class="bg-surface-base p-8 md:p-12 relative overflow-hidden group">
-          <div class="absolute -top-12 -right-12 text-[8rem] text-gold-500/5 font-display leading-none select-none">&#9733;</div>
-          <span class="font-body text-label text-gold-500 block mb-6 tracking-[0.3em]">COMPLEET PAKKET</span>
-          <div class="flex items-end justify-between mb-6 relative z-10">
-            <h4 class="font-display text-heading text-bone italic">The Works</h4>
-            <div class="leader"></div>
-            <span class="font-display text-heading text-gold-500">€75</span>
-          </div>
-          <p class="text-bone-warm text-body-lg mb-10 max-w-xl relative z-10" style="font-size: 1.125rem; line-height: 1.7; letter-spacing: 0.01em;">
-            Het volledige Cyrus-programma. Premium haarknippen of fade, baardwerk of warme scheering, en dan een ontspannende gezichtsmassage.
-          </p>
-          <a href="/booking" class="btn-outline">Kies dit Pakket</a>
-        </div>
+        <!-- Signature Packages -->
+        {#if signatureServices.length > 0}
+          {#each signatureServices as service}
+            <div use:reveal class="bg-surface-base p-8 md:p-12 relative overflow-hidden group">
+              <div class="absolute -top-12 -right-12 text-[8rem] text-gold-500/5 font-display leading-none select-none">&#9733;</div>
+              <span class="font-body text-label text-gold-500 block mb-6 tracking-[0.3em]">COMPLEET PAKKET</span>
+              <div class="flex items-end justify-between mb-6 relative z-10">
+                <h4 class="font-display text-heading text-bone italic">{service.name}</h4>
+                <div class="leader"></div>
+                <span class="font-display text-heading text-gold-500">€{service.price}</span>
+              </div>
+              {#if service.description}
+                <p class="text-bone-warm text-body-lg mb-10 max-w-xl relative z-10" style="font-size: 1.125rem; line-height: 1.7; letter-spacing: 0.01em;">
+                  {service.description}
+                </p>
+              {/if}
+              <a href="/booking" class="btn-outline">Kies dit Pakket</a>
+            </div>
+          {/each}
+        {/if}
       </div>
     </div>
   </div>

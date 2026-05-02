@@ -27,7 +27,10 @@
       "Bash(curl -sI http://localhost:5177/admin-login)",
       "Bash(npx tsx *)",
       "Bash(dir .env*)",
-      "Bash(node *)"
+      "Bash(node *)",
+      "Bash(Select-String -Pattern \"error|Error\")",
+      "Bash(Select-Object -First 10)",
+      "PowerShell(npm run *)"
     ]
   }
 }
