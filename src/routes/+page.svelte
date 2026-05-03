@@ -23,7 +23,7 @@
   const featureCards = [
     {
       href: '/services',
-      label: 'Behandelingen',
+      label: 'BEHANDELINGEN',
       title: 'Waar traditie en stijl samenkomen',
       description: 'Echte aandacht voor jouw look, van begin tot eind.',
       icon: '&#9986;'

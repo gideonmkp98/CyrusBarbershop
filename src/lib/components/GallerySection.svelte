@@ -2,11 +2,11 @@
   import { reveal } from '$lib/actions/reveal';
 </script>
 
-<section id="gallery" class="py-section bg-surface overflow-hidden">
+<section id="gallery" class="py-section bg-surface-low overflow-hidden">
   <div class="max-w-[1200px] mx-auto px-6 md:px-8">
     <div class="text-center mb-16">
-      <span use:reveal class="font-body text-label text-gold-500 block mb-4">IN ONS ATELIER</span>
-      <h2 use:reveal={{ delay: 1 }} class="font-display text-heading text-bone">De Winkel</h2>
+      <span use:reveal class="font-body text-label text-gold-500 block mb-4">DE PLEK VOOR JOUW STIJL</span>
+      <h2 use:reveal={{ delay: 1 }} class="font-display text-heading text-bone">De Barbershop</h2>
       <div use:reveal={{ delay: 2 }} class="section-divider mx-auto mt-6"></div>
     </div>
 

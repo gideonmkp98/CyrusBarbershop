@@ -117,28 +117,32 @@
     </div>
 
     <!-- Social Links -->
-    <div use:reveal class="py-20 mt-16 border-t border-white/5 text-center">
-      <h3 class="font-display text-subheading text-bone mb-10" style="font-size: clamp(1.25rem, 2vw, 1.5rem); line-height: 1.3; font-weight: 500;">Volg ons op social media</h3>
-      <div class="flex justify-center gap-10">
-        <a href="#" class="group flex flex-col items-center gap-3">
-          <div class="w-14 h-14 rounded-full border border-bone-muted/20 flex items-center justify-center group-hover:border-gold-500 transition-colors">
-            <span class="text-bone-warm group-hover:text-gold-500 transition-colors text-lg">IG</span>
-          </div>
-          <span class="font-body text-label text-bone-muted group-hover:text-gold-500 transition-colors">Instagram</span>
-        </a>
-        <a href="#" class="group flex flex-col items-center gap-3">
-          <div class="w-14 h-14 rounded-full border border-bone-muted/20 flex items-center justify-center group-hover:border-gold-500 transition-colors">
-            <span class="text-bone-warm group-hover:text-gold-500 transition-colors text-lg">FB</span>
-          </div>
-          <span class="font-body text-label text-bone-muted group-hover:text-gold-500 transition-colors">Facebook</span>
-        </a>
-        <!-- <a href="#" class="group flex flex-col items-center gap-3">
-          <div class="w-14 h-14 rounded-full border border-bone-muted/20 flex items-center justify-center group-hover:border-gold-500 transition-colors">
-            <span class="text-bone-warm group-hover:text-gold-500 transition-colors text-lg">&#9986;</span>
-          </div>
-          <span class="font-body text-label text-bone-muted group-hover:text-gold-500 transition-colors">Journal</span>
-        </a> -->
-      </div>
+   
+    
+  </div>
+</section>
+<section id="socialMedia" class="py-section bg-surface-low overflow-hidden">
+  <div class="max-w-[1200px] mx-auto px-6 md:px-8 text-center">
+    <h3 use:reveal class="font-display text-subheading text-bone mb-10" style="font-size: clamp(1.25rem, 2vw, 1.5rem); line-height: 1.3; font-weight: 500;">Volg ons op social media</h3>
+    <div class="flex justify-center gap-10">
+      <a href="#" use:reveal={{ delay: 1 }} class="group flex flex-col items-center gap-3">
+        <div class="w-14 h-14 rounded-full border border-bone-muted/20 flex items-center justify-center group-hover:border-gold-500 transition-colors">
+          <span class="text-bone-warm group-hover:text-gold-500 transition-colors text-lg">IG</span>
+        </div>
+        <span class="font-body text-label text-bone-muted group-hover:text-gold-500 transition-colors">Instagram</span>
+      </a>
+      <a href="#" use:reveal={{ delay: 2 }} class="group flex flex-col items-center gap-3">
+        <div class="w-14 h-14 rounded-full border border-bone-muted/20 flex items-center justify-center group-hover:border-gold-500 transition-colors">
+          <span class="text-bone-warm group-hover:text-gold-500 transition-colors text-lg">FB</span>
+        </div>
+        <span class="font-body text-label text-bone-muted group-hover:text-gold-500 transition-colors">Facebook</span>
+      </a>
+      <!-- <a href="#" use:reveal={{ delay: 3 }} class="group flex flex-col items-center gap-3">
+        <div class="w-14 h-14 rounded-full border border-bone-muted/20 flex items-center justify-center group-hover:border-gold-500 transition-colors">
+          <span class="text-bone-warm group-hover:text-gold-500 transition-colors text-lg">&#9986;</span>
+        </div>
+        <span class="font-body text-label text-bone-muted group-hover:text-gold-500 transition-colors">Journal</span>
+      </a> -->
     </div>
   </div>
 </section>

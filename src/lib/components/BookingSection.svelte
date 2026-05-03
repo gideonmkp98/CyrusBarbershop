@@ -179,7 +179,7 @@
   <div class="max-w-[1200px] mx-auto px-6 md:px-8">
     <header class="mb-12 md:mb-16">
       <span use:reveal class="font-body text-label text-gold-500 block mb-4">MAAK JE AFSPRAAK</span>
-      <h1 use:reveal={{ delay: 1 }} class="font-display text-heading text-gold-300 mb-4">Tijd voor een Snit</h1>
+      <h1 use:reveal={{ delay: 1 }} class="font-display text-heading text-gold-300 mb-4">Tijd voor een nieuwe look</h1>
       <p use:reveal={{ delay: 2 }} class="font-body text-body-lg text-bone-warm max-w-xl" style="font-size: 1.125rem; line-height: 1.7; letter-spacing: 0.01em;">
         Stap voor stap naar je volgende Cyrus-ervaring. Kies je service, selecteer datum en moment, en we zien je snel.
       </p>
@@ -192,7 +192,7 @@
         <!-- Step 1: Service Selection -->
         {#if currentStep === 1}
           <div class="booking-step" style="animation: fadeStep 0.5s ease-out">
-            <h3 use:reveal class="font-display text-subheading text-bone uppercase tracking-tight mb-8">Kies Service</h3>
+            <h3 use:reveal class="font-display text-subheading text-bone uppercase tracking-tight mb-8">Kies Behandeling</h3>
             <div class="space-y-2">
               {#each servicesList as svc, i}
                 <ServiceItem

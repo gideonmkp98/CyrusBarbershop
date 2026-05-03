@@ -1,15 +1,38 @@
 import 'dotenv/config';
-import { db } from './index';
+import mysql from 'mysql2/promise';
+import { drizzle } from 'drizzle-orm/mysql2';
+import * as schema from './schema';
 import { services, openingHours, users } from './schema';
-import { hashPassword } from '../auth';
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
+import bcrypt from 'bcryptjs';
+
+const SALT_ROUNDS = 12;
+
+async function hashPassword(plain: string): Promise<string> {
+  return bcrypt.hash(plain, SALT_ROUNDS);
+}
 
 async function seed() {
   const MASTER_EMAIL = process.env.MASTER_EMAIL || 'admin@cyrusbarber.com';
   const MASTER_PASSWORD = process.env.MASTER_PASSWORD || 'Admin123!';
   const MASTER_DISPLAY_NAME = process.env.MASTER_DISPLAY_NAME || 'Master Barber';
 
+  const DATABASE_URL = process.env.DATABASE_URL;
+  if (!DATABASE_URL) {
+    console.error('DATABASE_URL environment variable is not set');
+    process.exit(1);
+  }
+
   console.log('Seeding database...');
+
+  // Create direct mysql connection for clearing tables
+  const connection = await mysql.createConnection(DATABASE_URL);
+  const db = drizzle(connection, { schema, mode: 'default' });
+
+  // Clear existing data to prevent duplicates
+  await connection.execute('SET FOREIGN_KEY_CHECKS = 0');
+  await db.delete(services).execute();
+  await connection.execute('SET FOREIGN_KEY_CHECKS = 1');
 
   // Services - use ignore on duplicate key
   await db.insert(services).values([
@@ -51,6 +74,9 @@ async function seed() {
     });
     console.log(`✓ Master account created: ${MASTER_EMAIL}`);
   }
+
+  // Close connection
+  await connection.end();
 
   console.log('\nSeed complete!');
   console.log(`\nMaster Login Credentials:`);

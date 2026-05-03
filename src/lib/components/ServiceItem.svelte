@@ -50,22 +50,3 @@
     {/if}
   </div>
 {/if}
-  <div class="flex items-center justify-between mb-2">
-    <div class="flex-1">
-      <div class="flex items-end">
-        <h4 class="font-display text-subheading text-bone group-hover:text-gold-400 transition-colors">{name}</h4>
-        <div class="leader"></div>
-        <span class="font-display text-subheading text-gold-500">${price}</span>
-      </div>
-      {#if description && onclick}
-        <p class="text-bone-warm text-sm max-w-lg mt-1">{description}</p>
-      {/if}
-    </div>
-    {#if onclick}
-      <span class="text-bone-muted/40 text-xl ml-4">{selected ? '●' : '○'}</span>
-    {/if}
-  </div>
-  {#if !onclick && description}
-    <p class="text-bone-warm text-sm max-w-lg">{description}</p>
-  {/if}
-</div>

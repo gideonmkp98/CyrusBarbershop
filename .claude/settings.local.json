@@ -33,7 +33,8 @@
       "PowerShell(npm run *)",
       "Bash(Select-String -Pattern \"error|Error\" -CaseSensitive)",
       "Bash(timeout 2)",
-      "PowerShell(Stop-Process *)"
+      "PowerShell(Stop-Process *)",
+      "Bash(Select-Object -Last 20)"
     ]
   }
 }

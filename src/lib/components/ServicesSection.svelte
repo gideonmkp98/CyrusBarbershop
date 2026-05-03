@@ -17,16 +17,16 @@
 
   export let services: Service[] = [];
 
-  // Group services by category
-  const hairServices = services.filter(s => s.category === 'hair');
-  const beardServices = services.filter(s => s.category === 'beard');
+  // Group services by category, excluding signature services from regular categories
   const signatureServices = services.filter(s => s.isSignature);
+  const hairServices = services.filter(s => s.category === 'hair' && !s.isSignature);
+  const beardServices = services.filter(s => s.category === 'beard' && !s.isSignature);
 </script>
 
 <section id="services" class="py-section bg-surface-low">
   <div class="max-w-[1200px] mx-auto px-6 md:px-8">
     <div class="text-center mb-16 md:mb-24">
-      <span use:reveal class="font-body text-label text-gold-500 block mb-4">ONZE BEHANDELINGEN</span>
+      <span use:reveal class="font-body text-label text-gold-500 block mb-4 revealed">ONZE BEHANDELINGEN</span>
       <h2 use:reveal={{ delay: 1 }} class="font-display text-heading text-bone">Vakwerk Met Precisie</h2>
       <div use:reveal={{ delay: 2 }} class="section-divider mx-auto mt-6"></div>
     </div>
