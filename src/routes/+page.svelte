@@ -24,8 +24,8 @@
     {
       href: '/services',
       label: 'Behandelingen',
-      title: 'Voor jong en oud',
-      description: 'Van klassieke kapsels tot een prachtige baard. Ontdek onze behandelingen.',
+      title: 'Waar traditie en stijl samenkomen',
+      description: 'Echte aandacht voor jouw look, van begin tot eind.',
       icon: '&#9986;'
     },
     {
@@ -46,7 +46,7 @@
 </script>
 
 <svelte:head>
-  <title>Cyrus Kapsalon — Perfecte Sneden, Timeless Style</title>
+  <title>Cyrus Kapsalon - Precision Cuts, Timeless Style</title>
   <meta name="description" content="Cyrus Kapsalon — Vakwerk sinds 1994. Boek een afspraak voor haarsneden, skin fades, warme scheerbeurt en exclusieve grooming services." />
 </svelte:head>
 
@@ -57,7 +57,7 @@
   <div class="max-w-[1200px] mx-auto px-6 md:px-8 text-center">
     <div use:reveal class="section-divider mx-auto mb-8"></div>
     <p use:reveal={{ delay: 1 }} class="font-display text-subheading text-bone-warm italic mb-4">
-      Vakwerk sinds 1994
+      Vakwerk sinds 2025
     </p>
     <p use:reveal={{ delay: 2 }} class="font-body text-body-lg text-bone-muted max-w-lg mx-auto" style="font-size: 1.125rem; line-height: 1.7; letter-spacing: 0.01em;">
       Een barbershop gericht op vakmanschap, authenticiteit en het principe dat elke kapsel telt.

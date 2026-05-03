@@ -212,6 +212,37 @@ body {
 .mobile-menu a:nth-child(5) { transition-delay: 0.3s; }
 .mobile-menu a:hover { color: #D4AF37; }
 
+/* ── Mobile Menu Close Button ── */
+.mobile-menu-close {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  z-index: 1000;
+}
+.mobile-menu-close span {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: #e2e2e2;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), width 0.3s;
+}
+.mobile-menu-close span:nth-child(1) {
+  transform: rotate(45deg) translate(3px, 3px);
+}
+.mobile-menu-close span:nth-child(2) {
+  transform: rotate(-45deg) translate(3px, -3px);
+}
+.mobile-menu-close:hover span {
+  background: #D4AF37;
+}
+
 /* ── Hamburger ── */
 .hamburger span {
   display: block;
