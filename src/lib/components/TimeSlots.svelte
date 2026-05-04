@@ -5,18 +5,22 @@
     slots?: { time: string; unavailable?: boolean }[];
   }
 
-  let { selectedTime = '', selectTime, slots = [
-    { time: '09:00 AM' },
-    { time: '10:00 AM' },
-    { time: '11:00 AM' },
-    { time: '12:00 PM' },
-    { time: '01:00 PM' },
-    { time: '02:00 PM' },
-    { time: '03:00 PM' },
-    { time: '04:00 PM' },
-    { time: '05:00 PM' },
-    { time: '06:00 PM', unavailable: true }
-  ];
+  let {
+    selectedTime = '',
+    selectTime,
+    slots = [
+      { time: '09:00' },
+      { time: '10:00' },
+      { time: '11:00' },
+      { time: '12:00' },
+      { time: '13:00' },
+      { time: '14:00' },
+      { time: '15:00' },
+      { time: '16:00' },
+      { time: '17:00' },
+      { time: '18:00', unavailable: true }
+    ]
+  } = $props<Props>();
 </script>
 
 <div>
