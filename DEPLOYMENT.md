@@ -26,8 +26,8 @@ Ga in de Vercel dashboard naar je project → Settings → Environment Variables
 |----------|-------------|---------|
 | `DATABASE_URL` | MySQL connection string | `mysql://user:pass@host:3306/cyrus` |
 | `SESSION_SECRET` | Random string (min. 32 chars) | `x8K#2mP9$vL5nQ7wR3tY6uI0oA4sD8fG2` |
-| `MASTER_EMAIL` | Admin login email | `admin@cyrusbarber.com` |
-| `MASTER_PASSWORD` | Admin login password | `YourSecurePassword123!` |
+| `OWNER_EMAIL` | Admin login email | `admin@cyrusbarber.com` |
+| `OWNER_PASSWORD` | Admin login password | `YourSecurePassword123!` |
 | `PUBLIC_SITE_URL` | Your Vercel URL | `https://cyrus-barbershop.vercel.app` |
 
 **Let op:** Deze variabelen moeten zowel voor **Production** als **Preview** worden ingesteld.
@@ -48,14 +48,14 @@ git push origin main
 
 Het deployment script runt automatisch:
 1. `npm run db:migrate` - Database migrations
-2. `npm run db:seed` - Initiële data (services, opening hours, master user)
+2. `npm run db:seed` - Initiële data (services, opening hours, beheer user)
 3. `npm run build` - SvelteKit build
 
 ### Stap 4: Controleren
 
 Na deployment:
 1. Ga naar je Vercel URL
-2. Log in met de master credentials op `/admin/login`
+2. Log in met de beheer credentials op `/admin/login`
 3. Change het wachtwoord na de eerste login!
 
 ## Lokaal Ontwikkelen

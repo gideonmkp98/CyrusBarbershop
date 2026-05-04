@@ -399,7 +399,7 @@
         },
         "role": {
           "name": "role",
-          "type": "enum('master','staff')",
+          "type": "enum('owner','manager','staff')",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,

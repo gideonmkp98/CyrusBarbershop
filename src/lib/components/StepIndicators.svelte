@@ -1,6 +1,11 @@
 <script lang="ts">
   import { reveal } from '$lib/actions/reveal';
-  export let currentStep: number;
+
+  interface Props {
+    currentStep: number;
+  }
+
+  let { currentStep } = $props<Props>();
 </script>
 
 <div use:reveal={{ delay: 3 }} class="flex items-center gap-6 mb-12">

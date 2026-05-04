@@ -34,7 +34,15 @@
       "Bash(Select-String -Pattern \"error|Error\" -CaseSensitive)",
       "Bash(timeout 2)",
       "PowerShell(Stop-Process *)",
-      "Bash(Select-Object -Last 20)"
+      "Bash(Select-Object -Last 20)",
+      "Bash(Write-Host \"--- Checking server logs ---\")",
+      "Bash(Select-Object -Last 10)",
+      "Bash(mysql *)",
+      "Bash(Remove-Item -Force \"drizzle\\\\0001_change_master_to_beheer.sql\" -ErrorAction SilentlyContinue)",
+      "Bash(Remove-Item -Force \"drizzle\\\\0002_add_is_owner_column.sql\" -ErrorAction SilentlyContinue)",
+      "Bash(Select-String -Pattern \"error|Error|500\" -Context 2)",
+      "Bash(npx tsc *)",
+      "Bash(curl -s http://localhost:5176/admin/profile)"
     ]
   }
 }

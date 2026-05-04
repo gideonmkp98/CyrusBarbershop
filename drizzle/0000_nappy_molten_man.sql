@@ -61,7 +61,7 @@ CREATE TABLE `users` (
 	`email` varchar(255) NOT NULL,
 	`password_hash` varchar(255) NOT NULL,
 	`display_name` varchar(100) NOT NULL,
-	`role` enum('master','staff') NOT NULL DEFAULT 'staff',
+	`role` enum('owner','manager','staff') NOT NULL DEFAULT 'staff',
 	`is_active` boolean NOT NULL DEFAULT true,
 	`created_at` timestamp NOT NULL DEFAULT (now()),
 	CONSTRAINT `users_id` PRIMARY KEY(`id`),

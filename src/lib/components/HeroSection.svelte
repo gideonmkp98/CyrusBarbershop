@@ -1,8 +1,12 @@
 <script lang="ts">
   import { reveal } from '$lib/actions/reveal';
 
-  export let heroRevealed: boolean = false;
-  export let heroOffset: number = 0;
+  interface Props {
+    heroRevealed?: boolean;
+    heroOffset?: number;
+  }
+
+  let { heroRevealed = false, heroOffset = 0 } = $props<Props>();
 
   const heroTitleText: string = 'CYRUS BARBERSHOP';
   const heroChars: string[] = [...heroTitleText];

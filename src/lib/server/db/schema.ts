@@ -48,7 +48,7 @@ export const users = mysqlTable('users', {
   email: varchar('email', { length: 255 }).notNull().unique(),
   passwordHash: varchar('password_hash', { length: 255 }).notNull(),
   displayName: varchar('display_name', { length: 100 }).notNull(),
-  role: mysqlEnum('role', ['master', 'staff']).notNull().default('staff'),
+  role: mysqlEnum('role', ['owner', 'manager', 'staff']).notNull().default('staff'),
   isActive: boolean('is_active').notNull().default(true),
   createdAt: timestamp('created_at').notNull().defaultNow()
 });

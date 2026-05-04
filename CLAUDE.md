@@ -53,9 +53,9 @@ npm run db:seed      # Seed database with initial data
 - `appointments` - Bookings with service, date, timeSlot, client info, status
 - `opening_hours` - Business hours by day of week
 - `blocked_times` - Unavailable time slots
-- `users` - Admin/staff accounts with role (master/staff)
+- `users` - Admin/staff accounts with role (owner/manager/staff)
 - `sessions` - Auth tokens with expiry
 
 ### Environment Variables
 
-Required: `DATABASE_URL`, `SESSION_SECRET`, `MASTER_EMAIL`, `MASTER_PASSWORD`, `PUBLIC_SITE_URL`
+Required: `DATABASE_URL`, `SESSION_SECRET`, `OWNER_EMAIL`, `OWNER_PASSWORD`, `PUBLIC_SITE_URL`

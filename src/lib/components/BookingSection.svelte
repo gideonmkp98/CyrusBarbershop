@@ -15,21 +15,27 @@
     duration: number;
     description: string | null;
     isSignature: boolean;
+    category?: string;
   }
 
   let { services }: { services: ServiceData[] | undefined } = $props();
 
   // Default services matching original HTML when none provided
   const defaultServices: ServiceData[] = [
-    { id: 1, name: 'Haarknippen', price: '35', duration: 45, description: 'Een vakkundige snit op maat. Schaarwerk, tondeuse en styling. Inclusief wassen en föhnen.', isSignature: false },
-    { id: 2, name: 'Fade', price: '45', duration: 60, description: 'Vloeiende overgang van huid naar haar. Verschillende fademogelijkheden met scheermesafwerking.', isSignature: false },
-    { id: 3, name: 'De Klassieke', price: '45', duration: 50, description: 'Gerespecteerd klassiek werk. Hals netjes afgewerkt met warme handdoek. De standaard.', isSignature: false },
-    { id: 4, name: 'Baardtrim &amp; Vorm', price: '25', duration: 30, description: 'Vakkundig trimmen en vormen naar je gezichtsstructuur. Afgewerkt met premium baardolie.', isSignature: false },
-    { id: 5, name: 'Warme Scheerbeurt', price: '40', duration: 45, description: 'Klassieke scheerervaring. Stoom, zeep en scheermeswerk met de nodige finesse.', isSignature: false },
-    { id: 6, name: 'The Works', price: '75', duration: 90, description: 'Het volledige Cyrus-programma. Premium haarknippen of fade, baardwerk en gezichtsmassage', isSignature: true }
+    { id: 1, name: 'Haarknippen', price: '35', duration: 45, description: 'Een vakkundige snit op maat. Schaarwerk, tondeuse en styling. Inclusief wassen en föhnen.', isSignature: false, category: 'hair' },
+    { id: 2, name: 'Fade', price: '45', duration: 60, description: 'Vloeiende overgang van huid naar haar. Verschillende fademogelijkheden met scheermesafwerking.', isSignature: false, category: 'hair' },
+    { id: 3, name: 'De Klassieke', price: '45', duration: 50, description: 'Gerespecteerd klassiek werk. Hals netjes afgewerkt met warme handdoek. De standaard.', isSignature: false, category: 'hair' },
+    { id: 4, name: 'Baardtrim &amp; Vorm', price: '25', duration: 30, description: 'Vakkundig trimmen en vormen naar je gezichtsstructuur. Afgewerkt met premium baardolie.', isSignature: false, category: 'beard' },
+    { id: 5, name: 'Warme Scheerbeurt', price: '40', duration: 45, description: 'Klassieke scheerervaring. Stoom, zeep en scheermeswerk met de nodige finesse.', isSignature: false, category: 'beard' },
+    { id: 6, name: 'The Works', price: '75', duration: 90, description: 'Het volledige Cyrus-programma. Premium haarknippen of fade, baardwerk en gezichtsmassage', isSignature: true, category: 'signature' }
   ];
 
   const servicesList = $derived(services && services.length > 0 ? services : defaultServices);
+
+  // Group services by category
+  const signatureServices = servicesList.filter(s => s.isSignature);
+  const hairServices = servicesList.filter(s => s.category === 'hair' && !s.isSignature);
+  const beardServices = servicesList.filter(s => s.category === 'beard' && !s.isSignature);
 
   let currentStep = $state(1);
   let selectedServiceId = $state(0);
@@ -169,9 +175,7 @@
 
   function formatSlotTime(time: string): string {
     const [h, m] = time.split(':').map(Number);
-    const period = h >= 12 ? 'PM' : 'AM';
-    const displayH = h === 0 ? 12 : h > 12 ? h - 12 : h;
-    return `${String(displayH).padStart(2, '0')}:${String(m).padStart(2, '0')} ${period}`;
+    return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
   }
 </script>
 
@@ -193,17 +197,70 @@
         {#if currentStep === 1}
           <div class="booking-step" style="animation: fadeStep 0.5s ease-out">
             <h3 use:reveal class="font-display text-subheading text-bone uppercase tracking-tight mb-8">Kies Behandeling</h3>
-            <div class="space-y-2">
-              {#each servicesList as svc, i}
-                <ServiceItem
-                  name={svc.name}
-                  price={Number(svc.price)}
-                  description={svc.description || undefined}
-                  selected={selectedService === svc.name}
-                  signature={svc.isSignature}
-                  revealOpts={{ delay: i + 1 }}
-                  onclick={() => selectService(svc.id, svc.name, Number(svc.price))}
-                />
+            <div class="space-y-12">
+              <!-- Hair Services -->
+              {#if hairServices.length > 0}
+                <div>
+                  <h4 use:reveal class="font-body text-label text-bone-muted uppercase tracking-[0.2em] mb-6 flex items-center gap-3">
+                    <span class="h-px bg-bone-muted/20 flex-grow"></span>
+                    <span>Haarwerk</span>
+                    <span class="h-px bg-bone-muted/20 flex-grow"></span>
+                  </h4>
+                  <div class="space-y-2">
+                    {#each hairServices as svc, i}
+                      <ServiceItem
+                        name={svc.name}
+                        price={Number(svc.price)}
+                        description={svc.description || undefined}
+                        selected={selectedService === svc.name}
+                        signature={svc.isSignature}
+                        revealOpts={{ delay: i + 1 }}
+                        onclick={() => selectService(svc.id, svc.name, Number(svc.price))}
+                      />
+                    {/each}
+                  </div>
+                </div>
+              {/if}
+
+              <!-- Beard Services -->
+              {#if beardServices.length > 0}
+                <div>
+                  <h4 use:reveal class="font-body text-label text-bone-muted uppercase tracking-[0.2em] mb-6 flex items-center gap-3">
+                    <span class="h-px bg-bone-muted/20 flex-grow"></span>
+                    <span>Baardverzorging</span>
+                    <span class="h-px bg-bone-muted/20 flex-grow"></span>
+                  </h4>
+                  <div class="space-y-2">
+                    {#each beardServices as svc, i}
+                      <ServiceItem
+                        name={svc.name}
+                        price={Number(svc.price)}
+                        description={svc.description || undefined}
+                        selected={selectedService === svc.name}
+                        signature={svc.isSignature}
+                        revealOpts={{ delay: i + 1 }}
+                        onclick={() => selectService(svc.id, svc.name, Number(svc.price))}
+                      />
+                    {/each}
+                  </div>
+                </div>
+              {/if}
+
+              <!-- Signature Services -->
+              {#each signatureServices as svc}
+                <div use:reveal class="bg-surface-base p-6 md:p-8 relative overflow-hidden border border-gold-500/20">
+                  <div class="absolute -top-8 -right-8 text-[6rem] text-gold-500/5 font-display leading-none select-none">&#9733;</div>
+                  <span class="font-body text-label text-gold-500 block mb-4 tracking-[0.2em]">COMPLEET PAKKET</span>
+                  <ServiceItem
+                    name={svc.name}
+                    price={Number(svc.price)}
+                    description={svc.description || undefined}
+                    selected={selectedService === svc.name}
+                    signature={true}
+                    revealOpts={{ delay: 1 }}
+                    onclick={() => selectService(svc.id, svc.name, Number(svc.price))}
+                  />
+                </div>
               {/each}
             </div>
           </div>

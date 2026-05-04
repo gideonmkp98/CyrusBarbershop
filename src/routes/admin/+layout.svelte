@@ -3,7 +3,7 @@
   import { goto } from '$app/navigation';
   import { showGlobalNav, showGlobalFooter } from '$lib/stores/layout';
 
-  let { children } = $props();
+  let { children, data } = $props();
 
   // Hide global navbar/footer on admin routes
   $effect(() => {
@@ -18,7 +18,12 @@
   const navItems = [
     { href: '/admin', label: 'Dashboard' },
     { href: '/admin/appointments', label: 'Afspraken' },
-    { href: '/admin/users', label: 'Gebruikers' }
+    { href: '/admin/users', label: 'Gebruikers' },
+    { href: '/admin/opening-hours', label: 'Openingstijden' }
+  ];
+
+  const accountNavItems = [
+    { href: '/admin/profile', label: 'Mijn Profiel' }
   ];
 
   async function logout() {
@@ -45,6 +50,20 @@
         >{item.label}</a>
       {/each}
     </nav>
+
+    <!-- Account section -->
+    <div class="p-4 border-t border-white/5">
+      <div class="mb-3 px-4">
+        <span class="block text-xs font-body text-bone-muted uppercase tracking-wider">Account</span>
+        <span class="block text-sm font-body text-bone">{data.user.displayName}</span>
+      </div>
+      {#each accountNavItems as item}
+        <a
+          href={item.href}
+          class="block px-4 py-3 text-sm font-body transition-colors {page.url.pathname === item.href ? 'bg-gold-500/10 text-gold-500' : 'text-bone-muted hover:text-bone hover:bg-white/5'}"
+        >{item.label}</a>
+      {/each}
+    </div>
 
     <div class="p-4 border-t border-white/5">
       <button onclick={logout} class="block w-full text-left px-4 py-3 text-sm font-body text-bone-muted hover:text-bone hover:bg-white/5 transition-colors">

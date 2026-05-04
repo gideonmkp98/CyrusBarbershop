@@ -1,6 +1,10 @@
 <script lang="ts">
-  export let show: boolean;
-  export let onClose: () => void;
+  interface Props {
+    show: boolean;
+    onClose: () => void;
+  }
+
+  let { show, onClose } = $props<Props>();
 </script>
 
 {#if show}

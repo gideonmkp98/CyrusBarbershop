@@ -1,12 +1,16 @@
 <script lang="ts">
-  export let type: string = 'text';
-  export let id: string = '';
-  export let label: string = '';
-  export let value: string = '';
-  export let required: boolean = false;
-  export let rows: number | undefined = undefined;
-  export let placeholder: string = ' ';
-  export let cls: string = '';
+  interface Props {
+    type?: string;
+    id?: string;
+    label?: string;
+    value?: string;
+    required?: boolean;
+    rows?: number;
+    placeholder?: string;
+    cls?: string;
+  }
+
+  let { type = 'text', id = '', label = '', value = '', required = false, rows = undefined, placeholder = ' ', cls = '' } = $props<Props>();
 </script>
 
 <div class="field-group {cls}">

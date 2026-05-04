@@ -1,12 +1,17 @@
 <script lang="ts">
   import { reveal, type RevealOptions } from '$lib/actions/reveal';
-  export let name: string;
-  export let price: number;
-  export let description: string | undefined = undefined;
-  export let selected: boolean = false;
-  export let revealOpts: RevealOptions | undefined = undefined;
-  export let signature: boolean = false;
-  export let onclick: (() => void) | undefined = undefined;
+
+  interface Props {
+    name: string;
+    price: number;
+    description?: string;
+    selected?: boolean;
+    revealOpts?: RevealOptions;
+    signature?: boolean;
+    onclick?: () => void;
+  }
+
+  let { name, price, description = undefined, selected = false, revealOpts = undefined, signature = false, onclick = undefined } = $props<Props>();
 </script>
 
 {#if onclick}
@@ -21,7 +26,7 @@
         <div class="flex items-end">
           <h4 class="font-display text-subheading text-bone group-hover:text-gold-400 transition-colors">{name}</h4>
           <div class="leader"></div>
-          <span class="font-display text-subheading text-gold-500">${price}</span>
+          <span class="font-display text-subheading text-gold-500">€{price}</span>
         </div>
         {#if description}
           <p class="text-bone-warm text-sm max-w-lg mt-1">{description}</p>
@@ -41,7 +46,7 @@
         <div class="flex items-end">
           <h4 class="font-display text-subheading text-bone group-hover:text-gold-400 transition-colors">{name}</h4>
           <div class="leader"></div>
-          <span class="font-display text-subheading text-gold-500">${price}</span>
+          <span class="font-display text-subheading text-gold-500">€{price}</span>
         </div>
       </div>
     </div>

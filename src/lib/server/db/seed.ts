@@ -13,9 +13,9 @@ async function hashPassword(plain: string): Promise<string> {
 }
 
 async function seed() {
-  const MASTER_EMAIL = process.env.MASTER_EMAIL || 'admin@cyrusbarber.com';
-  const MASTER_PASSWORD = process.env.MASTER_PASSWORD || 'Admin123!';
-  const MASTER_DISPLAY_NAME = process.env.MASTER_DISPLAY_NAME || 'Master Barber';
+  const OWNER_EMAIL = process.env.OWNER_EMAIL || process.env.MASTER_EMAIL || 'admin@cyrusbarber.com';
+  const OWNER_PASSWORD = process.env.OWNER_PASSWORD || process.env.MASTER_PASSWORD || 'Admin123!';
+  const OWNER_DISPLAY_NAME = process.env.OWNER_DISPLAY_NAME || process.env.MASTER_DISPLAY_NAME || 'Owner';
 
   const DATABASE_URL = process.env.DATABASE_URL;
   if (!DATABASE_URL) {
@@ -59,29 +59,29 @@ async function seed() {
 
   console.log('✓ Opening hours seeded');
 
-  // Master admin - check if exists first, then create or update
-  const existingMaster = await db.select().from(users).where(eq(users.email, MASTER_EMAIL)).limit(1);
+  // Owner admin - check if exists first, then create or update
+  const existingOwner = await db.select().from(users).where(eq(users.email, OWNER_EMAIL)).limit(1);
 
-  if (existingMaster.length > 0) {
-    console.log(`✓ Master account already exists: ${MASTER_EMAIL}`);
+  if (existingOwner.length > 0) {
+    console.log(`✓ Owner account already exists: ${OWNER_EMAIL}`);
   } else {
-    const passwordHash = await hashPassword(MASTER_PASSWORD);
+    const passwordHash = await hashPassword(OWNER_PASSWORD);
     await db.insert(users).values({
-      email: MASTER_EMAIL,
+      email: OWNER_EMAIL,
       passwordHash,
-      displayName: MASTER_DISPLAY_NAME,
-      role: 'master'
+      displayName: OWNER_DISPLAY_NAME,
+      role: 'owner'
     });
-    console.log(`✓ Master account created: ${MASTER_EMAIL}`);
+    console.log(`✓ Owner account created: ${OWNER_EMAIL}`);
   }
 
   // Close connection
   await connection.end();
 
   console.log('\nSeed complete!');
-  console.log(`\nMaster Login Credentials:`);
-  console.log(`  Email: ${MASTER_EMAIL}`);
-  console.log(`  Password: ${MASTER_PASSWORD}`);
+  console.log(`\nOwner Login Credentials:`);
+  console.log(`  Email: ${OWNER_EMAIL}`);
+  console.log(`  Password: ${OWNER_PASSWORD}`);
   console.log(`\n⚠️  Change the password after first login!`);
 }
 

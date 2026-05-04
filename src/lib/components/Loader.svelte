@@ -1,8 +1,12 @@
 <script lang="ts">
   import { onMount } from 'svelte';
 
-  export let loaderHidden: boolean = false;
-  export let onReady: (() => void) | undefined = undefined;
+  interface Props {
+    loaderHidden?: boolean;
+    onReady?: () => void;
+  }
+
+  let { loaderHidden = false, onReady = undefined } = $props<Props>();
 
   onMount(() => {
     setTimeout(() => {

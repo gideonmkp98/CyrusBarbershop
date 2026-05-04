@@ -15,7 +15,11 @@
     isActive: boolean;
   }
 
-  export let services: Service[] = [];
+  interface Props {
+    services?: Service[];
+  }
+
+  let { services = [] } = $props<Props>();
 
   // Group services by category, excluding signature services from regular categories
   const signatureServices = services.filter(s => s.isSignature);

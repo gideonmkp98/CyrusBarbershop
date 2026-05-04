@@ -17,9 +17,9 @@ function defineSchema(db) {
 
 async function seed() {
   const DATABASE_URL = process.env.DATABASE_URL;
-  const MASTER_EMAIL = process.env.MASTER_EMAIL || 'admin@cyrusbarber.com';
-  const MASTER_PASSWORD = process.env.MASTER_PASSWORD || 'Admin123!';
-  const MASTER_DISPLAY_NAME = process.env.MASTER_DISPLAY_NAME || 'Master Barber';
+  const OWNER_EMAIL = process.env.OWNER_EMAIL || process.env.MASTER_EMAIL || 'admin@cyrusbarber.com';
+  const OWNER_PASSWORD = process.env.OWNER_PASSWORD || process.env.MASTER_PASSWORD || 'Admin123!';
+  const OWNER_DISPLAY_NAME = process.env.OWNER_DISPLAY_NAME || process.env.MASTER_DISPLAY_NAME || 'Owner';
 
   console.log('Connecting to database...');
   const connection = await mysql.createPool(DATABASE_URL);
@@ -62,26 +62,26 @@ async function seed() {
     console.log('⚠️  Opening hours may already exist');
   }
 
-  // Master admin - check if exists first
-  const [existing] = await db.execute('SELECT id FROM users WHERE email = ?', [MASTER_EMAIL]);
+  // Owner admin - check if exists first
+  const [existing] = await db.execute('SELECT id FROM users WHERE email = ?', [OWNER_EMAIL]);
 
   if (existing.length > 0) {
-    console.log(`✓ Master account already exists: ${MASTER_EMAIL}`);
+    console.log(`✓ Owner account already exists: ${OWNER_EMAIL}`);
   } else {
-    const passwordHash = hashSync(MASTER_PASSWORD, 10);
+    const passwordHash = hashSync(OWNER_PASSWORD, 10);
     await db.execute(
       'INSERT INTO users (email, password_hash, display_name, role) VALUES (?, ?, ?, ?)',
-      [MASTER_EMAIL, passwordHash, MASTER_DISPLAY_NAME, 'master']
+      [OWNER_EMAIL, passwordHash, OWNER_DISPLAY_NAME, 'owner']
     );
-    console.log(`✓ Master account created: ${MASTER_EMAIL}`);
+    console.log(`✓ Owner account created: ${OWNER_EMAIL}`);
   }
 
   await connection.end();
 
   console.log('\n✅ Seed complete!');
-  console.log(`\nMaster Login Credentials:`);
-  console.log(`  Email: ${MASTER_EMAIL}`);
-  console.log(`  Password: ${MASTER_PASSWORD}`);
+  console.log(`\nOwner Login Credentials:`);
+  console.log(`  Email: ${OWNER_EMAIL}`);
+  console.log(`  Password: ${OWNER_PASSWORD}`);
   console.log(`\n⚠️  Change the password after first login!`);
 }
 

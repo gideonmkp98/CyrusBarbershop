@@ -1,7 +1,11 @@
 <script lang="ts">
-  export let selectedTime: string = '';
-  export let selectTime: (time: string) => void;
-  export let slots: { time: string; unavailable?: boolean }[] = [
+  interface Props {
+    selectedTime?: string;
+    selectTime: (time: string) => void;
+    slots?: { time: string; unavailable?: boolean }[];
+  }
+
+  let { selectedTime = '', selectTime, slots = [
     { time: '09:00 AM' },
     { time: '10:00 AM' },
     { time: '11:00 AM' },

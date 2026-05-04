@@ -1,8 +1,12 @@
 <script lang="ts">
-  export let href: string | undefined = undefined;
-  export let type: 'button' | 'submit' = 'button';
-  export let disabled: boolean = false;
-  export let cls: string = '';
+  interface Props {
+    href?: string;
+    type?: 'button' | 'submit';
+    disabled?: boolean;
+    cls?: string;
+  }
+
+  let { href = undefined, type = 'button', disabled = false, cls = '' } = $props<Props>();
 </script>
 
 {#if href}

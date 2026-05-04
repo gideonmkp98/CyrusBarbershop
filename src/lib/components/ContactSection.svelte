@@ -2,14 +2,91 @@
   import { reveal } from '$lib/actions/reveal';
   import FieldGroup from './FieldGroup.svelte';
 
-  export let onSubmit: (e: Event) => void;
-  export const onNewsletterSubmit: (e: Event) => void = () => {};
+  interface Props {
+    onSubmit?: (e: Event) => void;
+    onNewsletterSubmit?: (e: Event) => void;
+  }
+
+  let { onSubmit = (e: Event) => {}, onNewsletterSubmit = (e: Event) => {} } = $props<Props>();
 
   let cName: string = '';
   let cEmail: string = '';
   let cMessage: string = '';
   let submitting: boolean = false;
   let submitted: boolean = false;
+
+  // Opening hours state
+  type OpeningHour = {
+    id: number;
+    dayOfWeek: number;
+    openTime: string;
+    closeTime: string;
+    isActive: boolean;
+  };
+
+  let openingHours = $state<OpeningHour[]>([]);
+  let hoursLoaded = $state(false);
+
+  // Fetch opening hours on mount
+  $effect(() => {
+    async function fetchHours() {
+      if (hoursLoaded) return;
+      try {
+        const res = await fetch('/api/opening-hours');
+        if (res.ok) {
+          const data = await res.json();
+          openingHours = data.hours || [];
+          hoursLoaded = true;
+        }
+      } catch (e) {
+        console.error('Failed to fetch opening hours:', e);
+        hoursLoaded = true;
+      }
+    }
+    fetchHours();
+  });
+
+  // Group hours by weekday/weekend
+  function getHoursDisplay() {
+    const activeHours = openingHours.filter((h) => h.isActive);
+
+    const weekdayHours = activeHours.filter((h) => h.dayOfWeek >= 1 && h.dayOfWeek <= 5);
+    const saturdayHours = activeHours.filter((h) => h.dayOfWeek === 6);
+    const sundayHours = activeHours.filter((h) => h.dayOfWeek === 7);
+
+    // Helper to format time (remove seconds if present)
+    const formatTime = (time: string) => {
+      if (!time) return '';
+      // Remove seconds if present (HH:MM:SS -> HH:MM)
+      return time.split(':').slice(0, 2).join(':');
+    };
+
+    const formatTimeRange = (hours: OpeningHour[]) => {
+      if (hours.length === 0) return { text: 'Gesloten', class: 'text-bone-muted' };
+
+      const allSame = hours.every(
+        (h) => h.openTime === hours[0].openTime && h.closeTime === hours[0].closeTime
+      );
+
+      if (allSame) {
+        const open = formatTime(hours[0].openTime);
+        const close = formatTime(hours[0].closeTime);
+        return { text: `${open} – ${close} uur`, class: 'text-bone' };
+      }
+
+      // Multiple time ranges - show earliest to latest
+      const times = hours.map((h) => ({ open: formatTime(h.openTime), close: formatTime(h.closeTime) }));
+      return { text: `${times[0].open} – ${times[times.length - 1].close} uur`, class: 'text-bone' };
+    };
+
+    return {
+      weekday: formatTimeRange(weekdayHours),
+      saturday: formatTimeRange(saturdayHours),
+      sunday: formatTimeRange(sundayHours)
+    };
+  }
+
+  let hoursDisplay = $derived(getHoursDisplay());
 
   async function handleSubmit(e: Event) {
     e.preventDefault();
@@ -82,15 +159,15 @@
           <div class="space-y-5">
             <div class="flex justify-between items-end font-body text-label uppercase">
               <span class="flex items-center w-full">Maandag &ndash; Vrijdag<div class="leader"></div></span>
-              <span class="whitespace-nowrap text-bone">9:00 &ndash; 20:00 uur</span>
+              <span class="whitespace-nowrap {hoursDisplay.weekday.class}">{hoursDisplay.weekday.text}</span>
             </div>
             <div class="flex justify-between items-end font-body text-label uppercase">
               <span class="flex items-center w-full">Zaterdag<div class="leader"></div></span>
-              <span class="whitespace-nowrap text-bone">10:00 &ndash; 18:00 uur</span>
+              <span class="whitespace-nowrap {hoursDisplay.saturday.class}">{hoursDisplay.saturday.text}</span>
             </div>
             <div class="flex justify-between items-end font-body text-label uppercase">
               <span class="flex items-center w-full">Zondag<div class="leader"></div></span>
-              <span class="whitespace-nowrap text-bone-muted">Gesloten</span>
+              <span class="whitespace-nowrap {hoursDisplay.sunday.class}">{hoursDisplay.sunday.text}</span>
             </div>
           </div>
         </div>

@@ -35,7 +35,13 @@ export async function validateSession(token: string) {
   const { user, session } = result[0];
   if (!user.isActive) return null;
 
-  return user;
+  return {
+    id: user.id,
+    email: user.email,
+    displayName: user.displayName,
+    role: user.role,
+    isActive: user.isActive
+  };
 }
 
 export async function deleteSession(token: string): Promise<void> {
