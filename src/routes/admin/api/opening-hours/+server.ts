@@ -32,8 +32,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   const { dayOfWeek, openTime, closeTime, isActive } = body;
 
   // Validation
-  if (dayOfWeek === undefined || openTime === undefined || closeTime === undefined) {
-    return new Response(JSON.stringify({ error: 'Ontbrekende velden' }), {
+  if (dayOfWeek === undefined) {
+    return new Response(JSON.stringify({ error: 'Ontbrekende dag' }), {
       status: 400,
       headers: { 'Content-Type': 'application/json' }
     });
@@ -46,21 +46,37 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     });
   }
 
-  // Validate time format (HH:MM)
-  const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
-  if (!timeRegex.test(openTime) || !timeRegex.test(closeTime)) {
-    return new Response(JSON.stringify({ error: 'Ongeldig tijdformaat. Gebruik HH:MM' }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json' }
-    });
-  }
+  // If day is closed, use placeholder times
+  let finalOpenTime = openTime;
+  let finalCloseTime = closeTime;
 
-  // Validate closeTime is after openTime (no overnight hours)
-  if (closeTime <= openTime) {
-    return new Response(JSON.stringify({ error: 'Sluitingstijd moet na openingstijd liggen' }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json' }
-    });
+  if (isActive === false) {
+    finalOpenTime = '00:00';
+    finalCloseTime = '00:00';
+  } else {
+    // Only validate time format if day is active
+    if (openTime === undefined || closeTime === undefined) {
+      return new Response(JSON.stringify({ error: 'Ontbrekende tijdvelden' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+    if (!timeRegex.test(openTime) || !timeRegex.test(closeTime)) {
+      return new Response(JSON.stringify({ error: 'Ongeldig tijdformaat. Gebruik HH:MM' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Validate closeTime is after openTime
+    if (closeTime <= openTime) {
+      return new Response(JSON.stringify({ error: 'Sluitingstijd moet na openingstijd liggen' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
   }
 
   try {
@@ -75,11 +91,11 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       // Update existing entry
       await db
         .update(openingHours)
-        .set({ openTime, closeTime, isActive: isActive ?? true })
+        .set({ openTime: finalOpenTime, closeTime: finalCloseTime, isActive: isActive ?? true })
         .where(eq(openingHours.dayOfWeek, dayOfWeek));
     } else {
       // Create new entry
-      await db.insert(openingHours).values({ dayOfWeek, openTime, closeTime, isActive: isActive ?? true });
+      await db.insert(openingHours).values({ dayOfWeek, openTime: finalOpenTime, closeTime: finalCloseTime, isActive: isActive ?? true });
     }
 
     return new Response(JSON.stringify({ success: true }), {

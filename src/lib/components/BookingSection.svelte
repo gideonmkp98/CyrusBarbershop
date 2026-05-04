@@ -33,12 +33,12 @@
   const servicesList = $derived(services && services.length > 0 ? services : defaultServices);
 
   // Group services by category
-  const signatureServices = servicesList.filter(s => s.isSignature);
-  const hairServices = servicesList.filter(s => s.category === 'hair' && !s.isSignature);
-  const beardServices = servicesList.filter(s => s.category === 'beard' && !s.isSignature);
+  const signatureServices = $derived(servicesList.filter(s => s.isSignature));
+  const hairServices = $derived(servicesList.filter(s => s.category === 'hair' && !s.isSignature));
+  const beardServices = $derived(servicesList.filter(s => s.category === 'beard' && !s.isSignature));
 
   let currentStep = $state(1);
-  let selectedServiceId = $state(0);
+  let selectedServiceId = $state<number | null>(null);
   let selectedService = $state('');
   let selectedPrice = $state(0);
   let selectedDate = $state<Date | null>(null);
@@ -62,7 +62,7 @@
       : '─'
   );
   let summaryTime = $derived(selectedTime || '─');
-  let canConfirm = $derived(!!(selectedServiceId && selectedDate && selectedTime && clientName && clientEmail));
+  let canConfirm = $derived(!!(selectedServiceId && selectedDate && selectedTime && clientName && clientEmail && clientPhone));
 
   // Fetch availability when date changes
   $effect(() => {
@@ -139,7 +139,7 @@
           timeSlot: selectedTime,
           clientName,
           clientEmail,
-          clientPhone: clientPhone || undefined,
+          clientPhone,
           notes: clientNotes || undefined
         })
       });
@@ -162,7 +162,7 @@
   function closeSuccess() {
     showSuccess = false;
     currentStep = 1;
-    selectedServiceId = 0;
+    selectedServiceId = null;
     selectedService = '';
     selectedPrice = 0;
     selectedDate = null;
@@ -288,10 +288,10 @@
           <div class="booking-step" style="animation: fadeStep 0.5s ease-out">
             <h3 class="font-display text-subheading text-bone uppercase tracking-tight mb-8">Contact Gegevens</h3>
             <form class="grid md:grid-cols-2 gap-8" onsubmit={submitBooking}>
-              <FieldGroup id="bName" label="Volledige Naam" bind:value={clientName} required />
-              <FieldGroup type="email" id="bEmail" label="E-mailadres" bind:value={clientEmail} required />
-              <FieldGroup type="tel" id="bPhone" label="Telefoonnummer" bind:value={clientPhone} />
-              <FieldGroup id="bNotes" label="Speciale Opmerkingen" bind:value={clientNotes} />
+              <FieldGroup id="bName" label="Volledige Naam" value={clientName} onchange={(val) => clientName = val} required />
+              <FieldGroup type="email" id="bEmail" label="E-mailadres" value={clientEmail} onchange={(val) => clientEmail = val} required />
+              <FieldGroup type="tel" id="bPhone" label="Telefoonnummer" value={clientPhone} onchange={(val) => clientPhone = val} required />
+              <FieldGroup id="bNotes" label="Speciale Opmerkingen" value={clientNotes} onchange={(val) => clientNotes = val} rows={undefined} />
             </form>
           </div>
         {/if}

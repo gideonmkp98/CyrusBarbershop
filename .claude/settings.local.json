@@ -42,7 +42,9 @@
       "Bash(Remove-Item -Force \"drizzle\\\\0002_add_is_owner_column.sql\" -ErrorAction SilentlyContinue)",
       "Bash(Select-String -Pattern \"error|Error|500\" -Context 2)",
       "Bash(npx tsc *)",
-      "Bash(curl -s http://localhost:5176/admin/profile)"
+      "Bash(curl -s http://localhost:5176/admin/profile)",
+      "Bash(curl -s http://localhost:5174/booking)",
+      "Bash(curl *)"
     ]
   }
 }
