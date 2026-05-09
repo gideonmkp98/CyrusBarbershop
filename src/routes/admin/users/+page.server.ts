@@ -18,7 +18,8 @@ export const load: PageServerLoad = async ({ locals }) => {
     email: users.email,
     displayName: users.displayName,
     role: users.role,
-    isActive: users.isActive
+    isActive: users.isActive,
+    isBarber: users.isBarber
   }).from(users);
 
   return { canManageUsers, users: allUsers };

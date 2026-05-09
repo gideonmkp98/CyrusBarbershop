@@ -24,6 +24,14 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     });
   }
 
+  // Handle toggle isBarber
+  if (body.id !== undefined && body.isBarber !== undefined) {
+    await db.update(users).set({ isBarber: body.isBarber }).where(eq(users.id, body.id));
+    return new Response(JSON.stringify({ success: true }), {
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+
   // Handle role change
   if (body.id !== undefined && body.role !== undefined) {
     const userToChange = await db.select({ role: users.role }).from(users).where(eq(users.id, body.id)).limit(1);
@@ -93,10 +101,11 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   }
 
   const { email, password, displayName } = parsed.data;
+  const isBarber = body.isBarber === true;
 
   try {
     const passwordHash = await hashPassword(password);
-    const result = await db.insert(users).values({ email, passwordHash, displayName, role: 'staff' });
+    const result = await db.insert(users).values({ email, passwordHash, displayName, role: 'staff', isBarber });
 
     // Get the ID of the newly created user
     const createdUser = await db.select({ id: users.id }).from(users).where(eq(users.email, email)).limit(1);

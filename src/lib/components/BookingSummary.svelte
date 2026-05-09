@@ -1,6 +1,7 @@
 <script lang="ts">
   interface Props {
     summaryService: string;
+    summaryBarber: string;
     summaryDate: string;
     summaryTime: string;
     summaryTotal: string;
@@ -8,7 +9,7 @@
     onConfirm: () => void;
   }
 
-  let { summaryService, summaryDate, summaryTime, summaryTotal, canConfirm, onConfirm } = $props<Props>();
+  let { summaryService, summaryBarber, summaryDate, summaryTime, summaryTotal, canConfirm, onConfirm } = $props<Props>();
 </script>
 
 <div class="lg:sticky lg:top-32 bg-surface-base p-8 border border-gold-500/15">
@@ -17,6 +18,10 @@
     <div class="flex justify-between items-start">
       <span class="font-body text-label text-bone-muted">BEHANDELING</span>
       <span class="font-body text-body text-right">{summaryService}</span>
+    </div>
+    <div class="flex justify-between items-start">
+      <span class="font-body text-label text-bone-muted">KAPPER</span>
+      <span class="font-body text-body text-right">{summaryBarber}</span>
     </div>
     <div class="flex justify-between items-start">
       <span class="font-body text-label text-bone-muted">DATUM</span>

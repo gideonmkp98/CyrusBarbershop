@@ -1,5 +1,6 @@
 <script lang="ts">
   import { reveal } from '$lib/actions/reveal';
+  import { Scissors, Diamond } from 'lucide-svelte';
   import ServiceItem from './ServiceItem.svelte';
 
   interface Service {
@@ -44,15 +45,15 @@
           </p>
           <div class="space-y-5">
             <div class="flex items-center gap-4 group">
-              <span class="text-gold-500 text-2xl">&#9986;</span>
+              <Scissors class="text-gold-500 text-2xl" />
               <span class="font-body text-label text-bone-warm group-hover:text-gold-400 transition-colors">Perfecte Kapsels</span>
             </div>
             <div class="flex items-center gap-4 group">
-              <span class="text-gold-500 text-2xl">&#9671;</span>
+              <Diamond class="text-gold-500 text-2xl" />
               <span class="font-body text-label text-bone-warm group-hover:text-gold-400 transition-colors">Premium Producten</span>
             </div>
             <div class="flex items-center gap-4 group">
-              <span class="text-gold-500 text-2xl">&#9672;</span>
+              <Diamond class="text-gold-500 text-2xl" />
               <span class="font-body text-label text-bone-warm group-hover:text-gold-400 transition-colors">Ontspannen Atmosfeer</span>
             </div>
           </div>
@@ -110,7 +111,7 @@
         {#if signatureServices.length > 0}
           {#each signatureServices as service}
             <div use:reveal class="bg-surface-base p-8 md:p-12 relative overflow-hidden group">
-              <div class="absolute -top-12 -right-12 text-[8rem] text-gold-500/5 font-display leading-none select-none">&#9733;</div>
+              <Diamond class="absolute -top-12 -right-12 text-[8rem] text-gold-500/5" style="font-display: leading-none; user-select: none;" />
               <span class="font-body text-label text-gold-500 block mb-6 tracking-[0.3em]">COMPLEET PAKKET</span>
               <div class="flex items-end justify-between mb-6 relative z-10">
                 <h4 class="font-display text-heading text-bone italic">{service.name}</h4>

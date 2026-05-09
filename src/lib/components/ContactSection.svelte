@@ -1,5 +1,6 @@
 <script lang="ts">
   import { reveal } from '$lib/actions/reveal';
+  import { Phone, Mail, MapPin, Scissors } from 'lucide-svelte';
   import FieldGroup from './FieldGroup.svelte';
 
   interface Props {
@@ -127,7 +128,7 @@
         <div use:reveal class="space-y-8">
           <div class="flex gap-5 items-start">
             <div class="p-3 border border-gold-500/20 text-gold-500">
-              <span class="text-lg">&#9926;</span>
+              <Phone size={24} />
             </div>
             <div>
               <span class="block font-body text-label text-bone-muted mb-1">Telefoon</span>
@@ -136,7 +137,7 @@
           </div>
           <div class="flex gap-5 items-start">
             <div class="p-3 border border-gold-500/20 text-gold-500">
-              <span class="text-lg">&#9993;</span>
+              <Mail size={24} />
             </div>
             <div>
               <span class="block font-body text-label text-bone-muted mb-1">E-mail</span>
@@ -145,7 +146,7 @@
           </div>
           <div class="flex gap-5 items-start">
             <div class="p-3 border border-gold-500/20 text-gold-500">
-              <span class="text-lg">&#8982;</span>
+              <MapPin size={24} />
             </div>
             <div>
               <span class="block font-body text-label text-bone-muted mb-1">Locatie</span>
@@ -216,7 +217,7 @@
       </a>
       <!-- <a href="#" use:reveal={{ delay: 3 }} class="group flex flex-col items-center gap-3">
         <div class="w-14 h-14 rounded-full border border-bone-muted/20 flex items-center justify-center group-hover:border-gold-500 transition-colors">
-          <span class="text-bone-warm group-hover:text-gold-500 transition-colors text-lg">&#9986;</span>
+          <Scissors class="text-bone-warm group-hover:text-gold-500 transition-colors" size={24} />
         </div>
         <span class="font-body text-label text-bone-muted group-hover:text-gold-500 transition-colors">Journal</span>
       </a> -->

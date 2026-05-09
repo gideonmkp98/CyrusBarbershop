@@ -4,8 +4,12 @@ import { eq, desc, sql, and, gte, lte } from 'drizzle-orm';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async () => {
-  const today = new Date().toISOString().split('T')[0];
-  const weekFromNow = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+  // Format dates as YYYY-MM-DD using local date, not UTC
+  const todayDate = new Date();
+  const today = `${todayDate.getFullYear()}-${String(todayDate.getMonth() + 1).padStart(2, '0')}-${String(todayDate.getDate()).padStart(2, '0')}`;
+  
+  const weekFromNowDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+  const weekFromNow = `${weekFromNowDate.getFullYear()}-${String(weekFromNowDate.getMonth() + 1).padStart(2, '0')}-${String(weekFromNowDate.getDate()).padStart(2, '0')}`;
 
   const todayAppts = await db
     .select({

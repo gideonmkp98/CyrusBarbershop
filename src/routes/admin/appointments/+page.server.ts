@@ -1,5 +1,5 @@
 import { db } from '$lib/server/db/index';
-import { appointments, services } from '$lib/server/db/schema';
+import { appointments, services, users } from '$lib/server/db/schema';
 import { eq, desc } from 'drizzle-orm';
 import type { PageServerLoad, Actions } from './$types';
 
@@ -12,10 +12,12 @@ export const load: PageServerLoad = async () => {
       clientName: appointments.clientName,
       clientEmail: appointments.clientEmail,
       serviceName: services.name,
-      status: appointments.status
+      status: appointments.status,
+      barberName: users.displayName
     })
     .from(appointments)
     .innerJoin(services, eq(appointments.serviceId, services.id))
+    .leftJoin(users, eq(appointments.staffId, users.id))
     .orderBy(desc(appointments.date));
 
   return { appointments: result };

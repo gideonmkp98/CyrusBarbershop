@@ -2,6 +2,7 @@
   import { onMount } from 'svelte';
   import { reveal } from '$lib/actions/reveal';
   import HeroSection from '$lib/components/HeroSection.svelte';
+  import { Scissors, Calendar, MapPin } from 'lucide-svelte';
 
   let heroRevealed = false;
   let heroOffset = 0;
@@ -26,21 +27,21 @@
       label: 'BEHANDELINGEN',
       title: 'Waar traditie en stijl samenkomen',
       description: 'Echte aandacht voor jouw look, van begin tot eind.',
-      icon: '&#9986;'
+      icon: Scissors
     },
     {
       href: '/booking',
       label: 'RESERVEREN',
       title: 'Boek je Stoel',
       description: 'Online reserveren zorgt ervoor dat je de aandacht krijgt die je verdient. Drie simpele stappen en klaar.',
-      icon: '&#9201;'
+      icon: Calendar
     },
     {
       href: '/contact',
       label: 'CONTACT',
       title: 'Kom Langs',
       description: 'Bezoek onze zaak of neem contact op. Graag helpen we je met vragen, tips of een walk-in afspraak.',
-      icon: '&#8982;'
+      icon: MapPin
     }
   ];
 </script>
@@ -76,7 +77,7 @@
           class="group bg-surface-base p-8 md:p-10 border border-white/5 hover:border-gold-500/20 transition-all duration-500 relative overflow-hidden"
         >
           <div class="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-gold-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-          <span class="text-gold-500 text-3xl block mb-6">{@html card.icon}</span>
+          <svelte:component this={card.icon} class="text-gold-500 text-3xl block mb-6" />
           <span class="font-body text-label text-gold-500 block mb-3">{card.label}</span>
           <h3 class="font-display text-subheading text-bone mb-3 group-hover:text-gold-400 transition-colors">{card.title}</h3>
           <p class="font-body text-body text-bone-warm" style="font-size: 1rem; line-height: 1.7; letter-spacing: 0.01em;">{card.description}</p>

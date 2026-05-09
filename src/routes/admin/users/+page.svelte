@@ -22,7 +22,7 @@
   }
 
   // Define user type
-  type User = { id: number; email: string; displayName: string; role: 'owner' | 'manager' | 'staff'; isActive: boolean };
+  type User = { id: number; email: string; displayName: string; role: 'owner' | 'manager' | 'staff'; isActive: boolean; isBarber: boolean };
 
   // Create a reactive local copy of users
   let users = $state<User[]>([]);
@@ -35,6 +35,7 @@
   let newEmail = $state('');
   let newPassword = $state('');
   let newName = $state('');
+  let newIsBarber = $state(false);
   let error = $state('');
   let success = $state('');
 
@@ -62,6 +63,99 @@
       }
     }
   }
+
+  async function toggleBarber(id: number, isBarber: boolean) {
+    const res = await fetch('/admin/api/users', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, isBarber: !isBarber })
+    });
+
+    if (res.ok) {
+      // Update the user in the list without refresh
+      const user = users.find(u => u.id === id);
+      if (user) {
+        user.isBarber = !isBarber;
+      }
+    }
+  }
+
+  function openScheduleModal(id: number, displayName: string) {
+    userToEditSchedule = { id, displayName };
+    showScheduleModal = true;
+    fetchUserSchedule(id);
+  }
+
+  function closeScheduleModal() {
+    showScheduleModal = false;
+    userToEditSchedule = null;
+  }
+
+  let userToEditSchedule = $state<{ id: number; displayName: string } | null>(null);
+  let showScheduleModal = $state(false);
+  let userSchedules = $state<Record<number, { openTime: string; closeTime: string; isActive: boolean }>>({});
+  let loadingSchedule = $state(false);
+
+  async function fetchUserSchedule(staffId: number) {
+    loadingSchedule = true;
+    try {
+      const res = await fetch(`/admin/api/staff-schedules?staffId=${staffId}`);
+      if (res.ok) {
+        const data = await res.json();
+        const schedules: Record<number, any> = {};
+        (data.schedules || []).forEach((s: any) => {
+          schedules[s.dayOfWeek] = { openTime: s.openTime || '', closeTime: s.closeTime || '', isActive: s.isActive };
+        });
+        userSchedules = schedules;
+      }
+    } catch {
+      userSchedules = {};
+    }
+    loadingSchedule = false;
+  }
+
+  async function saveUserSchedule(dayOfWeek: number, openTime: string, closeTime: string, isActive: boolean) {
+    if (!userToEditSchedule) return;
+    try {
+      const res = await fetch('/admin/api/staff-schedules', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          staffId: userToEditSchedule.id,
+          dayOfWeek,
+          openTime: openTime || null,
+          closeTime: closeTime || null,
+          isActive
+        })
+      });
+      if (res.ok) {
+        await fetchUserSchedule(userToEditSchedule.id);
+      } else {
+        const error = await res.json();
+        alert('Fout bij opslaan: ' + (error.error || 'Onbekende fout'));
+      }
+    } catch (e: any) {
+      alert('Netwerkfout: ' + (e.message || e));
+    }
+  }
+
+  async function deleteUserSchedule(dayOfWeek: number) {
+    if (!userToEditSchedule) return;
+    try {
+      const res = await fetch(`/admin/api/staff-schedules?staffId=${userToEditSchedule.id}&dayOfWeek=${dayOfWeek}`, {
+        method: 'DELETE'
+      });
+      if (res.ok) {
+        await fetchUserSchedule(userToEditSchedule.id);
+      } else {
+        alert('Fout bij verwijderen');
+      }
+    } catch {
+      alert('Netwerkfout');
+    }
+  }
+
+  const dayNames = ['Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za', 'Zo'];
 
   function openDeleteModal(id: number, displayName: string) {
     userToDelete = { id, displayName };
@@ -138,7 +232,7 @@
       const res = await fetch('/admin/api/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: newEmail, password: newPassword, displayName: newName })
+        body: JSON.stringify({ email: newEmail, password: newPassword, displayName: newName, isBarber: newIsBarber })
       });
 
       const result = await res.json();
@@ -152,12 +246,14 @@
           email: newEmail,
           displayName: newName,
           role: 'staff',
-          isActive: true
+          isActive: true,
+          isBarber: newIsBarber
         });
 
         newEmail = '';
         newPassword = '';
         newName = '';
+        newIsBarber = false;
 
         // Clear success message after 3 seconds
         setTimeout(() => success = '', 3000);
@@ -202,6 +298,10 @@
         <input type="password" id="newPassword" bind:value={newPassword} placeholder=" " required />
         <label for="newPassword">Wachtwoord</label>
       </div>
+      <div class="md:col-span-3 flex items-center gap-3 mb-2">
+        <input type="checkbox" id="newIsBarber" bind:checked={newIsBarber} class="w-4 h-4" />
+        <label for="newIsBarber" class="font-body text-body text-bone">Dit personeelslid is een kapper</label>
+      </div>
       <div class="md:col-span-3">
         <button type="submit" class="btn-primary">Gebruiker Aanmaken</button>
       </div>
@@ -216,6 +316,7 @@
           <th class="text-left p-4 font-body text-label text-bone-muted">Naam</th>
           <th class="text-left p-4 font-body text-label text-bone-muted">E-mail</th>
           <th class="text-left p-4 font-body text-label text-bone-muted">Rol</th>
+          <th class="text-left p-4 font-body text-label text-bone-muted">Kapper</th>
           <th class="text-left p-4 font-body text-label text-bone-muted">Status</th>
           <th class="text-left p-4 font-body text-label text-bone-muted">Acties</th>
         </tr>
@@ -231,11 +332,32 @@
               </span>
             </td>
             <td class="p-4">
+              <button
+                onclick={() => toggleBarber(user.id, user.isBarber)}
+                onmouseenter={(e) => showTip(e, user.isBarber ? 'Geen kapper' : 'Maak kapper')}
+                onmouseleave={hideTip}
+                class="font-body text-label {user.isBarber ? 'text-gold-500 hover:text-gold-400' : 'text-bone-muted hover:text-bone'} transition-colors"
+              >
+                {#if user.isBarber}✓ Kapper{:else}—{/if}
+              </button>
+            </td>
+            <td class="p-4">
               <span class="font-body text-label {user.isActive ? 'text-green-500' : 'text-red-400'}">{user.isActive ? 'Actief' : 'Inactief'}</span>
             </td>
             <td class="p-4">
               {#if user.role !== 'owner'}
                 <div class="flex gap-3">
+                  {#if user.isBarber}
+                    <button
+                      onclick={() => openScheduleModal(user.id, user.displayName)}
+                      onmouseenter={(e) => showTip(e, 'Werktijden bewerken')}
+                      onmouseleave={hideTip}
+                      class="p-1.5 rounded hover:bg-white/5 transition-colors text-blue-400 hover:text-blue-300"
+                      title="Werktijden"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    </button>
+                  {/if}
                   <button
                     onclick={() => toggleActive(user.id, user.isActive)}
                     onmouseenter={(e) => showTip(e, user.isActive ? 'Deactiveren' : 'Reactiveren')}
@@ -277,7 +399,7 @@
       <div class="bg-surface-base p-8 rounded-lg border border-white/10 max-w-md w-full mx-6 shadow-2xl" onclick={e => e.stopPropagation()} onkeydown={(e) => e.key === 'Escape' && closeRoleModal()} role="dialog" aria-modal="true" tabindex="-1">
         <div class="text-center mb-6">
           <div class="w-16 h-16 rounded-full bg-gold-500/10 flex items-center justify-center mx-auto mb-4">
-            <span class="text-gold-500 text-2xl">&#9733;</span>
+            <UserCog class="text-gold-500" size={32} />
           </div>
           <h3 class="font-display text-subheading text-bone mb-2">Rol Wijzigen</h3>
           <p class="font-body text-body text-bone-muted mb-4">
@@ -344,6 +466,60 @@
           >
             Verwijderen
           </button>
+        </div>
+      </div>
+    </div>
+  {/if}
+
+  <!-- Schedule Modal -->
+  {#if showScheduleModal}
+    <div class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 w-full" role="button" tabindex="0" aria-label="Modal sluiten" onclick={closeScheduleModal} onkeydown={(e) => e.key === 'Enter' && closeScheduleModal()}>
+      <div class="bg-surface-base p-8 rounded-lg border border-white/10 max-w-2xl w-full mx-6 shadow-2xl max-h-[90vh] overflow-y-auto" onclick={e => e.stopPropagation()} onkeydown={(e) => e.key === 'Escape' && closeScheduleModal()} role="dialog" aria-modal="true" tabindex="-1">
+        <div class="text-center mb-6">
+          <h3 class="font-display text-subheading text-bone mb-2">Werktijden: {userToEditSchedule?.displayName}</h3>
+          <p class="font-body text-sm text-bone-muted">Stel hier de werktijden in. Deze moeten binnen de openingstijden van de zaak vallen.</p>
+        </div>
+
+        {#if loadingSchedule}
+          <p class="text-center text-bone-muted">Laden...</p>
+        {:else}
+          <div class="space-y-3">
+            {#each dayNames as day, i}
+              {@const dayOfWeek = i + 1}
+              {@const sched = userSchedules[dayOfWeek]}
+              <div class="flex items-center gap-3 p-3 bg-surface-low border border-white/5 rounded">
+                <span class="w-8 font-body text-sm text-bone">{day}</span>
+                {#if sched && sched.isActive}
+                  <div class="flex items-center gap-2 flex-1">
+                    <input type="time" id="open_{dayOfWeek}" class="bg-surface-base border border-gold-500/20 text-bone font-body text-sm px-2 py-1 w-24" value={sched.openTime} />
+                    <span class="text-bone-muted">-</span>
+                    <input type="time" id="close_{dayOfWeek}" class="bg-surface-base border border-gold-500/20 text-bone font-body text-sm px-2 py-1 w-24" value={sched.closeTime} />
+                    <button onclick={() => {
+                      const openEl = document.getElementById('open_' + dayOfWeek) as HTMLInputElement;
+                      const closeEl = document.getElementById('close_' + dayOfWeek) as HTMLInputElement;
+                      saveUserSchedule(dayOfWeek, openEl.value, closeEl.value, true);
+                    }} class="px-3 py-1 text-xs bg-gold-500/20 text-gold-500 rounded hover:bg-gold-500/30">Opslaan</button>
+                    <button onclick={() => deleteUserSchedule(dayOfWeek)} class="px-3 py-1 text-xs bg-red-500/20 text-red-400 rounded hover:bg-red-500/30">Verwijderen</button>
+                  </div>
+                {:else}
+                  <div class="flex items-center gap-2 flex-1">
+                    <input type="time" id="open_{dayOfWeek}" class="bg-surface-base border border-gold-500/20 text-bone font-body text-sm px-2 py-1 w-24" value="09:00" />
+                    <span class="text-bone-muted">-</span>
+                    <input type="time" id="close_{dayOfWeek}" class="bg-surface-base border border-gold-500/20 text-bone font-body text-sm px-2 py-1 w-24" value="18:00" />
+                    <button onclick={() => {
+                      const openEl = document.getElementById('open_' + dayOfWeek) as HTMLInputElement;
+                      const closeEl = document.getElementById('close_' + dayOfWeek) as HTMLInputElement;
+                      saveUserSchedule(dayOfWeek, openEl.value, closeEl.value, true);
+                    }} class="px-3 py-1 text-xs bg-gold-500/20 text-gold-500 rounded hover:bg-gold-500/30">Opslaan</button>
+                  </div>
+                {/if}
+              </div>
+            {/each}
+          </div>
+        {/if}
+
+        <div class="flex justify-end mt-6">
+          <button onclick={closeScheduleModal} class="btn-outline py-2">Sluiten</button>
         </div>
       </div>
     </div>

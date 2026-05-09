@@ -1,7 +1,9 @@
 <script lang="ts">
   import { reveal } from '$lib/actions/reveal';
+  import { Scissors } from 'lucide-svelte';
   import StepIndicators from './StepIndicators.svelte';
   import ServiceItem from './ServiceItem.svelte';
+  import BarberSelection from './BarberSelection.svelte';
   import Calendar from './Calendar.svelte';
   import TimeSlots from './TimeSlots.svelte';
   import FieldGroup from './FieldGroup.svelte';
@@ -16,6 +18,12 @@
     description: string | null;
     isSignature: boolean;
     category?: string;
+  }
+
+  interface Barber {
+    id: number;
+    displayName: string;
+    email: string;
   }
 
   let { services }: { services: ServiceData[] | undefined } = $props();
@@ -41,6 +49,8 @@
   let selectedServiceId = $state(0);
   let selectedService = $state('');
   let selectedPrice = $state(0);
+  let selectedStaffId = $state<number | null>(null);
+  let selectedBarberName = $state('');
   let selectedDate = $state<Date | null>(null);
   let selectedTime = $state('');
   let calMonth = $state(new Date().getMonth());
@@ -53,6 +63,27 @@
   let submitting = $state(false);
   let availableSlots = $state<{ time: string; available: boolean }[]>([]);
   let loadingSlots = $state(false);
+  let barbers = $state<Barber[]>([]);
+  let loadingBarbers = $state(false);
+
+  // Fetch barbers on mount
+  $effect(() => {
+    fetchBarbers();
+  });
+
+  async function fetchBarbers() {
+    loadingBarbers = true;
+    try {
+      const res = await fetch('/api/barbers');
+      if (res.ok) {
+        const data = await res.json();
+        barbers = data.barbers || [];
+      }
+    } catch {
+      barbers = [];
+    }
+    loadingBarbers = false;
+  }
 
   let summaryService = $derived(selectedService || '─');
   let summaryTotal = $derived(selectedPrice ? `€${selectedPrice}` : '€0');
@@ -62,9 +93,10 @@
       : '─'
   );
   let summaryTime = $derived(selectedTime || '─');
+  let summaryBarber = $derived(selectedBarberName || '─');
   let canConfirm = $derived(!!(selectedServiceId && selectedDate && selectedTime && clientName && clientEmail));
 
-  // Fetch availability when date changes
+  // Fetch availability when date changes (regardless of staff selection)
   $effect(() => {
     if (selectedDate) {
       fetchAvailability(selectedDate);
@@ -73,9 +105,15 @@
 
   async function fetchAvailability(date: Date) {
     loadingSlots = true;
-    const dateStr = date.toISOString().split('T')[0];
+    // Format date as YYYY-MM-DD using local date, not UTC
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const dateStr = `${year}-${month}-${day}`;
     try {
-      const res = await fetch(`/api/availability?date=${dateStr}`);
+      // When no barber selected (no preference), use allBarbers=true to combine availability
+      const staffIdParam = selectedStaffId !== null ? `&staffId=${selectedStaffId}` : '&allBarbers=true';
+      const res = await fetch(`/api/availability?date=${dateStr}${staffIdParam}`);
       if (res.ok) {
         const data = await res.json();
         availableSlots = data.slots || [];
@@ -90,6 +128,20 @@
     selectedServiceId = id;
     selectedService = name;
     selectedPrice = price;
+  }
+
+  function selectBarber(id: number | null) {
+    selectedStaffId = id;
+    if (id === null) {
+      selectedBarberName = 'Geen Voorkeur';
+    } else {
+      const barber = barbers.find(b => b.id === id);
+      selectedBarberName = barber?.displayName || '';
+    }
+    // Reset date/time/slots when changing barber to force re-fetch of availability
+    selectedDate = null;
+    selectedTime = '';
+    availableSlots = [];
   }
 
   function selectTime(time: string) {
@@ -111,8 +163,9 @@
 
   function nextStep() {
     if (currentStep === 1 && !selectedService) return;
-    if (currentStep === 2 && (!selectedDate || !selectedTime)) return;
-    if (currentStep < 3) currentStep++;
+    // Step 2: allow proceeding with no preference (selectedStaffId === null is valid)
+    if (currentStep === 3 && (!selectedDate || !selectedTime)) return;
+    if (currentStep < 4) currentStep++;
   }
 
   function prevStep() {
@@ -128,13 +181,50 @@
     if (!canConfirm || submitting) return;
     submitting = true;
 
-    const dateStr = selectedDate!.toISOString().split('T')[0];
+    // Format date as YYYY-MM-DD using local date, not UTC
+    const date = selectedDate!;
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const dateStr = `${year}-${month}-${day}`;
+
+    // When no barber preference, pick from barbers who actually have availability at the selected time
+    let finalStaffId = selectedStaffId;
+    if (finalStaffId === null && barbers.length > 0) {
+      // Find which barbers have the selected time available
+      const availableBarbers: number[] = [];
+      
+      for (const barber of barbers) {
+        try {
+          const res = await fetch(`/api/availability?date=${dateStr}&staffId=${barber.id}`);
+          if (res.ok) {
+            const data = await res.json();
+            const hasSlot = data.slots?.some((s: { time: string; available: boolean }) => 
+              s.time === selectedTime && s.available
+            );
+            if (hasSlot) {
+              availableBarbers.push(barber.id);
+            }
+          }
+        } catch {
+          // Skip this barber if API call fails
+        }
+      }
+
+      // Pick a random barber from those available
+      if (availableBarbers.length > 0) {
+        const randomIndex = Math.floor(Math.random() * availableBarbers.length);
+        finalStaffId = availableBarbers[randomIndex];
+      }
+    }
+
     try {
       const res = await fetch('/api/appointments', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           serviceId: selectedServiceId,
+          staffId: finalStaffId || undefined,
           date: dateStr,
           timeSlot: selectedTime,
           clientName,
@@ -165,6 +255,8 @@
     selectedServiceId = 0;
     selectedService = '';
     selectedPrice = 0;
+    selectedStaffId = null;
+    selectedBarberName = '';
     selectedDate = null;
     selectedTime = '';
     clientName = '';
@@ -189,7 +281,7 @@
       </p>
     </header>
 
-    <StepIndicators {currentStep} />
+    <StepIndicators currentStep={currentStep} totalSteps={4} />
 
     <div class="grid lg:grid-cols-12 gap-12 lg:gap-16">
       <div class="lg:col-span-8">
@@ -249,7 +341,7 @@
               <!-- Signature Services -->
               {#each signatureServices as svc}
                 <div use:reveal class="bg-surface-base p-6 md:p-8 relative overflow-hidden border border-gold-500/20">
-                  <div class="absolute -top-8 -right-8 text-[6rem] text-gold-500/5 font-display leading-none select-none">&#9733;</div>
+                  <Scissors class="absolute -top-8 -right-8 text-[6rem] text-gold-500/5" style="font-display: leading-none; user-select: none;" />
                   <span class="font-body text-label text-gold-500 block mb-4 tracking-[0.2em]">COMPLEET PAKKET</span>
                   <ServiceItem
                     name={svc.name}
@@ -266,12 +358,28 @@
           </div>
         {/if}
 
-        <!-- Step 2: Date & Time -->
+        <!-- Step 2: Barber Selection -->
         {#if currentStep === 2}
+          <div class="booking-step" style="animation: fadeStep 0.5s ease-out">
+            <h3 use:reveal class="font-display text-subheading text-bone uppercase tracking-tight mb-8">Kies je Kapper</h3>
+            {#if loadingBarbers}
+              <p class="text-bone-muted font-body text-body">Kappers laden...</p>
+            {:else}
+              <BarberSelection
+                {barbers}
+                selectedBarberId={selectedStaffId}
+                onselect={selectBarber}
+              />
+            {/if}
+          </div>
+        {/if}
+
+        <!-- Step 3: Date & Time -->
+        {#if currentStep === 3}
           <div class="booking-step" style="animation: fadeStep 0.5s ease-out">
             <h3 class="font-display text-subheading text-bone uppercase tracking-tight mb-8">Selecteer Datum &amp; Moment</h3>
             <div class="grid md:grid-cols-2 gap-8">
-              <Calendar {calMonth} {calYear} {selectedDate} selectDay={selectCalendarDay} {changeMonth} />
+              <Calendar {calMonth} {calYear} {selectedDate} selectDay={selectCalendarDay} {changeMonth} selectedStaffId={selectedStaffId} />
               {#if loadingSlots}
                 <div class="flex items-center justify-center">
                   <span class="text-bone-warm font-body text-label">Beschikbaarheid laden...</span>
@@ -283,15 +391,15 @@
           </div>
         {/if}
 
-        <!-- Step 3: Contact Info -->
-        {#if currentStep === 3}
+        <!-- Step 4: Contact Info -->
+        {#if currentStep === 4}
           <div class="booking-step" style="animation: fadeStep 0.5s ease-out">
             <h3 class="font-display text-subheading text-bone uppercase tracking-tight mb-8">Contact Gegevens</h3>
             <form class="grid md:grid-cols-2 gap-8" onsubmit={submitBooking}>
-              <FieldGroup id="bName" label="Volledige Naam" bind:value={clientName} required />
-              <FieldGroup type="email" id="bEmail" label="E-mailadres" bind:value={clientEmail} required />
-              <FieldGroup type="tel" id="bPhone" label="Telefoonnummer" bind:value={clientPhone} />
-              <FieldGroup id="bNotes" label="Speciale Opmerkingen" bind:value={clientNotes} />
+              <FieldGroup id="bName" label="Volledige Naam" value={clientName} onchange={(v) => clientName = v} required />
+              <FieldGroup type="email" id="bEmail" label="E-mailadres" value={clientEmail} onchange={(v) => clientEmail = v} required />
+              <FieldGroup type="tel" id="bPhone" label="Telefoonnummer" value={clientPhone} onchange={(v) => clientPhone = v} />
+              <FieldGroup id="bNotes" label="Speciale Opmerkingen" value={clientNotes} onchange={(v) => clientNotes = v} />
             </form>
           </div>
         {/if}
@@ -301,7 +409,7 @@
           {#if currentStep > 1}
             <button class="btn-outline" onclick={prevStep}>Terug</button>
           {/if}
-          {#if currentStep < 3}
+          {#if currentStep < 4}
             <button class="btn-primary ml-auto" onclick={nextStep}>Doorgaan</button>
           {/if}
         </div>
@@ -310,6 +418,7 @@
       <aside class="lg:col-span-4">
         <BookingSummary
           {summaryService}
+          {summaryBarber}
           {summaryDate}
           {summaryTime}
           {summaryTotal}

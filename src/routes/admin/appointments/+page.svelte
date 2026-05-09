@@ -49,6 +49,7 @@
         <th class="text-left p-4 font-body text-label text-bone-muted">Klant</th>
         <th class="text-left p-4 font-body text-label text-bone-muted">E-mail</th>
         <th class="text-left p-4 font-body text-label text-bone-muted">Service</th>
+        <th class="text-left p-4 font-body text-label text-bone-muted">Kapper</th>
         <th class="text-left p-4 font-body text-label text-bone-muted">Status</th>
         <th class="text-left p-4 font-body text-label text-bone-muted">Acties</th>
       </tr>
@@ -61,6 +62,7 @@
           <td class="p-4 font-body text-bone">{appt.clientName}</td>
           <td class="p-4 font-body text-bone-muted text-xs">{appt.clientEmail}</td>
           <td class="p-4 font-body text-bone">{appt.serviceName}</td>
+          <td class="p-4 font-body text-bone">{appt.barberName || '—'}</td>
           <td class="p-4">
             <span class="font-body text-label {appt.status === 'confirmed' ? 'text-gold-500' : appt.status === 'completed' ? 'text-green-500' : 'text-bone-muted'}">
               {statusLabels[appt.status] || appt.status}

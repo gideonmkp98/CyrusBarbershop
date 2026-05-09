@@ -1,7 +1,6 @@
 <script lang="ts">
   let { data } = $props();
 
-  // Day name mapping
   const dayNames: Record<number, string> = {
     1: 'Maandag',
     2: 'Dinsdag',
@@ -12,87 +11,99 @@
     7: 'Zondag'
   };
 
-  // Create reactive local copy of opening hours
-  let openingHours = $state<
-    Array<{ id: number; dayOfWeek: number; openTime: string; closeTime: string; isActive: boolean }>
-  >([]);
-
-  $effect(() => {
-    if (data.openingHours) {
-      openingHours = [...data.openingHours];
-    }
-  });
-
   let error = $state('');
   let success = $state('');
-  let savingId = $state<number | null>(null);
+  let saving = $state(false);
 
-  // Initialize missing days with default values
-  function initializeMissingDays() {
+  // Work with normalized time data directly
+  let days = $derived.by(() => {
+    if (!data?.openingHours) return [];
+    
+    // Create a map of dayOfWeek to hours data
+    const dayMap = new Map();
+    
+    data.openingHours.forEach(h => {
+      dayMap.set(h.dayOfWeek, {
+        ...h,
+        openTime: h.openTime?.substring(0, 5) || '00:00',
+        closeTime: h.closeTime?.substring(0, 5) || '00:00'
+      });
+    });
+    
+    // Ensure all 7 days exist
     for (let day = 1; day <= 7; day++) {
-      const existingDay = openingHours.find((h) => h.dayOfWeek === day);
-      if (!existingDay) {
-        openingHours.push({
+      if (!dayMap.has(day)) {
+        dayMap.set(day, {
           id: 0,
           dayOfWeek: day,
-          openTime: day <= 5 ? '09:00' : day === 6 ? '10:00' : '00:00',
-          closeTime: day <= 5 ? '20:00' : day === 6 ? '18:00' : '00:00',
+          openTime: day <= 5 ? '09:00' : day === 6 ? '10:00' : '10:00',
+          closeTime: day <= 5 ? '20:00' : day === 6 ? '18:00' : '10:00',
           isActive: day <= 6
         });
       }
     }
-    openingHours.sort((a, b) => a.dayOfWeek - b.dayOfWeek);
-  }
+    
+    // Convert to array and sort
+    return Array.from(dayMap.values()).sort((a, b) => a.dayOfWeek - b.dayOfWeek);
+  });
 
-  // Run initialization once
-  if (openingHours.length < 7) {
-    initializeMissingDays();
-  }
-
-  function formatTimeForInput(time: string): string {
-    // Ensure time is in HH:MM format for input
-    if (!time) return '00:00';
-    return time;
-  }
-
-  async function saveHours(day: number) {
+  async function saveAllHours() {
     error = '';
     success = '';
-    savingId = day;
+    saving = true;
 
-    const hours = openingHours.find((h) => h.dayOfWeek === day);
-    if (!hours) return;
+    // Validate
+    const validationErrors: string[] = [];
+    for (const h of days) {
+      if (h.isActive) {
+        if (!h.openTime || !h.closeTime) {
+          validationErrors.push(`${dayNames[h.dayOfWeek]}: beide tijden zijn verplicht`);
+        } else if (h.closeTime <= h.openTime) {
+          validationErrors.push(`${dayNames[h.dayOfWeek]}: sluitingstijd moet na openingstijd liggen`);
+        }
+      }
+    }
+
+    if (validationErrors.length > 0) {
+      error = validationErrors.join(', ');
+      saving = false;
+      return;
+    }
 
     try {
-      const res = await fetch('/admin/api/opening-hours', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          dayOfWeek: hours.dayOfWeek,
-          openTime: hours.openTime,
-          closeTime: hours.closeTime,
-          isActive: hours.isActive
+      const promises = days.map((h) =>
+        fetch('/admin/api/opening-hours', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            dayOfWeek: h.dayOfWeek,
+            openTime: h.isActive ? h.openTime : '00:00',
+            closeTime: h.isActive ? h.closeTime : '00:00',
+            isActive: h.isActive
+          })
         })
-      });
+      );
 
-      const result = await res.json();
+      const responses = await Promise.all(promises);
+      const hasErrors = responses.some((res) => !res.ok);
 
-      if (res.ok) {
-        success = `${dayNames[day]} bijgewerkt`;
-        setTimeout(() => (success = ''), 3000);
+      if (hasErrors) {
+        const firstError = await responses.find((res) => !res.ok)?.json();
+        error = firstError?.error || 'Opslaan mislukt';
       } else {
-        error = result.error || 'Opslaan mislukt';
+        success = 'Alle openingstijden bijgewerkt!';
+        setTimeout(() => (success = ''), 3000);
       }
-    } catch {
-      error = 'Netwerkfout. Probeer het opnieuw.';
+    } catch (err) {
+      error = 'Netwerkfout';
     }
-    savingId = null;
+    saving = false;
   }
 
   function toggleActive(day: number) {
-    const hours = openingHours.find((h) => h.dayOfWeek === day);
-    if (hours) {
-      hours.isActive = !hours.isActive;
+    const idx = days.findIndex((h) => h.dayOfWeek === day);
+    if (idx >= 0) {
+      days[idx].isActive = !days[idx].isActive;
     }
   }
 </script>
@@ -118,58 +129,42 @@
         <th class="text-left p-4 font-body text-label text-bone-muted">Openingstijd</th>
         <th class="text-left p-4 font-body text-label text-bone-muted">Sluitingstijd</th>
         <th class="text-left p-4 font-body text-label text-bone-muted">Status</th>
-        <th class="text-right p-4 font-body text-label text-bone-muted">Actie</th>
       </tr>
     </thead>
     <tbody>
-      {#each openingHours as hours}
+      {#each days as h}
         <tr class="border-b border-white/5 last:border-0">
-          <td class="p-4 font-body text-bone">
-            {dayNames[hours.dayOfWeek]}
-          </td>
+          <td class="p-4 font-body text-bone">{dayNames[h.dayOfWeek]}</td>
           <td class="p-4">
             <input
               type="time"
-              value={formatTimeForInput(hours.openTime)}
-              onchange={(e) => {
-                hours.openTime = e.currentTarget.value;
-              }}
-              disabled={!hours.isActive}
-              class="bg-surface-low border border-white/10 px-3 py-2 text-bone font-body text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              value={h.openTime}
+              onchange={(e) => (h.openTime = e.currentTarget.value)}
+              disabled={!h.isActive}
+              class="bg-surface-low border border-white/10 px-3 py-2 text-bone font-body text-sm disabled:opacity-50"
             />
           </td>
           <td class="p-4">
             <input
               type="time"
-              value={formatTimeForInput(hours.closeTime)}
-              onchange={(e) => {
-                hours.closeTime = e.currentTarget.value;
-              }}
-              disabled={!hours.isActive}
-              class="bg-surface-low border border-white/10 px-3 py-2 text-bone font-body text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              value={h.closeTime}
+              onchange={(e) => (h.closeTime = e.currentTarget.value)}
+              disabled={!h.isActive}
+              class="bg-surface-low border border-white/10 px-3 py-2 text-bone font-body text-sm disabled:opacity-50"
             />
           </td>
           <td class="p-4">
             <label class="flex items-center gap-2 cursor-pointer">
               <input
                 type="checkbox"
-                checked={hours.isActive}
-                onchange={() => toggleActive(hours.dayOfWeek)}
+                checked={h.isActive}
+                onchange={() => toggleActive(h.dayOfWeek)}
                 class="w-4 h-4 accent-gold-500"
               />
-              <span class="font-body text-sm {hours.isActive ? 'text-green-500' : 'text-bone-muted'}">
-                {hours.isActive ? 'Actief' : 'Gesloten'}
+              <span class="font-body text-sm {h.isActive ? 'text-green-500' : 'text-bone-muted'}">
+                {h.isActive ? 'Actief' : 'Gesloten'}
               </span>
             </label>
-          </td>
-          <td class="p-4 text-right">
-            <button
-              onclick={() => saveHours(hours.dayOfWeek)}
-              disabled={savingId === hours.dayOfWeek}
-              class="btn-primary py-2 px-4 text-sm"
-            >
-              {#if savingId === hours.dayOfWeek}Opslaan...{:else}Opslaan{/if}
-            </button>
           </td>
         </tr>
       {/each}
@@ -177,6 +172,15 @@
   </table>
 </div>
 
-<div class="mt-6 text-sm text-bone-muted">
-  <p>Tip: Schakel "Gesloten" uit voor dagen dat de zaak gesloten is. De tijden worden dan genegeerd.</p>
+<div class="mt-6 flex gap-4">
+  <button onclick={saveAllHours} disabled={saving} class="btn-primary py-2 px-6">
+    {#if saving}
+      Opslaan...
+    {:else}
+      Alles Opslaan
+    {/if}
+  </button>
+  <p class="text-sm text-bone-muted self-center">
+    Tip: Schakel "Gesloten" uit voor dagen dat de zaak gesloten is. De tijden worden dan genegeerd.
+  </p>
 </div>

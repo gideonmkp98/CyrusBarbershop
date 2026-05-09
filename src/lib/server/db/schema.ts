@@ -17,6 +17,7 @@ export const services = mysqlTable('services', {
 export const appointments = mysqlTable('appointments', {
   id: int('id').primaryKey().autoincrement(),
   serviceId: int('service_id').notNull(),
+  staffId: int('staff_id').references(() => users.id),
   date: date('date').notNull(),
   timeSlot: varchar('time_slot', { length: 8 }).notNull(),
   clientName: varchar('client_name', { length: 100 }).notNull(),
@@ -49,6 +50,7 @@ export const users = mysqlTable('users', {
   passwordHash: varchar('password_hash', { length: 255 }).notNull(),
   displayName: varchar('display_name', { length: 100 }).notNull(),
   role: mysqlEnum('role', ['owner', 'manager', 'staff']).notNull().default('staff'),
+  isBarber: boolean('is_barber').notNull().default(false),
   isActive: boolean('is_active').notNull().default(true),
   createdAt: timestamp('created_at').notNull().defaultNow()
 });
@@ -59,4 +61,13 @@ export const sessions = mysqlTable('sessions', {
   token: varchar('token', { length: 64 }).notNull().unique(),
   expiresAt: timestamp('expires_at').notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow()
+});
+
+export const staffSchedules = mysqlTable('staff_schedules', {
+  id: int('id').primaryKey().autoincrement(),
+  staffId: int('staff_id').notNull().references(() => users.id),
+  dayOfWeek: int('day_of_week').notNull(),  // 1-7 (Monday-Sunday, 7 = Sunday)
+  openTime: time('open_time'),              // NULL = not working this day
+  closeTime: time('close_time'),
+  isActive: boolean('is_active').notNull().default(true)
 });

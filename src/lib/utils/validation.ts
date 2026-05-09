@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 export const appointmentSchema = z.object({
   serviceId: z.number().int().positive(),
+  staffId: z.number().int().positive().optional(),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   timeSlot: z.string().regex(/^\d{2}:\d{2}$/),
   clientName: z.string().min(2).max(100),

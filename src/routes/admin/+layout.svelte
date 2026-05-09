@@ -18,6 +18,7 @@
   const navItems = [
     { href: '/admin', label: 'Dashboard' },
     { href: '/admin/appointments', label: 'Afspraken' },
+    { href: '/admin/services', label: 'Behandelingen' },
     { href: '/admin/users', label: 'Gebruikers' },
     { href: '/admin/opening-hours', label: 'Openingstijden' }
   ];
