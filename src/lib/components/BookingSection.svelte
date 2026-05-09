@@ -1,6 +1,6 @@
 <script lang="ts">
   import { reveal } from '$lib/actions/reveal';
-  import { Scissors } from 'lucide-svelte';
+  import { Scissors, Star } from 'lucide-svelte';
   import StepIndicators from './StepIndicators.svelte';
   import ServiceItem from './ServiceItem.svelte';
   import BarberSelection from './BarberSelection.svelte';
@@ -41,12 +41,12 @@
   const servicesList = $derived(services && services.length > 0 ? services : defaultServices);
 
   // Group services by category
-  const signatureServices = servicesList.filter(s => s.isSignature);
-  const hairServices = servicesList.filter(s => s.category === 'hair' && !s.isSignature);
-  const beardServices = servicesList.filter(s => s.category === 'beard' && !s.isSignature);
+  const signatureServices = $derived(servicesList.filter(s => s.isSignature));
+  const hairServices = $derived(servicesList.filter(s => s.category === 'hair' && !s.isSignature));
+  const beardServices = $derived(servicesList.filter(s => s.category === 'beard' && !s.isSignature));
 
   let currentStep = $state(1);
-  let selectedServiceId = $state(0);
+  let selectedServiceId = $state<number | null>(null);
   let selectedService = $state('');
   let selectedPrice = $state(0);
   let selectedStaffId = $state<number | null>(null);
@@ -229,7 +229,7 @@
           timeSlot: selectedTime,
           clientName,
           clientEmail,
-          clientPhone: clientPhone || undefined,
+          clientPhone,
           notes: clientNotes || undefined
         })
       });
@@ -252,7 +252,7 @@
   function closeSuccess() {
     showSuccess = false;
     currentStep = 1;
-    selectedServiceId = 0;
+    selectedServiceId = null;
     selectedService = '';
     selectedPrice = 0;
     selectedStaffId = null;

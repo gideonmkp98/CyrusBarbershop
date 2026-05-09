@@ -32,6 +32,7 @@ async function seed() {
   // Clear existing data to prevent duplicates
   await connection.execute('SET FOREIGN_KEY_CHECKS = 0');
   await db.delete(services).execute();
+  await db.delete(openingHours).execute();
   await connection.execute('SET FOREIGN_KEY_CHECKS = 1');
 
   // Services - use ignore on duplicate key
@@ -47,14 +48,15 @@ async function seed() {
 
   console.log('✓ Services seeded');
 
-  // Opening hours (Mon=1 through Sat=6, no Sunday)
+  // Opening hours (Mon=1 through Sat=6, Sun=7)
   await db.insert(openingHours).values([
-    { dayOfWeek: 1, openTime: '09:00', closeTime: '20:00' },
-    { dayOfWeek: 2, openTime: '09:00', closeTime: '20:00' },
-    { dayOfWeek: 3, openTime: '09:00', closeTime: '20:00' },
-    { dayOfWeek: 4, openTime: '09:00', closeTime: '20:00' },
-    { dayOfWeek: 5, openTime: '09:00', closeTime: '20:00' },
-    { dayOfWeek: 6, openTime: '10:00', closeTime: '18:00' }
+    { dayOfWeek: 1, openTime: '09:00', closeTime: '20:00', isActive: true },
+    { dayOfWeek: 2, openTime: '09:00', closeTime: '20:00', isActive: true },
+    { dayOfWeek: 3, openTime: '09:00', closeTime: '20:00', isActive: true },
+    { dayOfWeek: 4, openTime: '09:00', closeTime: '20:00', isActive: true },
+    { dayOfWeek: 5, openTime: '09:00', closeTime: '20:00', isActive: true },
+    { dayOfWeek: 6, openTime: '10:00', closeTime: '18:00', isActive: true },
+    { dayOfWeek: 7, openTime: '00:00', closeTime: '00:00', isActive: false }
   ]);
 
   console.log('✓ Opening hours seeded');

@@ -43,9 +43,14 @@
       "Bash(Select-String -Pattern \"error|Error|500\" -Context 2)",
       "Bash(npx tsc *)",
       "Bash(curl -s http://localhost:5176/admin/profile)",
+<<<<<<< HEAD
       "Bash(Select-Object -First 50)",
       "Bash(Select-String -Pattern \"error|Error|warning|Warning|built|preview\")",
       "Bash(Select-Object -First 30)"
+=======
+      "Bash(curl -s http://localhost:5174/booking)",
+      "Bash(curl *)"
+>>>>>>> e40e7bf5910e37d3d66382d857e0a464ed12b561
     ]
   }
 }
