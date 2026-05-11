@@ -50,14 +50,6 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   let finalOpenTime = openTime;
   let finalCloseTime = closeTime;
 
-<<<<<<< HEAD
-  // Validate closeTime is after openTime (only for active days)
-  if (isActive && closeTime <= openTime) {
-    return new Response(JSON.stringify({ error: 'Sluitingstijd moet na openingstijd liggen' }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json' }
-    });
-=======
   if (isActive === false) {
     finalOpenTime = '00:00';
     finalCloseTime = '00:00';
@@ -85,7 +77,6 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         headers: { 'Content-Type': 'application/json' }
       });
     }
->>>>>>> e40e7bf5910e37d3d66382d857e0a464ed12b561
   }
 
   try {

@@ -7,6 +7,7 @@
     required?: boolean;
     rows?: number;
     placeholder?: string;
+    pattern?: string;
     cls?: string;
     onchange?: (value: string) => void;
   }
@@ -19,6 +20,7 @@
     required = false,
     rows = undefined,
     placeholder = ' ',
+    pattern = undefined,
     cls = '',
     onchange
   } = $props<Props>();
@@ -35,7 +37,7 @@
   {#if rows}
     <textarea {id} {value} on:change={handleChange} on:input={handleChange} {placeholder} {rows} class="resize-none" required={required || undefined}></textarea>
   {:else}
-    <input {type} {id} {value} on:change={handleChange} on:input={handleChange} {placeholder} required={required || undefined} />
+    <input {type} {id} {value} on:change={handleChange} on:input={handleChange} {placeholder} {pattern} required={required || undefined} />
   {/if}
   <label for={id}>{label}</label>
 </div>

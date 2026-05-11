@@ -13,7 +13,7 @@
 </script>
 
 <div class="lg:sticky lg:top-32 bg-surface-base p-8 border border-gold-500/15">
-  <h3 class="font-display text-subheading text-gold-300 mb-8 uppercase tracking-[0.15em]">Samenvatting</h3>
+  <h3 class="font-display text-subheading text-gold-300 mb-8 uppercase tracking-[0.15em]">Jouw afspraak</h3>
   <div class="space-y-5 mb-8">
     <div class="flex justify-between items-start">
       <span class="font-body text-label text-bone-muted">BEHANDELING</span>

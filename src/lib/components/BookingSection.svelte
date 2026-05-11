@@ -61,6 +61,7 @@
   let clientNotes = $state('');
   let showSuccess = $state(false);
   let submitting = $state(false);
+  let formError = $state<string | null>(null);
   let availableSlots = $state<{ time: string; available: boolean }[]>([]);
   let loadingSlots = $state(false);
   let barbers = $state<Barber[]>([]);
@@ -179,7 +180,25 @@
 
   async function confirmBooking() {
     if (!canConfirm || submitting) return;
+    formError = null;
     submitting = true;
+
+    // Client-side validatie
+    if (!clientName.trim()) {
+      formError = 'Voer je volledige naam in';
+      submitting = false;
+      return;
+    }
+    if (!clientEmail.trim()) {
+      formError = 'Voer je e-mailadres in';
+      submitting = false;
+      return;
+    }
+    if (clientPhone.trim() && !/^[\d\s\-+()]{6,20}$/.test(clientPhone)) {
+      formError = 'Voer een geldig telefoonnummer in (bijv. 06 12345678)';
+      submitting = false;
+      return;
+    }
 
     // Format date as YYYY-MM-DD using local date, not UTC
     const date = selectedDate!;
@@ -237,14 +256,19 @@
       if (res.ok) {
         showSuccess = true;
       } else if (res.status === 409) {
-        alert('Dit tijdvak was zojuist geboekt. Selecteer alstublieft ander moment.');
+        formError = 'Dit tijdvak was zojuist geboekt. Selecteer een ander moment.';
         selectedTime = '';
         fetchAvailability(selectedDate!);
       } else {
-        alert('Boeking mislukt. Probeer het alstublieft opnieuw.');
+        const data = await res.json().catch(() => ({}));
+        if (data.issues && data.issues.length > 0) {
+          formError = data.issues.map((i: any) => i.message).join('. ');
+        } else {
+          formError = data.error || 'Boeking mislukt. Probeer het opnieuw.';
+        }
       }
     } catch {
-      alert('Netwerkfout. Probeer het alstublieft opnieuw.');
+      formError = 'Netwerkfout. Controleer je verbinding en probeer opnieuw.';
     }
     submitting = false;
   }
@@ -395,10 +419,15 @@
         {#if currentStep === 4}
           <div class="booking-step" style="animation: fadeStep 0.5s ease-out">
             <h3 class="font-display text-subheading text-bone uppercase tracking-tight mb-8">Contact Gegevens</h3>
+            {#if formError}
+              <div class="bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 mb-6 text-sm font-body rounded">
+                {formError}
+              </div>
+            {/if}
             <form class="grid md:grid-cols-2 gap-8" onsubmit={submitBooking}>
               <FieldGroup id="bName" label="Volledige Naam" value={clientName} onchange={(v) => clientName = v} required />
               <FieldGroup type="email" id="bEmail" label="E-mailadres" value={clientEmail} onchange={(v) => clientEmail = v} required />
-              <FieldGroup type="tel" id="bPhone" label="Telefoonnummer" value={clientPhone} onchange={(v) => clientPhone = v} />
+              <FieldGroup type="tel" id="bPhone" label="Telefoonnummer" value={clientPhone} onchange={(v) => clientPhone = v} pattern="[0-9\s\-+()]{6,20}" />
               <FieldGroup id="bNotes" label="Speciale Opmerkingen" value={clientNotes} onchange={(v) => clientNotes = v} />
             </form>
           </div>
