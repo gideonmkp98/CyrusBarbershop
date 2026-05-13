@@ -301,7 +301,7 @@
       <span use:reveal class="font-body text-label text-gold-500 block mb-4">MAAK JE AFSPRAAK</span>
       <h1 use:reveal={{ delay: 1 }} class="font-display text-heading text-gold-300 mb-4">Tijd voor een nieuwe look</h1>
       <p use:reveal={{ delay: 2 }} class="font-body text-body-lg text-bone-warm max-w-xl" style="font-size: 1.125rem; line-height: 1.7; letter-spacing: 0.01em;">
-        Stap voor stap naar je volgende Cyrus-ervaring. Kies je service, selecteer datum en moment, en we zien je snel.
+        Stap voor stap naar je volgende Cyrus-ervaring. Kies je behandeling, selecteer datum en moment, en we zien je snel.
       </p>
     </header>
 
@@ -428,7 +428,7 @@
               <FieldGroup id="bName" label="Volledige Naam" value={clientName} onchange={(v) => clientName = v} required />
               <FieldGroup type="email" id="bEmail" label="E-mailadres" value={clientEmail} onchange={(v) => clientEmail = v} required />
               <FieldGroup type="tel" id="bPhone" label="Telefoonnummer" value={clientPhone} onchange={(v) => clientPhone = v} pattern="[0-9\s\-+()]{6,20}" />
-              <FieldGroup id="bNotes" label="Speciale Opmerkingen" value={clientNotes} onchange={(v) => clientNotes = v} />
+              <FieldGroup id="bNotes" label="Opmerkingen" value={clientNotes} onchange={(v) => clientNotes = v} />
             </form>
           </div>
         {/if}

@@ -334,7 +334,7 @@
     <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
       {#each filteredServices as service}
         {@const IconComponent = getCategoryIcon(service.category)}
-        <div class="bg-surface-base border border-white/5 rounded-lg p-5 hover:border-white/10 transition-all group">
+        <div class="bg-surface-base border border-white/5 p-5 hover:border-white/10 transition-all group">
           <div class="flex justify-between items-start mb-3">
             <span class="text-xs font-body px-2 py-1 rounded border flex items-center gap-1.5 {getCategoryColor(service.category)}">
               <IconComponent size={12} />
