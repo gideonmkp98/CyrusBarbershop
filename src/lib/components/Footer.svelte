@@ -106,8 +106,8 @@
         </div>
         <div class="flex flex-col gap-3">
           <span class="font-body text-label text-gold-500">SOCIALS</span>
-          <a href="#" class="font-display text-caption text-bone-muted hover:text-bone transition-colors">Instagram</a>
-          <a href="#" class="font-display text-caption text-bone-muted hover:text-bone transition-colors">Facebook</a>
+          <a href="/contact" class="font-display text-caption text-bone-muted hover:text-bone transition-colors">Instagram</a>
+          <a href="/contact" class="font-display text-caption text-bone-muted hover:text-bone transition-colors">Facebook</a>
         </div>
       </div>
 

@@ -44,12 +44,12 @@
       {/if}
 
       <div class="field-group">
-        <input type="email" name="email" bind:value={email} placeholder=" " required />
-        <label>E-mail</label>
+        <input id="email" type="email" name="email" bind:value={email} placeholder=" " required />
+        <label for="email">E-mail</label>
       </div>
       <div class="field-group">
-        <input type="password" name="password" bind:value={password} placeholder=" " required />
-        <label>Wachtwoord</label>
+        <input id="password" type="password" name="password" bind:value={password} placeholder=" " required />
+        <label for="password">Wachtwoord</label>
       </div>
 
       <button type="submit" class="btn-primary w-full py-4" disabled={loading}>

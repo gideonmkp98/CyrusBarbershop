@@ -5,21 +5,22 @@
   let { data } = $props();
 
   // ── Accumulated appointment data ──
-  let allAppointments = $state<any[]>(data.appointments);
+  let allAppointments = $state<any[]>([]);
   let loadedRanges = $state<{ start: string; end: string }[]>([]);
   let isLoadingCalendar = $state(false);
   let isLoadingMore = $state(false);
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  let appointmentIds = $state(new Set<number>(data.appointments.map((a: any) => a.id)));
+  let appointmentIds = $state(new Set<number>());
+  let initialDataLoaded = $state(false);
 
   // ── Infinite scroll pagination ──
-  let nextCursor = $state<string | null>(data.nextCursor || null);
-  let hasMore = $state(data.hasMore || false);
+  let nextCursor = $state<string | null>(null);
+  let hasMore = $state(false);
   let loadMoreRef = $state<HTMLDivElement | null>(null);
 
   // Use refs to avoid reactive dependencies in observer callback
-  let hasMoreRef = $state({ value: hasMore });
-  let isLoadingMoreRef = $state({ value: isLoadingMore });
+  let hasMoreRef = $state({ value: false });
+  let isLoadingMoreRef = $state({ value: false });
 
   // Keep refs in sync
   $effect(() => {
@@ -28,6 +29,16 @@
 
   $effect(() => {
     isLoadingMoreRef.value = isLoadingMore;
+  });
+
+  $effect(() => {
+    if (!initialDataLoaded) {
+      allAppointments = data.appointments;
+      appointmentIds = new Set<number>(data.appointments.map((a: any) => a.id));
+      nextCursor = data.nextCursor || null;
+      hasMore = data.hasMore || false;
+      initialDataLoaded = true;
+    }
   });
 
   // ── Infinite scroll observer setup ──
@@ -78,6 +89,25 @@
   // ── Detail modal ──
   let selectedAppointment = $state<any | null>(null);
   let showDetailModal = $state(false);
+
+  // ── Tooltip state ──
+  let tooltipText = $state('');
+  let tooltipVisible = $state(false);
+  let tooltipPosition = $state({ x: 0, y: 0 });
+
+  function showTooltip(e: MouseEvent, text: string) {
+    const rect = (e.target as HTMLElement).getBoundingClientRect();
+    tooltipPosition = {
+      x: rect.left + rect.width / 2,
+      y: rect.top - 8
+    };
+    tooltipText = text;
+    tooltipVisible = true;
+  }
+
+  function hideTooltip() {
+    tooltipVisible = false;
+  }
 
   const statusLabels: Record<string, string> = {
     confirmed: 'Bevestigd',
@@ -418,7 +448,7 @@
 
   <div class="flex items-center gap-3">
     <!-- View toggle -->
-    <div class="flex bg-surface-base border border-white/10 rounded overflow-hidden">
+    <div class="flex bg-surface-base border border-white/10 overflow-hidden">
       <button
         onclick={() => viewMode = 'calendar'}
         class="px-4 py-2 text-sm font-body transition-colors {viewMode === 'calendar' ? 'bg-gold-500 text-surface' : 'text-bone hover:text-bone'}"
@@ -444,16 +474,17 @@
     <h2 class="font-display text-subheading text-bone mb-4">Nieuwe Afspraak Inplannen</h2>
 
     {#if formError}
-      <div class="bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 mb-6 text-sm font-body rounded">{formError}</div>
+      <div class="bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 mb-6 text-sm font-body">{formError}</div>
     {/if}
     {#if formSuccess}
-      <div class="bg-green-500/10 border border-green-500/30 text-green-400 px-4 py-3 mb-6 text-sm font-body rounded">{formSuccess}</div>
+      <div class="bg-green-500/10 border border-green-500/30 text-green-400 px-4 py-3 mb-6 text-sm font-body">{formSuccess}</div>
     {/if}
 
     <form onsubmit={createAppointment} class="grid md:grid-cols-2 gap-4">
       <div>
-        <label class="block text-xs font-body text-bone-muted mb-2">Behandeling *</label>
+        <label for="appointment-service" class="block text-xs font-body text-bone-muted mb-2">Behandeling *</label>
         <select
+          id="appointment-service"
           bind:value={selectedServiceId}
           class="w-full bg-surface-low border border-white/5 px-3 py-2 text-sm font-body text-bone focus:outline-none focus:border-gold-500"
           required
@@ -466,8 +497,9 @@
       </div>
 
       <div>
-        <label class="block text-xs font-body text-bone-muted mb-2">Kapper (optioneel)</label>
+        <label for="appointment-staff" class="block text-xs font-body text-bone-muted mb-2">Barber (optioneel)</label>
         <select
+          id="appointment-staff"
           bind:value={selectedStaffId}
           class="w-full bg-surface-low border border-white/5 px-3 py-2 text-sm font-body text-bone focus:outline-none focus:border-gold-500"
         >
@@ -479,8 +511,9 @@
       </div>
 
       <div>
-        <label class="block text-xs font-body text-bone-muted mb-2">Datum *</label>
+        <label for="appointment-date" class="block text-xs font-body text-bone-muted mb-2">Datum *</label>
         <input
+          id="appointment-date"
           type="date"
           bind:value={appointmentDate}
           min={new Date().toISOString().split('T')[0]}
@@ -490,7 +523,7 @@
       </div>
 
       <div>
-        <label class="block text-xs font-body text-bone-muted mb-2">Tijdstip *</label>
+        <label for="appointment-time" class="block text-xs font-body text-bone-muted mb-2">Tijdstip *</label>
         {#if loadingSlots}
           <div class="flex items-center justify-center h-[42px] bg-surface-low border border-white/5 text-sm font-body text-bone-muted">Beschikbaarheid laden...</div>
         {:else if availableSlots.length === 0}
@@ -499,6 +532,7 @@
           </div>
         {:else}
           <select
+            id="appointment-time"
             bind:value={appointmentTime}
             class="w-full bg-surface-low border border-white/5 px-3 py-2 text-sm font-body text-bone focus:outline-none focus:border-gold-500"
             required
@@ -514,28 +548,28 @@
       </div>
 
       <div>
-        <label class="block text-xs font-body text-bone-muted mb-2">Naam Klant *</label>
-        <input type="text" bind:value={clientName} placeholder="Voornaam Achternaam"
+        <label for="appointment-client-name" class="block text-xs font-body text-bone-muted mb-2">Naam Klant *</label>
+        <input id="appointment-client-name" type="text" bind:value={clientName} placeholder="Voornaam Achternaam"
           class="w-full bg-surface-low border border-white/5 px-3 py-2 text-sm font-body text-bone focus:outline-none focus:border-gold-500" required />
       </div>
 
       <div>
-        <label class="block text-xs font-body text-bone-muted mb-2">Telefoonnummer</label>
-        <input type="tel" bind:value={clientPhone} placeholder="06 12345678"
+        <label for="appointment-client-phone" class="block text-xs font-body text-bone-muted mb-2">Telefoonnummer</label>
+        <input id="appointment-client-phone" type="tel" bind:value={clientPhone} placeholder="06 12345678"
           pattern="[0-9\s\-+()]{6,20}"
           title="Voer een geldig telefoonnummer in (bijv. 06 12345678)"
           class="w-full bg-surface-low border border-white/5 px-3 py-2 text-sm font-body text-bone focus:outline-none focus:border-gold-500" />
       </div>
 
       <div class="md:col-span-2">
-        <label class="block text-xs font-body text-bone-muted mb-2">E-mail (optioneel)</label>
-        <input type="email" bind:value={clientEmail} placeholder="klant@voorbeeld.nl"
+        <label for="appointment-client-email" class="block text-xs font-body text-bone-muted mb-2">E-mail (optioneel)</label>
+        <input id="appointment-client-email" type="email" bind:value={clientEmail} placeholder="klant@voorbeeld.nl"
           class="w-full bg-surface-low border border-white/5 px-3 py-2 text-sm font-body text-bone focus:outline-none focus:border-gold-500" />
       </div>
 
       <div class="md:col-span-2">
-        <label class="block text-xs font-body text-bone-muted mb-2">Notities</label>
-        <textarea bind:value={notes} placeholder="Optionele notities..." rows="3"
+        <label for="appointment-notes" class="block text-xs font-body text-bone-muted mb-2">Notities</label>
+        <textarea id="appointment-notes" bind:value={notes} placeholder="Optionele notities..." rows="3"
           class="w-full bg-surface-low border border-white/5 px-3 py-2 text-sm font-body text-bone focus:outline-none focus:border-gold-500 resize-none"></textarea>
       </div>
 
@@ -556,7 +590,7 @@
     {#each ['all', 'confirmed', 'completed', 'cancelled', 'no_show'] as status}
       <button
         onclick={() => filterStatus = status}
-        class="px-3 py-1.5 text-xs font-body transition-colors rounded border {filterStatus === status ? 'bg-gold-500 text-surface border-gold-500' : 'bg-surface-base text-bone-muted border-white/10 hover:text-bone'}"
+        class="px-3 py-1.5 text-xs font-body transition-colors border {filterStatus === status ? 'bg-gold-500 text-surface border-gold-500' : 'bg-surface-base text-bone-muted border-white/10 hover:text-bone'}"
       >
         {status === 'all' ? 'Alle' : statusLabels[status] || status}
       </button>
@@ -568,7 +602,7 @@
       bind:value={filterBarber}
       class="bg-surface-base border border-white/10 px-3 py-1.5 text-xs font-body text-bone focus:outline-none focus:border-gold-500"
     >
-      <option value="all">Alle kappers</option>
+      <option value="all">Alle barbers</option>
       {#each data.staff as staffMember}
         <option value={String(staffMember.id)}>{staffMember.displayName}</option>
       {/each}
@@ -612,7 +646,7 @@
           <!-- Day header -->
           <div class="flex items-center gap-3 mb-3">
             <span class="font-display text-subheading text-bone">{groupLabel}</span>
-            <span class="px-2 py-0.5 bg-surface-base border border-white/10 text-xs font-body text-bone-muted rounded">{groupAppts.length}</span>
+            <span class="px-2 py-0.5 bg-surface-base border border-white/10 text-xs font-body text-bone-muted">{groupAppts.length}</span>
             <div class="flex-1 h-px bg-white/5"></div>
           </div>
 
@@ -621,11 +655,14 @@
             {#each groupAppts as appt (appt.id)}
               <div
                 class="group bg-surface-base border border-white/5 hover:border-gold-500/20 p-4 flex flex-col md:flex-row md:items-center gap-4 transition-all cursor-pointer"
+                role="button"
+                tabindex="0"
                 onclick={() => openDetail(appt)}
+                onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && openDetail(appt)}
               >
                 <!-- Time column -->
                 <div class="flex items-center gap-3 md:w-28 shrink-0">
-                  <div class="w-10 h-10 rounded bg-surface-low border border-white/5 flex items-center justify-center">
+                  <div class="w-10 h-10 bg-surface-low border border-white/5 flex items-center justify-center">
                     <span class="font-display text-sm text-gold-500">{appt.timeSlot.split(':')[0]}</span>
                   </div>
                   <div class="md:hidden">
@@ -676,7 +713,7 @@
 
                 <!-- Status + actions -->
                 <div class="flex items-center gap-3 shrink-0">
-                  <span class="px-2 py-1 text-xs font-body border rounded {statusBadgeBg[appt.status] || 'bg-surface-low border-white/10'} {statusColors[appt.status] || 'text-bone-muted'}">
+                  <span class="px-2 py-1 text-xs font-body border {statusBadgeBg[appt.status] || 'bg-surface-low border-white/10'} {statusColors[appt.status] || 'text-bone-muted'}">
                     {statusLabels[appt.status] || appt.status}
                   </span>
 
@@ -685,7 +722,8 @@
                     <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button
                         onclick={(e) => { e.stopPropagation(); updateStatus(appt.id, 'completed'); }}
-                        title="Markeer als afgerond"
+                        onmouseenter={(e) => showTooltip(e, 'Markeer als afgerond')}
+                        onmouseleave={hideTooltip}
                         class="w-8 h-8 flex items-center justify-center bg-green-500/10 border border-green-500/20 text-green-500 hover:bg-green-500 hover:text-surface transition-colors"
                       >
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -694,7 +732,8 @@
                       </button>
                       <button
                         onclick={(e) => { e.stopPropagation(); updateStatus(appt.id, 'no_show'); }}
-                        title="Niet verschenen"
+                        onmouseenter={(e) => showTooltip(e, 'Niet verschenen')}
+                        onmouseleave={hideTooltip}
                         class="w-8 h-8 flex items-center justify-center bg-bone-muted/10 border border-bone-muted/20 text-bone-muted hover:bg-bone-muted/20 transition-colors"
                       >
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -703,7 +742,8 @@
                       </button>
                       <button
                         onclick={(e) => { e.stopPropagation(); updateStatus(appt.id, 'cancelled'); }}
-                        title="Annuleer afspraak"
+                        onmouseenter={(e) => showTooltip(e, 'Annuleer afspraak')}
+                        onmouseleave={hideTooltip}
                         class="w-8 h-8 flex items-center justify-center bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500 hover:text-surface transition-colors"
                       >
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -737,13 +777,13 @@
     <div class="bg-surface-base border border-white/10 p-8 max-w-md w-full mx-4">
       <div class="flex justify-between items-start mb-6">
         <h2 class="font-display text-subheading text-bone">Afspraak Details</h2>
-        <button onclick={closeDetail} class="text-bone-muted hover:text-bone text-xl">×</button>
+        <button onclick={closeDetail} onmouseenter={(e) => showTooltip(e, 'Sluiten')} onmouseleave={hideTooltip} class="text-bone-muted hover:text-bone text-xl">×</button>
       </div>
 
       <div class="space-y-4">
         <div class="flex justify-between">
           <span class="font-body text-label text-bone-muted">Status</span>
-          <span class="inline-block px-2 py-0.5 text-xs font-body border rounded {statusBadgeBg[selectedAppointment.status] || 'bg-surface-low border-white/10'} {statusColors[selectedAppointment.status] || 'text-bone-muted'}">
+          <span class="inline-block px-2 py-0.5 text-xs font-body border {statusBadgeBg[selectedAppointment.status] || 'bg-surface-low border-white/10'} {statusColors[selectedAppointment.status] || 'text-bone-muted'}">
             {statusLabels[selectedAppointment.status] || selectedAppointment.status}
           </span>
         </div>
@@ -772,7 +812,7 @@
           <span class="font-body text-bone">{selectedAppointment.serviceName}</span>
         </div>
         <div class="flex justify-between">
-          <span class="font-body text-label text-bone-muted">Kapper</span>
+          <span class="font-body text-label text-bone-muted">Barber</span>
           <span class="font-body text-bone">{selectedAppointment.barberName || 'Geen voorkeur'}</span>
         </div>
       </div>
@@ -785,5 +825,15 @@
         </div>
       {/if}
     </div>
+  </div>
+{/if}
+
+<!-- Custom Tooltip -->
+{#if tooltipVisible}
+  <div
+    class="fixed px-3 py-1.5 bg-surface-base text-bone text-xs font-body whitespace-nowrap z-[100] pointer-events-none border border-white/10 shadow-xl"
+    style="left: {tooltipPosition.x}px; top: {tooltipPosition.y}px; transform: translate(-50%, -100%);"
+  >
+    {tooltipText}
   </div>
 {/if}

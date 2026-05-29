@@ -95,7 +95,7 @@
   );
   let summaryTime = $derived(selectedTime || '─');
   let summaryBarber = $derived(selectedBarberName || '─');
-  let canConfirm = $derived(!!(selectedServiceId && selectedDate && selectedTime && clientName && clientEmail));
+  let canConfirm = $derived(!!(selectedServiceId && selectedDate && selectedTime && clientName && clientEmail && clientPhone));
 
   // Fetch availability when date changes (regardless of staff selection)
   $effect(() => {
@@ -194,7 +194,12 @@
       submitting = false;
       return;
     }
-    if (clientPhone.trim() && !/^[\d\s\-+()]{6,20}$/.test(clientPhone)) {
+    if (!clientPhone.trim()) {
+      formError = 'Voer je telefoonnummer in';
+      submitting = false;
+      return;
+    }
+    if (!/^[\d\s\-+()]{6,20}$/.test(clientPhone)) {
       formError = 'Voer een geldig telefoonnummer in (bijv. 06 12345678)';
       submitting = false;
       return;
@@ -385,9 +390,9 @@
         <!-- Step 2: Barber Selection -->
         {#if currentStep === 2}
           <div class="booking-step" style="animation: fadeStep 0.5s ease-out">
-            <h3 use:reveal class="font-display text-subheading text-bone uppercase tracking-tight mb-8">Kies je Kapper</h3>
+            <h3 use:reveal class="font-display text-subheading text-bone uppercase tracking-tight mb-8">Kies je Barber</h3>
             {#if loadingBarbers}
-              <p class="text-bone-muted font-body text-body">Kappers laden...</p>
+              <p class="text-bone-muted font-body text-body">Barbers laden...</p>
             {:else}
               <BarberSelection
                 {barbers}
@@ -427,7 +432,7 @@
             <form class="grid md:grid-cols-2 gap-8" onsubmit={submitBooking}>
               <FieldGroup id="bName" label="Volledige Naam" value={clientName} onchange={(v) => clientName = v} required />
               <FieldGroup type="email" id="bEmail" label="E-mailadres" value={clientEmail} onchange={(v) => clientEmail = v} required />
-              <FieldGroup type="tel" id="bPhone" label="Telefoonnummer" value={clientPhone} onchange={(v) => clientPhone = v} pattern="[0-9\s\-+()]{6,20}" />
+              <FieldGroup type="tel" id="bPhone" label="Telefoonnummer" value={clientPhone} onchange={(v) => clientPhone = v} pattern="[0-9\s\-+()]{6,20}" required />
               <FieldGroup id="bNotes" label="Opmerkingen" value={clientNotes} onchange={(v) => clientNotes = v} />
             </form>
           </div>

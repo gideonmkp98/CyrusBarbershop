@@ -4,10 +4,11 @@
   let { data } = $props();
 
   // Email form state
-  let email = $state(data.user.email);
+  let email = $state('');
   let emailError = $state('');
   let emailSuccess = $state('');
   let emailLoading = $state(false);
+  let emailInitialized = $state(false);
 
   // Password form state
   let currentPassword = $state('');
@@ -16,6 +17,13 @@
   let passwordError = $state('');
   let passwordSuccess = $state('');
   let passwordLoading = $state(false);
+
+  $effect(() => {
+    if (!emailInitialized) {
+      email = data.user.email;
+      emailInitialized = true;
+    }
+  });
 
   async function updateEmail(e: Event) {
     e.preventDefault();

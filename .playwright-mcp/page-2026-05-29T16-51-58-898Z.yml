@@ -1,0 +1,66 @@
+- generic [ref=e2]:
+  - banner [ref=e5]:
+    - navigation [ref=e6]:
+      - link "Cyrus Barbershop" [ref=e7] [cursor=pointer]:
+        - /url: /
+        - img "Cyrus Barbershop" [ref=e8]
+      - generic [ref=e9]:
+        - link "Home" [ref=e10] [cursor=pointer]:
+          - /url: /
+        - link "Behandelingen" [ref=e11] [cursor=pointer]:
+          - /url: /services
+        - link "Over" [ref=e12] [cursor=pointer]:
+          - /url: /about
+        - link "Contact" [ref=e13] [cursor=pointer]:
+          - /url: /contact
+      - link "Maak een Afspraak" [ref=e15] [cursor=pointer]:
+        - /url: /booking
+  - main [ref=e16]:
+    - generic [ref=e19]:
+      - generic [ref=e20]:
+        - generic [ref=e21]: SINDS 2025
+        - heading "Over Cyrus Barbershop" [level=2] [ref=e22]:
+          - text: Over Cyrus
+          - text: Barbershop
+        - paragraph [ref=e23]: De naam Cyrus is geïnspireerd op Cyrus de Grote, een van de meest gerespecteerde leiders uit de geschiedenis. Hij stond bekend om zijn wijsheid, visie, rechtvaardigheid en respect.
+        - paragraph [ref=e25]: Bij Cyrus Barbershop vormen deze principes de basis van alles wat we doen. Wij geloven dat een bezoek aan de barbershop meer is dan alleen een knip- of scheerbeurt. Het is een moment van aandacht, vakmanschap en persoonlijke verzorging.
+        - paragraph [ref=e26]: Onze barbers combineren traditionele technieken met moderne stijl, waarbij kwaliteit, gastvrijheid en respect voor iedere klant centraal staan.
+        - blockquote [ref=e27]: "\"Karakter, klasse en vakmanschap - samengebracht in een ervaring die verder gaat dan alleen haarverzorging.\""
+      - img "Cyrus Barbershop interior" [ref=e30]
+    - generic [ref=e33]:
+      - generic [ref=e34]:
+        - generic [ref=e35]: DE PLEK VOOR JOUW STIJL
+        - heading "De Barbershop" [level=2] [ref=e36]
+      - generic [ref=e38]:
+        - img "Vintage barber chair" [ref=e40]
+        - img "Barbershop workspace" [ref=e42]
+        - img "Classic barber interior" [ref=e44]
+        - img "Barbershop from behind" [ref=e46]
+  - contentinfo [ref=e47]:
+    - generic [ref=e49]:
+      - generic [ref=e50]:
+        - generic [ref=e51]:
+          - img "Cyrus Barbershop" [ref=e52]
+          - generic [ref=e53]: CYRUS BARBERSHOP
+        - paragraph [ref=e54]: © 2025 CYRUS BARBERSHOP.
+      - generic [ref=e55]:
+        - generic [ref=e56]:
+          - generic [ref=e57]: OPENINGSTIJDEN
+          - 'link "Ma–Vr: Gesloten" [ref=e58] [cursor=pointer]':
+            - /url: /contact
+          - 'link "Za: Gesloten" [ref=e59] [cursor=pointer]':
+            - /url: /contact
+          - 'link "Zo: Gesloten" [ref=e60] [cursor=pointer]':
+            - /url: /contact
+        - generic [ref=e61]:
+          - generic [ref=e62]: CONTACT
+          - link "Locatie" [ref=e63] [cursor=pointer]:
+            - /url: /contact
+          - link "Maak een afspraak" [ref=e64] [cursor=pointer]:
+            - /url: /booking
+        - generic [ref=e65]:
+          - generic [ref=e66]: SOCIALS
+          - link "Instagram" [ref=e67] [cursor=pointer]:
+            - /url: /contact
+          - link "Facebook" [ref=e68] [cursor=pointer]:
+            - /url: /contact

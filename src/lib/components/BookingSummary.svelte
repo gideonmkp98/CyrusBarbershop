@@ -20,7 +20,7 @@
       <span class="font-body text-body text-right">{summaryService}</span>
     </div>
     <div class="flex justify-between items-start">
-      <span class="font-body text-label text-bone-muted">KAPPER</span>
+      <span class="font-body text-label text-bone-muted">BARBER</span>
       <span class="font-body text-body text-right">{summaryBarber}</span>
     </div>
     <div class="flex justify-between items-start">

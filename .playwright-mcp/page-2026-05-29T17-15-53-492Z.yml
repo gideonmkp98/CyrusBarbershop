@@ -1,0 +1,87 @@
+- generic [ref=e2]:
+  - banner [ref=e5]:
+    - navigation [ref=e6]:
+      - link "Cyrus Barbershop" [ref=e7] [cursor=pointer]:
+        - /url: /
+        - img "Cyrus Barbershop" [ref=e8]
+      - button "Toggle menu" [ref=e10]
+  - main [ref=e14]:
+    - generic [ref=e15]:
+      - img "Cyrus Barbershop interior" [ref=e17]
+      - generic [ref=e19]:
+        - img "Cyrus Barbershop" [ref=e21]
+        - heading "C Y R U S B A R B E R S H O P" [level=1] [ref=e22]:
+          - generic [ref=e23]: C
+          - generic [ref=e24]: "Y"
+          - generic [ref=e25]: R
+          - generic [ref=e26]: U
+          - generic [ref=e27]: S
+          - generic [ref=e28]: B
+          - generic [ref=e29]: A
+          - generic [ref=e30]: R
+          - generic [ref=e31]: B
+          - generic [ref=e32]: E
+          - generic [ref=e33]: R
+          - generic [ref=e34]: S
+          - generic [ref=e35]: H
+          - generic [ref=e36]: O
+          - generic [ref=e37]: P
+        - paragraph [ref=e38]: Precision Cuts, Timeless Style.
+        - generic [ref=e40]:
+          - link "Maak een Afspraak" [ref=e41] [cursor=pointer]:
+            - /url: /booking
+          - link "Bekijk Behandelingen" [ref=e42] [cursor=pointer]:
+            - /url: /services
+    - generic [ref=e46]:
+      - paragraph [ref=e48]: Vakwerk sinds 2025
+      - paragraph [ref=e49]: Een barbershop gericht op vakmanschap, authenticiteit en het principe dat elke kapsel telt.
+    - generic [ref=e52]:
+      - link "BEHANDELINGEN Waar traditie en stijl samenkomen Echte aandacht voor jouw look, van begin tot eind. →" [ref=e53] [cursor=pointer]:
+        - /url: /services
+        - img [ref=e55]
+        - generic [ref=e61]: BEHANDELINGEN
+        - heading "Waar traditie en stijl samenkomen" [level=3] [ref=e62]
+        - paragraph [ref=e63]: Echte aandacht voor jouw look, van begin tot eind.
+        - generic [ref=e64]: →
+      - link "RESERVEREN Boek je Stoel Online reserveren zorgt ervoor dat je de aandacht krijgt die je verdient. Drie simpele stappen en klaar. →" [ref=e65] [cursor=pointer]:
+        - /url: /booking
+        - img [ref=e67]
+        - generic [ref=e69]: RESERVEREN
+        - heading "Boek je Stoel" [level=3] [ref=e70]
+        - paragraph [ref=e71]: Online reserveren zorgt ervoor dat je de aandacht krijgt die je verdient. Drie simpele stappen en klaar.
+        - generic [ref=e72]: →
+      - link "CONTACT Kom Langs Bezoek onze zaak of neem contact op. Graag helpen we je met vragen, tips of een walk-in afspraak. →" [ref=e73] [cursor=pointer]:
+        - /url: /contact
+        - img [ref=e75]
+        - generic [ref=e78]: CONTACT
+        - heading "Kom Langs" [level=3] [ref=e79]
+        - paragraph [ref=e80]: Bezoek onze zaak of neem contact op. Graag helpen we je met vragen, tips of een walk-in afspraak.
+        - generic [ref=e81]: →
+  - contentinfo [ref=e82]:
+    - generic [ref=e84]:
+      - generic [ref=e85]:
+        - generic [ref=e86]:
+          - img "Cyrus Barbershop" [ref=e87]
+          - generic [ref=e88]: CYRUS BARBERSHOP
+        - paragraph [ref=e89]: © 2025 CYRUS BARBERSHOP.
+      - generic [ref=e90]:
+        - generic [ref=e91]:
+          - generic [ref=e92]: OPENINGSTIJDEN
+          - 'link "Ma–Vr: Gesloten" [ref=e93] [cursor=pointer]':
+            - /url: /contact
+          - 'link "Za: Gesloten" [ref=e94] [cursor=pointer]':
+            - /url: /contact
+          - 'link "Zo: Gesloten" [ref=e95] [cursor=pointer]':
+            - /url: /contact
+        - generic [ref=e96]:
+          - generic [ref=e97]: CONTACT
+          - link "Locatie" [ref=e98] [cursor=pointer]:
+            - /url: /contact
+          - link "Maak een afspraak" [ref=e99] [cursor=pointer]:
+            - /url: /booking
+        - generic [ref=e100]:
+          - generic [ref=e101]: SOCIALS
+          - link "Instagram" [ref=e102] [cursor=pointer]:
+            - /url: /contact
+          - link "Facebook" [ref=e103] [cursor=pointer]:
+            - /url: /contact

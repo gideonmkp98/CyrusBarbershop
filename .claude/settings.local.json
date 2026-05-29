@@ -58,7 +58,12 @@
       "Bash(Get-Process -Name \"node\" -ErrorAction SilentlyContinue)",
       "Bash(Select-Object -Property Id,ProcessName,StartTime)",
       "Bash(Format-Table)",
-      "Bash(timeout 5)"
+      "Bash(timeout 5)",
+      "mcp__plugin_playwright_playwright__browser_click",
+      "mcp__plugin_playwright_playwright__browser_fill_form",
+      "Bash(Get-ChildItem \".playwright-mcp\")",
+      "Bash(Sort-Object LastWriteTime -Descending)",
+      "mcp__plugin_playwright_playwright__browser_resize"
     ]
   }
 }

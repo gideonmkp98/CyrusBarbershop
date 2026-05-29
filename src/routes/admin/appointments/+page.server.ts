@@ -56,7 +56,7 @@ export const load: PageServerLoad = async () => {
     .where(eq(services.isActive, true))
     .orderBy(services.displayOrder, services.name);
 
-  // Haal alle kappers/staff op
+  // Haal alle barbers/staff op
   const allStaff = await db
     .select({
       id: users.id,

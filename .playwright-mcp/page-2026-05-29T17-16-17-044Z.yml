@@ -1,0 +1,139 @@
+- generic [ref=e2]:
+  - banner [ref=e5]:
+    - navigation [ref=e6]:
+      - link "Cyrus Barbershop" [ref=e7] [cursor=pointer]:
+        - /url: /
+        - img "Cyrus Barbershop" [ref=e8]
+      - button "Toggle menu" [ref=e10]
+  - main [ref=e14]:
+    - generic [ref=e16]:
+      - generic [ref=e17]:
+        - generic [ref=e18]: MAAK JE AFSPRAAK
+        - heading "Tijd voor een nieuwe look" [level=1] [ref=e19]
+        - paragraph [ref=e20]: Stap voor stap naar je volgende Cyrus-ervaring. Kies je behandeling, selecteer datum en moment, en we zien je snel.
+      - generic [ref=e21]:
+        - generic [ref=e22]: "01"
+        - generic [ref=e24]: "02"
+        - generic [ref=e26]: "03"
+      - generic [ref=e27]:
+        - generic [ref=e28]:
+          - generic [ref=e29]:
+            - heading "Kies Behandeling" [level=3] [ref=e30]
+            - generic [ref=e31]:
+              - generic [ref=e32]:
+                - heading "Haarwerk" [level=4] [ref=e33]:
+                  - generic [ref=e35]: Haarwerk
+                - generic [ref=e37]:
+                  - button "Haarknippen €35 Een vakkundige snit op maat. Schaarwerk, tondeuse en styling. Inclusief wassen en föhnen. ○" [ref=e38] [cursor=pointer]:
+                    - generic [ref=e39]:
+                      - generic [ref=e40]:
+                        - generic [ref=e41]:
+                          - heading "Haarknippen" [level=4] [ref=e42]
+                          - generic [ref=e44]: €35
+                        - paragraph [ref=e45]: Een vakkundige snit op maat. Schaarwerk, tondeuse en styling. Inclusief wassen en föhnen.
+                      - generic [ref=e46]: ○
+                  - button "Fade €45 Vloeiende overgang van huid naar haar. Verschillende fademogelijkheden met scheermesafwerking. ○" [ref=e47] [cursor=pointer]:
+                    - generic [ref=e48]:
+                      - generic [ref=e49]:
+                        - generic [ref=e50]:
+                          - heading "Fade" [level=4] [ref=e51]
+                          - generic [ref=e53]: €45
+                        - paragraph [ref=e54]: Vloeiende overgang van huid naar haar. Verschillende fademogelijkheden met scheermesafwerking.
+                      - generic [ref=e55]: ○
+                  - button "De Klassieke €45 Gerespecteerd klassiek werk. Hals netjes afgewerkt met warme handdoek. De standaard. ○" [ref=e56] [cursor=pointer]:
+                    - generic [ref=e57]:
+                      - generic [ref=e58]:
+                        - generic [ref=e59]:
+                          - heading "De Klassieke" [level=4] [ref=e60]
+                          - generic [ref=e62]: €45
+                        - paragraph [ref=e63]: Gerespecteerd klassiek werk. Hals netjes afgewerkt met warme handdoek. De standaard.
+                      - generic [ref=e64]: ○
+              - generic [ref=e65]:
+                - heading "Baardverzorging" [level=4] [ref=e66]:
+                  - generic [ref=e68]: Baardverzorging
+                - generic [ref=e70]:
+                  - button "Baardtrim & Vorm €25 Vakkundig trimmen en vormen naar je gezichtsstructuur. Afgewerkt met premium baardolie. ○" [ref=e71] [cursor=pointer]:
+                    - generic [ref=e72]:
+                      - generic [ref=e73]:
+                        - generic [ref=e74]:
+                          - heading "Baardtrim & Vorm" [level=4] [ref=e75]
+                          - generic [ref=e76]: €25
+                        - paragraph [ref=e77]: Vakkundig trimmen en vormen naar je gezichtsstructuur. Afgewerkt met premium baardolie.
+                      - generic [ref=e78]: ○
+                  - button "Warme Scheerbeurt €40 Klassieke scheerervaring. Stoom, zeep en scheermeswerk met de nodige finesse. ○" [ref=e79] [cursor=pointer]:
+                    - generic [ref=e80]:
+                      - generic [ref=e81]:
+                        - generic [ref=e82]:
+                          - heading "Warme Scheerbeurt" [level=4] [ref=e83]
+                          - generic [ref=e84]: €40
+                        - paragraph [ref=e85]: Klassieke scheerervaring. Stoom, zeep en scheermeswerk met de nodige finesse.
+                      - generic [ref=e86]: ○
+                  - button "Baard Design €30 Fijne vorming en linenwerk. Voor wie waarde hecht aan perfecte details en vakwerk. ○" [ref=e87] [cursor=pointer]:
+                    - generic [ref=e88]:
+                      - generic [ref=e89]:
+                        - generic [ref=e90]:
+                          - heading "Baard Design" [level=4] [ref=e91]
+                          - generic [ref=e93]: €30
+                        - paragraph [ref=e94]: Fijne vorming en linenwerk. Voor wie waarde hecht aan perfecte details en vakwerk.
+                      - generic [ref=e95]: ○
+              - generic [ref=e96]:
+                - img [ref=e97]
+                - generic [ref=e103]: COMPLEET PAKKET
+                - button "The Works €75 Het volledige Cyrus-programma. Premium haarknippen of fade, baardwerk en gezichtsmassage. ○" [ref=e104] [cursor=pointer]:
+                  - generic [ref=e105]:
+                    - generic [ref=e106]:
+                      - generic [ref=e107]:
+                        - heading "The Works" [level=4] [ref=e108]
+                        - generic [ref=e110]: €75
+                      - paragraph [ref=e111]: Het volledige Cyrus-programma. Premium haarknippen of fade, baardwerk en gezichtsmassage.
+                    - generic [ref=e112]: ○
+          - button "Doorgaan" [ref=e114] [cursor=pointer]
+        - complementary [ref=e115]:
+          - generic [ref=e116]:
+            - heading "Jouw afspraak" [level=3] [ref=e117]
+            - generic [ref=e118]:
+              - generic [ref=e119]:
+                - generic [ref=e120]: BEHANDELING
+                - generic [ref=e121]: ─
+              - generic [ref=e122]:
+                - generic [ref=e123]: BARBER
+                - generic [ref=e124]: ─
+              - generic [ref=e125]:
+                - generic [ref=e126]: DATUM
+                - generic [ref=e127]: ─
+              - generic [ref=e128]:
+                - generic [ref=e129]: MOMENT
+                - generic [ref=e130]: ─
+              - generic [ref=e131]:
+                - generic [ref=e132]: TOTAAL
+                - generic [ref=e133]: €0
+            - button "BEVESTIG AFSPRAAK" [disabled] [ref=e134] [cursor=pointer]
+            - paragraph [ref=e135]: Door te bevestigen ga je akkoord met ons annuleringsbeleid van 24 uur. Er wordt spoedig een bevestigingsmail verzonden.
+  - contentinfo [ref=e136]:
+    - generic [ref=e138]:
+      - generic [ref=e139]:
+        - generic [ref=e140]:
+          - img "Cyrus Barbershop" [ref=e141]
+          - generic [ref=e142]: CYRUS BARBERSHOP
+        - paragraph [ref=e143]: © 2025 CYRUS BARBERSHOP.
+      - generic [ref=e144]:
+        - generic [ref=e145]:
+          - generic [ref=e146]: OPENINGSTIJDEN
+          - 'link "Ma–Vr: Gesloten" [ref=e147] [cursor=pointer]':
+            - /url: /contact
+          - 'link "Za: Gesloten" [ref=e148] [cursor=pointer]':
+            - /url: /contact
+          - 'link "Zo: Gesloten" [ref=e149] [cursor=pointer]':
+            - /url: /contact
+        - generic [ref=e150]:
+          - generic [ref=e151]: CONTACT
+          - link "Locatie" [ref=e152] [cursor=pointer]:
+            - /url: /contact
+          - link "Maak een afspraak" [ref=e153] [cursor=pointer]:
+            - /url: /booking
+        - generic [ref=e154]:
+          - generic [ref=e155]: SOCIALS
+          - link "Instagram" [ref=e156] [cursor=pointer]:
+            - /url: /contact
+          - link "Facebook" [ref=e157] [cursor=pointer]:
+            - /url: /contact

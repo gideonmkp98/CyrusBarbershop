@@ -166,12 +166,15 @@
       {#if day.empty}
         <div class="cal-day empty"></div>
       {:else}
-        <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
         <div
           class="cal-day"
           class:disabled={day.disabled}
           class:selected={day.selected}
+          role="button"
+          tabindex={day.disabled ? -1 : 0}
+          aria-disabled={day.disabled}
           onclick={() => selectDay(day)}
+          onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && selectDay(day)}
         >
           {day.day}
         </div>
@@ -187,9 +190,4 @@
     background: rgba(0, 0, 0, 0.2) !important;
   }
 
-  .cal-day.fully-booked {
-    opacity: 0.3;
-    cursor: not-allowed;
-    background: rgba(0, 0, 0, 0.2) !important;
-  }
 </style>

@@ -1,0 +1,60 @@
+- generic [ref=e2]:
+  - banner [ref=e5]:
+    - navigation [ref=e6]:
+      - link "Cyrus Barbershop" [ref=e7] [cursor=pointer]:
+        - /url: /
+        - img "Cyrus Barbershop" [ref=e8]
+      - generic [ref=e9]:
+        - link "Home" [ref=e10] [cursor=pointer]:
+          - /url: /
+        - link "Behandelingen" [ref=e11] [cursor=pointer]:
+          - /url: /services
+        - link "Over" [ref=e12] [cursor=pointer]:
+          - /url: /about
+        - link "Contact" [ref=e13] [cursor=pointer]:
+          - /url: /contact
+      - link "Maak een Afspraak" [ref=e15] [cursor=pointer]:
+        - /url: /booking
+  - main [ref=e16]:
+    - generic [ref=e18]:
+      - generic [ref=e19]:
+        - img "Cyrus" [ref=e20]
+        - heading "CYRUS BEHEER" [level=1] [ref=e21]
+      - generic [ref=e22]:
+        - generic [ref=e23]:
+          - textbox "E-mail" [ref=e24]:
+            - /placeholder: " "
+          - generic: E-mail
+        - generic [ref=e25]:
+          - textbox "Wachtwoord" [ref=e26]:
+            - /placeholder: " "
+          - generic: Wachtwoord
+        - button "Aanmelden" [ref=e27] [cursor=pointer]
+  - contentinfo [ref=e28]:
+    - generic [ref=e30]:
+      - generic [ref=e31]:
+        - generic [ref=e32]:
+          - img "Cyrus Barbershop" [ref=e33]
+          - generic [ref=e34]: CYRUS BARBERSHOP
+        - paragraph [ref=e35]: © 2025 CYRUS BARBERSHOP.
+      - generic [ref=e36]:
+        - generic [ref=e37]:
+          - generic [ref=e38]: OPENINGSTIJDEN
+          - 'link "Ma–Vr: Gesloten" [ref=e39] [cursor=pointer]':
+            - /url: /contact
+          - 'link "Za: Gesloten" [ref=e40] [cursor=pointer]':
+            - /url: /contact
+          - 'link "Zo: Gesloten" [ref=e41] [cursor=pointer]':
+            - /url: /contact
+        - generic [ref=e42]:
+          - generic [ref=e43]: CONTACT
+          - link "Locatie" [ref=e44] [cursor=pointer]:
+            - /url: /contact
+          - link "Maak een afspraak" [ref=e45] [cursor=pointer]:
+            - /url: /booking
+        - generic [ref=e46]:
+          - generic [ref=e47]: SOCIALS
+          - link "Instagram" [ref=e48] [cursor=pointer]:
+            - /url: /contact
+          - link "Facebook" [ref=e49] [cursor=pointer]:
+            - /url: /contact

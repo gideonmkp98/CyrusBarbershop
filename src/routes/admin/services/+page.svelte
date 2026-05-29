@@ -3,6 +3,25 @@
 
   let { data } = $props();
 
+  // Tooltip state
+  let tooltipText = $state('');
+  let tooltipVisible = $state(false);
+  let tooltipPosition = $state({ x: 0, y: 0 });
+
+  function showTooltip(e: MouseEvent, text: string) {
+    const rect = (e.target as HTMLElement).getBoundingClientRect();
+    tooltipPosition = {
+      x: rect.left + rect.width / 2,
+      y: rect.top - 8
+    };
+    tooltipText = text;
+    tooltipVisible = true;
+  }
+
+  function hideTooltip() {
+    tooltipVisible = false;
+  }
+
   interface Service {
     id: number;
     name: string;
@@ -313,7 +332,7 @@
     />
 
     <!-- View toggle -->
-    <div class="flex md:ml-auto bg-surface-base border border-white/10 rounded overflow-hidden">
+    <div class="flex md:ml-auto bg-surface-base border border-white/10 overflow-hidden">
       <button
         onclick={() => viewMode = 'grid'}
         class="px-3 py-1.5 text-sm font-body transition-colors {viewMode === 'grid' ? 'bg-gold-500 text-surface' : 'text-bone hover:text-bone'}"
@@ -336,12 +355,14 @@
         {@const IconComponent = getCategoryIcon(service.category)}
         <div class="bg-surface-base border border-white/5 p-5 hover:border-white/10 transition-all group">
           <div class="flex justify-between items-start mb-3">
-            <span class="text-xs font-body px-2 py-1 rounded border flex items-center gap-1.5 {getCategoryColor(service.category)}">
+            <span class="text-xs font-body px-2 py-1 border flex items-center gap-1.5 {getCategoryColor(service.category)}">
               <IconComponent size={12} />
               {getCategoryLabel(service.category)}
             </span>
             {#if service.isSignature}
-              <Sparkles class="text-gold-500" size={16} title="Signature Behandeling" />
+              <div onmouseenter={(e) => showTooltip(e, 'Signature Behandeling')} onmouseleave={hideTooltip}>
+                <Sparkles class="text-gold-500" size={16} />
+              </div>
             {/if}
           </div>
 
@@ -375,15 +396,17 @@
             <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
               <button
                 onclick={() => openEditModal(service)}
-                class="p-1.5 rounded hover:bg-white/5 transition-colors text-blue-400 hover:text-blue-300"
-                title="Bewerken"
+                onmouseenter={(e) => showTooltip(e, 'Bewerken')}
+                onmouseleave={hideTooltip}
+                class="p-1.5 hover:bg-white/5 transition-colors text-blue-400 hover:text-blue-300"
               >
                 <Pencil size={14} />
               </button>
               <button
                 onclick={() => openDeleteModal(service.id, service.name)}
-                class="p-1.5 rounded hover:bg-white/5 transition-colors text-red-400 hover:text-red-300"
-                title="Verwijderen"
+                onmouseenter={(e) => showTooltip(e, 'Verwijderen')}
+                onmouseleave={hideTooltip}
+                class="p-1.5 hover:bg-white/5 transition-colors text-red-400 hover:text-red-300"
               >
                 <Trash2 size={14} />
               </button>
@@ -432,7 +455,7 @@
                 </div>
               </td>
               <td class="p-4">
-                <span class="font-body text-xs px-2 py-1 rounded border flex items-center gap-1.5 {getCategoryColor(service.category)}">
+                <span class="font-body text-xs px-2 py-1 border flex items-center gap-1.5 {getCategoryColor(service.category)}">
                   <IconComponent size={12} />
                   {getCategoryLabel(service.category)}
                 </span>
@@ -441,7 +464,9 @@
               <td class="p-4 font-body text-bone-muted">{service.duration} min</td>
               <td class="p-4">
                 {#if service.isSignature}
-                  <Sparkles class="text-gold-500" size={16} title="Signature Behandeling" />
+                  <div onmouseenter={(e) => showTooltip(e, 'Signature Behandeling')} onmouseleave={hideTooltip}>
+                    <Sparkles class="text-gold-500" size={16} />
+                  </div>
                 {:else}
                   <span class="text-bone-muted">—</span>
                 {/if}
@@ -463,15 +488,17 @@
                 <div class="flex gap-2">
                   <button
                     onclick={() => openEditModal(service)}
-                    class="p-1.5 rounded hover:bg-white/5 transition-colors text-blue-400 hover:text-blue-300"
-                    title="Bewerken"
+                    onmouseenter={(e) => showTooltip(e, 'Bewerken')}
+                    onmouseleave={hideTooltip}
+                    class="p-1.5 hover:bg-white/5 transition-colors text-blue-400 hover:text-blue-300"
                   >
                     <Pencil size={16} />
                   </button>
                   <button
                     onclick={() => openDeleteModal(service.id, service.name)}
-                    class="p-1.5 rounded hover:bg-white/5 transition-colors text-red-400 hover:text-red-300"
-                    title="Verwijderen"
+                    onmouseenter={(e) => showTooltip(e, 'Verwijderen')}
+                    onmouseleave={hideTooltip}
+                    class="p-1.5 hover:bg-white/5 transition-colors text-red-400 hover:text-red-300"
                   >
                     <Trash2 size={16} />
                   </button>
@@ -496,8 +523,8 @@
 
   <!-- Create/Edit Modal -->
   {#if showFormModal}
-    <div class="fixed inset-0 bg-black/70 flex items-center justify-center z-50" onclick={closeFormModal}>
-      <div class="bg-surface-base p-8 rounded-lg border border-white/10 max-w-2xl w-full mx-6 shadow-2xl max-h-[90vh] overflow-y-auto" onclick={e => e.stopPropagation()}>
+    <div class="fixed inset-0 bg-black/70 flex items-center justify-center z-50" role="button" tabindex="0" aria-label="Modal sluiten" onclick={closeFormModal} onkeydown={(e) => e.key === 'Enter' && closeFormModal()}>
+      <div class="bg-surface-base p-8 border border-white/10 max-w-2xl w-full mx-6 shadow-2xl max-h-[90vh] overflow-y-auto" role="dialog" aria-modal="true" tabindex="-1" onclick={e => e.stopPropagation()} onkeydown={(e) => e.key === 'Escape' && closeFormModal()}>
         <div class="flex items-center gap-4 mb-6 pb-4 border-b border-white/5">
           <div class="w-12 h-12 rounded-full bg-gold-500/10 flex items-center justify-center">
             <Scissors class="text-gold-500" size={24} />
@@ -513,14 +540,14 @@
         </div>
 
         {#if formError}
-          <div class="bg-red-500/10 border border-red-500/20 p-3 text-sm text-red-400 mb-4 rounded flex items-start gap-2">
+          <div class="bg-red-500/10 border border-red-500/20 p-3 text-sm text-red-400 mb-4 flex items-start gap-2">
             <AlertTriangle size={18} class="shrink-0 mt-0.5" />
             <span>{formError}</span>
           </div>
         {/if}
 
         {#if formSuccess}
-          <div class="bg-green-500/10 border border-green-500/20 p-3 text-sm text-green-400 mb-4 rounded flex items-start gap-2">
+          <div class="bg-green-500/10 border border-green-500/20 p-3 text-sm text-green-400 mb-4 flex items-start gap-2">
             <CheckCircle size={18} class="shrink-0 mt-0.5" />
             <span>{formSuccess}</span>
           </div>
@@ -529,8 +556,9 @@
         <form onsubmit={handleSubmit} class="space-y-5">
           <div class="grid md:grid-cols-2 gap-4">
             <div>
-              <label class="block text-xs font-body text-bone-muted mb-2">Naam *</label>
+              <label for="service-name" class="block text-xs font-body text-bone-muted mb-2">Naam *</label>
               <input
+                id="service-name"
                 type="text"
                 bind:value={formData.name}
                 class="w-full bg-surface-low border border-white/5 px-3 py-2.5 text-sm font-body text-bone focus:outline-none focus:border-gold-500 transition-colors"
@@ -539,8 +567,9 @@
               />
             </div>
             <div>
-              <label class="block text-xs font-body text-bone-muted mb-2">Prijs (€) *</label>
+              <label for="service-price" class="block text-xs font-body text-bone-muted mb-2">Prijs (€) *</label>
               <input
+                id="service-price"
                 type="number"
                 bind:value={formData.price}
                 class="w-full bg-surface-low border border-white/5 px-3 py-2.5 text-sm font-body text-bone focus:outline-none focus:border-gold-500 transition-colors"
@@ -553,8 +582,9 @@
           </div>
 
           <div>
-            <label class="block text-xs font-body text-bone-muted mb-2">Beschrijving</label>
+            <label for="service-description" class="block text-xs font-body text-bone-muted mb-2">Beschrijving</label>
             <textarea
+              id="service-description"
               bind:value={formData.description}
               class="w-full bg-surface-low border border-white/5 px-3 py-2.5 text-sm font-body text-bone focus:outline-none focus:border-gold-500 transition-colors resize-none"
               placeholder="Beschrijf de behandeling..."
@@ -564,8 +594,9 @@
 
           <div class="grid md:grid-cols-2 gap-4">
             <div>
-              <label class="block text-xs font-body text-bone-muted mb-2">Duur (minuten)</label>
+              <label for="service-duration" class="block text-xs font-body text-bone-muted mb-2">Duur (minuten)</label>
               <input
+                id="service-duration"
                 type="number"
                 bind:value={formData.duration}
                 class="w-full bg-surface-low border border-white/5 px-3 py-2.5 text-sm font-body text-bone focus:outline-none focus:border-gold-500 transition-colors"
@@ -574,8 +605,9 @@
               />
             </div>
             <div>
-              <label class="block text-xs font-body text-bone-muted mb-2">Categorie</label>
+              <label for="service-category" class="block text-xs font-body text-bone-muted mb-2">Categorie</label>
               <select
+                id="service-category"
                 bind:value={formData.category}
                 class="w-full bg-surface-low border border-white/5 px-3 py-2.5 text-sm font-body text-bone focus:outline-none focus:border-gold-500 transition-colors"
               >
@@ -587,7 +619,7 @@
           </div>
 
           <div class="flex flex-col gap-3 pt-2 border-t border-white/5">
-            <label class="flex items-center gap-3 cursor-pointer p-3 rounded bg-surface-low border border-white/5 hover:border-gold-500/30 transition-colors">
+            <label class="flex items-center gap-3 cursor-pointer p-3 bg-surface-low border border-white/5 hover:border-gold-500/30 transition-colors">
               <input type="checkbox" bind:checked={formData.isSignature} class="w-5 h-5 text-gold-500 accent-gold-500" />
               <div class="flex items-center gap-3">
                 <Sparkles size={18} class="text-gold-500" />
@@ -597,7 +629,7 @@
                 </div>
               </div>
             </label>
-            <label class="flex items-center gap-3 cursor-pointer p-3 rounded bg-surface-low border border-white/5 hover:border-green-500/30 transition-colors">
+            <label class="flex items-center gap-3 cursor-pointer p-3 bg-surface-low border border-white/5 hover:border-green-500/30 transition-colors">
               <input type="checkbox" bind:checked={formData.isActive} class="w-5 h-5 text-green-500 accent-green-500" />
               <div class="flex items-center gap-3">
                 <Eye size={18} class="text-green-500" />
@@ -610,10 +642,10 @@
           </div>
 
           <div class="flex gap-4 pt-4 border-t border-white/5">
-            <button type="button" onclick={closeFormModal} class="flex-1 px-4 py-2.5 bg-surface-low border border-white/10 text-bone-muted hover:text-bone hover:border-white/20 text-sm font-body rounded transition-all">
+            <button type="button" onclick={closeFormModal} class="flex-1 px-4 py-2.5 bg-surface-low border border-white/10 text-bone-muted hover:text-bone hover:border-white/20 text-sm font-body transition-all">
               Annuleren
             </button>
-            <button type="submit" class="flex-1 px-4 py-2.5 bg-gold-500 text-surface text-sm font-body hover:bg-gold-600 rounded transition-colors">
+            <button type="submit" class="flex-1 px-4 py-2.5 bg-gold-500 text-surface text-sm font-body hover:bg-gold-600 transition-colors">
               {editingService ? 'Opslaan' : 'Aanmaken'}
             </button>
           </div>
@@ -624,8 +656,8 @@
 
   <!-- Delete Confirmation Modal -->
   {#if showDeleteModal}
-    <div class="fixed inset-0 bg-black/70 flex items-center justify-center z-50" onclick={closeDeleteModal}>
-      <div class="bg-surface-base p-8 rounded-lg border border-white/10 max-w-md w-full mx-6 shadow-2xl" onclick={e => e.stopPropagation()}>
+    <div class="fixed inset-0 bg-black/70 flex items-center justify-center z-50" role="button" tabindex="0" aria-label="Modal sluiten" onclick={closeDeleteModal} onkeydown={(e) => e.key === 'Enter' && closeDeleteModal()}>
+      <div class="bg-surface-base p-8 border border-white/10 max-w-md w-full mx-6 shadow-2xl" role="dialog" aria-modal="true" tabindex="-1" onclick={e => e.stopPropagation()} onkeydown={(e) => e.key === 'Escape' && closeDeleteModal()}>
         <div class="text-center mb-6">
           <div class="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-4">
             <AlertTriangle size={32} class="text-red-400" />
@@ -640,16 +672,27 @@
           </p>
         </div>
         <div class="flex gap-3">
-          <button onclick={closeDeleteModal} class="flex-1 px-4 py-2.5 bg-surface-low border border-white/10 text-bone-muted hover:text-bone hover:border-white/20 text-sm font-body rounded transition-all">
+          <button onclick={closeDeleteModal} class="flex-1 px-4 py-2.5 bg-surface-low border border-white/10 text-bone-muted hover:text-bone hover:border-white/20 text-sm font-body transition-all">
             Annuleren
           </button>
-          <button onclick={handleDelete} class="flex-1 px-4 py-2.5 bg-red-500 text-white text-sm font-body hover:bg-red-600 rounded transition-colors">
+          <button onclick={handleDelete} class="flex-1 px-4 py-2.5 bg-red-500 text-white text-sm font-body hover:bg-red-600 transition-colors">
             Verwijderen
           </button>
         </div>
       </div>
     </div>
   {/if}
+
+  <!-- Custom Tooltip -->
+  {#if tooltipVisible}
+    <div
+      class="fixed px-3 py-1.5 bg-surface-base text-bone text-xs font-body whitespace-nowrap z-[100] pointer-events-none border border-white/10 shadow-xl"
+      style="left: {tooltipPosition.x}px; top: {tooltipPosition.y}px; transform: translate(-50%, -100%);"
+    >
+      {tooltipText}
+    </div>
+  {/if}
+
 {:else}
   <div class="text-center py-20">
     <h1 class="font-display text-subheading text-bone-muted mb-4">Toegang Geweigerd</h1>

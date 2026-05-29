@@ -20,7 +20,7 @@
 
 <div class="space-y-4">
   {#if barbers.length === 0}
-    <p class="text-bone-muted font-body text-body">Geen kappers beschikbaar op dit moment.</p>
+    <p class="text-bone-muted font-body text-body">Geen barbers beschikbaar op dit moment.</p>
   {:else}
     <!-- No preference option -->
     <button
@@ -35,7 +35,7 @@
         </div>
         <div class="text-left flex-1">
           <p class="font-body text-body-lg text-bone">Geen voorkeur</p>
-          <p class="font-body text-sm text-bone-muted">Elke beschikbare kapper</p>
+          <p class="font-body text-sm text-bone-muted">Elke beschikbare barber</p>
         </div>
         {#if selectedBarberId === null}
           <div class="w-6 h-6 flex items-center justify-center text-gold-500">
@@ -52,7 +52,7 @@
         <div class="w-full border-t border-bone-muted/20"></div>
       </div>
       <div class="relative flex justify-center text-sm">
-        <span class="px-4 bg-surface-low text-bone-muted">OF KIES EEN SPECIFIEKE KAPPER</span>
+        <span class="px-4 bg-surface-low text-bone-muted">OF KIES EEN SPECIFIEKE BARBER</span>
       </div>
     </div>
 

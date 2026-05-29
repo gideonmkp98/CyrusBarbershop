@@ -35,7 +35,7 @@
 
 <div class="min-h-screen bg-surface flex">
   <!-- Sidebar -->
-  <aside class="w-64 bg-surface-low border-r border-white/5 flex flex-col">
+  <aside class="w-64 bg-surface-low border-r border-white/5 flex flex-col fixed top-0 left-0 h-full">
     <div class="p-6 border-b border-white/5">
       <a href="/" class="flex items-center gap-3">
         <img src="/images/logo.jpeg" alt="Cyrus" class="w-8 h-8 object-contain rounded-full"/>
@@ -43,7 +43,7 @@
       </a>
     </div>
 
-    <nav class="flex-1 p-4 space-y-1">
+    <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
       {#each navItems as item}
         <a
           href={item.href}
@@ -74,7 +74,7 @@
   </aside>
 
   <!-- Main content -->
-  <main class="flex-1 p-8">
+  <main class="flex-1 p-8 ml-64">
     {@render children()}
   </main>
 </div>

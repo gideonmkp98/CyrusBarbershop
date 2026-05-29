@@ -23,9 +23,9 @@
   let { services = [] } = $props<Props>();
 
   // Group services by category, excluding signature services from regular categories
-  const signatureServices = services.filter(s => s.isSignature);
-  const hairServices = services.filter(s => s.category === 'hair' && !s.isSignature);
-  const beardServices = services.filter(s => s.category === 'beard' && !s.isSignature);
+  const signatureServices = $derived(services.filter(s => s.isSignature));
+  const hairServices = $derived(services.filter(s => s.category === 'hair' && !s.isSignature));
+  const beardServices = $derived(services.filter(s => s.category === 'beard' && !s.isSignature));
 </script>
 
 <section id="services" class="py-section bg-surface-low">
