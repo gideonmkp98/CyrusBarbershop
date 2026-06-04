@@ -12,7 +12,7 @@
     setTimeout(() => {
       loaderHidden = true;
       onReady?.();
-    }, 1600);
+    }, 800);
   });
 </script>
 

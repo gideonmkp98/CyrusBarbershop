@@ -9,9 +9,9 @@
       <div class="order-1 md:order-2 pt-4 md:pt-8">
         <span use:reveal class="font-body text-label text-gold-500 block mb-6">SINDS 2025</span>
 
-        <h2 use:reveal={{ delay: 1 }} class="font-display text-heading text-bone mb-10 leading-[1.1]">
+        <h1 use:reveal={{ delay: 1 }} class="font-display text-heading text-bone mb-10 leading-[1.1]">
           Over Cyrus<br/>Barbershop
-        </h2>
+        </h1>
 
         <p use:reveal={{ delay: 2 }} class="font-body text-body-lg text-bone-warm mb-6 max-w-md leading-relaxed">
           De naam Cyrus is geïnspireerd op Cyrus de Grote, een van de meest gerespecteerde leiders uit de geschiedenis. Hij stond bekend om zijn wijsheid, visie, rechtvaardigheid en respect.
@@ -35,7 +35,7 @@
       <!-- Image -->
       <div use:reveal={{ direction: 'right', delay: 2 }} class="order-2 md:order-1 relative">
         <div class="aspect-[4/5] overflow-hidden">
-          <img src="/images/storefromdesk.jpeg" alt="Cyrus Barbershop interior" class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700"/>
+          <img src="/images/storefromdesk.jpeg" alt="Cyrus Barbershop interior" class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700" loading="lazy" width="400" height="500" sizes="(max-width: 768px) 100vw, 50vw" />
         </div>
         <div class="absolute -bottom-6 -left-6 w-48 h-48 border border-gold-500/10 -z-10"></div>
       </div>

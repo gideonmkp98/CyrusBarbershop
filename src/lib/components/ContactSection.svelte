@@ -115,7 +115,7 @@
     <div class="flex flex-col md:flex-row gap-12 md:gap-16 items-start mb-16 md:mb-24">
       <div>
         <span use:reveal class="font-body text-label text-gold-500 block mb-4">BEREIK ONS</span>
-        <h2 use:reveal={{ delay: 1 }} class="font-display text-heading text-bone">Contact</h2>
+        <h1 use:reveal={{ delay: 1 }} class="font-display text-heading text-bone">Contact</h1>
       </div>
       <p use:reveal={{ delay: 2 }} class="font-body text-body-lg text-bone-warm max-w-md" style="font-size: 1.125rem; line-height: 1.7; letter-spacing: 0.01em;">
         Neem contact op met vragen, of kom langs voor advies en styling. Altijd graag behulpzaam.

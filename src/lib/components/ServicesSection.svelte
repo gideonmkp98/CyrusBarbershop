@@ -32,7 +32,7 @@
   <div class="max-w-[1200px] mx-auto px-6 md:px-8">
     <div class="text-center mb-16 md:mb-24">
       <span use:reveal class="font-body text-label text-gold-500 block mb-4 revealed">ONZE BEHANDELINGEN</span>
-      <h2 use:reveal={{ delay: 1 }} class="font-display text-heading text-bone">Vakwerk Met Precisie</h2>
+      <h1 use:reveal={{ delay: 1 }} class="font-display text-heading text-bone">Vakwerk Met Precisie</h1>
       <div use:reveal={{ delay: 2 }} class="section-divider mx-auto mt-6"></div>
     </div>
 
@@ -59,7 +59,7 @@
           </div>
         </div>
         <div use:reveal={{ delay: 2 }} class="overflow-hidden">
-          <img src="/images/barberchair1.jpeg" alt="Barber chair" class="w-full h-64 object-cover grayscale hover:grayscale-0 transition-all duration-700"/>
+          <img src="/images/barberchair1.jpeg" alt="Barber chair" class="w-full h-64 object-cover grayscale hover:grayscale-0 transition-all duration-700" loading="lazy" width="400" height="256" />
         </div>
       </div>
 
