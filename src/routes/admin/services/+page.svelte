@@ -152,7 +152,7 @@
     };
 
     try {
-      const res = await fetch('/admin/services', {
+      const res = await fetch('/admin/api/services', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
@@ -192,7 +192,7 @@
           closeFormModal();
         }, 1200);
       } else {
-        formError = result.data?.error || result.error || 'Fout bij opslaan';
+        formError = result.error || 'Fout bij opslaan';
       }
     } catch (e: any) {
       const errorMsg = e instanceof Error ? e.message : String(e);
@@ -204,7 +204,7 @@
     if (!serviceToDelete) return;
 
     try {
-      const res = await fetch('/admin/services', {
+      const res = await fetch('/admin/api/services', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: serviceToDelete.id, _action: 'delete' })
@@ -216,7 +216,7 @@
         services = services.filter(s => s.id !== serviceToDelete!.id);
         closeDeleteModal();
       } else {
-        formError = result.data?.error || result.error || 'Verwijderen mislukt';
+        formError = result.error || 'Verwijderen mislukt';
       }
     } catch (e: any) {
       const errorMsg = e instanceof Error ? e.message : String(e);
@@ -226,7 +226,7 @@
 
   async function toggleActive(id: number, isActive: boolean) {
     try {
-      const res = await fetch('/admin/services', {
+      const res = await fetch('/admin/api/services', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id, isActive: String(isActive), _action: 'toggle' })
