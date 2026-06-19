@@ -78,6 +78,7 @@
                 <ServiceItem
                   name={service.name}
                   price={+service.price}
+                  duration={service.duration}
                   description={service.description ?? undefined}
                   revealOpts={{ delay: i + 1 }}
                 />
@@ -99,6 +100,7 @@
                 <ServiceItem
                   name={service.name}
                   price={+service.price}
+                  duration={service.duration}
                   description={service.description ?? undefined}
                   revealOpts={{ delay: i + 1 }}
                 />

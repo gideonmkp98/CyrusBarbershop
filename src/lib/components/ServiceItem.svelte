@@ -4,6 +4,7 @@
   interface Props {
     name: string;
     price: number;
+    duration?: number;
     description?: string;
     selected?: boolean;
     revealOpts?: RevealOptions;
@@ -11,7 +12,7 @@
     onclick?: () => void;
   }
 
-  let { name, price, description = undefined, selected = false, revealOpts = undefined, signature = false, onclick = undefined } = $props<Props>();
+  let { name, price, duration, description = undefined, selected = false, revealOpts = undefined, signature = false, onclick = undefined } = $props<Props>();
 </script>
 
 {#if onclick}
@@ -23,11 +24,14 @@
   >
     <div class="flex items-center justify-between mb-2">
       <div class="flex-1">
-        <div class="flex items-end">
+        <div class="flex items-end gap-4">
           <h4 class="font-display text-subheading text-bone group-hover:text-gold-400 transition-colors">{name}</h4>
           <div class="leader"></div>
           <span class="font-display text-subheading text-gold-500">€{price}</span>
         </div>
+        {#if duration}
+          <p class="text-bone-muted text-xs mt-1">{duration} min</p>
+        {/if}
         {#if description}
           <p class="text-bone-warm text-sm max-w-lg mt-1">{description}</p>
         {/if}
@@ -43,11 +47,14 @@
   >
     <div class="flex items-center justify-between mb-2">
       <div class="flex-1">
-        <div class="flex items-end">
+        <div class="flex items-end gap-4">
           <h4 class="font-display text-subheading text-bone group-hover:text-gold-400 transition-colors">{name}</h4>
           <div class="leader"></div>
           <span class="font-display text-subheading text-gold-500">€{price}</span>
         </div>
+        {#if duration}
+          <p class="text-bone-muted text-xs mt-1">{duration} min</p>
+        {/if}
       </div>
     </div>
     {#if description}

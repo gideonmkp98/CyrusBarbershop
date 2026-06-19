@@ -8,8 +8,8 @@ export const load: PageServerLoad = async ({ locals }) => {
     throw redirect(303, '/admin-login');
   }
 
-  // Only owners can manage opening hours
-  if (locals.user.role !== 'owner') {
+  // Owners and managers can manage opening hours
+  if (locals.user.role !== 'owner' && locals.user.role !== 'manager') {
     throw redirect(303, '/admin');
   }
 
