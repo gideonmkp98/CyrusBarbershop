@@ -1,0 +1,98 @@
+- generic [ref=e2]:
+  - banner [ref=e5]:
+    - navigation [ref=e6]:
+      - link "Cyrus Barbershop" [ref=e7] [cursor=pointer]:
+        - /url: /
+        - img "Cyrus Barbershop" [ref=e8]
+      - generic [ref=e9]:
+        - link "Home" [ref=e10] [cursor=pointer]:
+          - /url: /
+        - link "Behandelingen" [ref=e11] [cursor=pointer]:
+          - /url: /services
+        - link "Over" [ref=e12] [cursor=pointer]:
+          - /url: /about
+        - link "Contact" [ref=e13] [cursor=pointer]:
+          - /url: /contact
+      - link "Maak een Afspraak" [ref=e15] [cursor=pointer]:
+        - /url: /booking
+  - main [ref=e16]:
+    - generic [ref=e18]:
+      - generic [ref=e19]:
+        - generic [ref=e20]: MAAK JE AFSPRAAK
+        - heading "Tijd voor een nieuwe look" [level=1] [ref=e21]
+        - paragraph [ref=e22]: Stap voor stap naar je volgende Cyrus-ervaring. Kies je behandeling, selecteer datum en moment, en we zien je snel.
+      - generic [ref=e23]:
+        - generic [ref=e24]: "01"
+        - generic [ref=e26]: "02"
+        - generic [ref=e28]: "03"
+      - generic [ref=e29]:
+        - generic [ref=e30]:
+          - generic [ref=e276]:
+            - heading "Contact Gegevens" [level=3] [ref=e277]
+            - generic [ref=e278]:
+              - generic [ref=e279]:
+                - textbox "Volledige Naam" [ref=e280]:
+                  - /placeholder: " "
+                - generic: Volledige Naam
+              - generic [ref=e281]:
+                - textbox "E-mailadres" [ref=e282]:
+                  - /placeholder: " "
+                - generic: E-mailadres
+              - generic [ref=e283]:
+                - textbox "Telefoonnummer" [ref=e284]:
+                  - /placeholder: " "
+                - generic: Telefoonnummer
+              - generic [ref=e285]:
+                - textbox "Opmerkingen" [ref=e286]:
+                  - /placeholder: " "
+                - generic: Opmerkingen
+          - button "Terug" [ref=e195] [cursor=pointer]
+        - complementary [ref=e119]:
+          - generic [ref=e120]:
+            - heading "Jouw afspraak" [level=3] [ref=e121]
+            - generic [ref=e122]:
+              - generic [ref=e123]:
+                - generic [ref=e124]: BEHANDELING
+                - generic [ref=e125]: Haarknippen
+              - generic [ref=e126]:
+                - generic [ref=e127]: BARBER
+                - generic [ref=e128]: ─
+              - generic [ref=e129]:
+                - generic [ref=e130]: DATUM
+                - generic [ref=e131]: 29 mei 2026
+              - generic [ref=e132]:
+                - generic [ref=e133]: MOMENT
+                - generic [ref=e134]: 19:00
+              - generic [ref=e135]:
+                - generic [ref=e136]: TOTAAL
+                - generic [ref=e137]: €35
+            - button "BEVESTIG AFSPRAAK" [disabled] [ref=e138] [cursor=pointer]
+            - paragraph [ref=e139]: Door te bevestigen ga je akkoord met ons annuleringsbeleid van 24 uur. Er wordt spoedig een bevestigingsmail verzonden.
+  - contentinfo [ref=e140]:
+    - generic [ref=e142]:
+      - generic [ref=e143]:
+        - generic [ref=e144]:
+          - img "Cyrus Barbershop" [ref=e145]
+          - generic [ref=e146]: CYRUS BARBERSHOP
+        - paragraph [ref=e147]: © 2025 CYRUS BARBERSHOP.
+      - generic [ref=e148]:
+        - generic [ref=e149]:
+          - generic [ref=e150]: OPENINGSTIJDEN
+          - 'link "Ma–Vr: 09:00 – 20:00 uur" [ref=e162] [cursor=pointer]':
+            - /url: /contact
+          - 'link "Za: 10:00 – 18:00 uur" [ref=e163] [cursor=pointer]':
+            - /url: /contact
+          - 'link "Zo: Gesloten" [ref=e153] [cursor=pointer]':
+            - /url: /contact
+        - generic [ref=e154]:
+          - generic [ref=e155]: CONTACT
+          - link "Locatie" [ref=e156] [cursor=pointer]:
+            - /url: /contact
+          - link "Maak een afspraak" [ref=e157] [cursor=pointer]:
+            - /url: /booking
+        - generic [ref=e158]:
+          - generic [ref=e159]: SOCIALS
+          - link "Instagram" [ref=e160] [cursor=pointer]:
+            - /url: /contact
+          - link "Facebook" [ref=e161] [cursor=pointer]:
+            - /url: /contact

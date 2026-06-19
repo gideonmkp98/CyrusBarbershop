@@ -49,6 +49,7 @@
   let selectedServiceId = $state<number | null>(null);
   let selectedService = $state('');
   let selectedPrice = $state(0);
+  let selectedDuration = $state(0);
   let selectedStaffId = $state<number | null>(null);
   let selectedBarberName = $state('');
   let selectedDate = $state<Date | null>(null);
@@ -95,7 +96,7 @@
   );
   let summaryTime = $derived(selectedTime || '─');
   let summaryBarber = $derived(selectedBarberName || '─');
-  let canConfirm = $derived(!!(selectedServiceId && selectedDate && selectedTime && clientName && clientEmail));
+  let canConfirm = $derived(!!(selectedServiceId && selectedDate && selectedTime && clientName && clientEmail && clientPhone));
 
   // Fetch availability when date changes (regardless of staff selection)
   $effect(() => {
@@ -114,7 +115,9 @@
     try {
       // When no barber selected (no preference), use allBarbers=true to combine availability
       const staffIdParam = selectedStaffId !== null ? `&staffId=${selectedStaffId}` : '&allBarbers=true';
-      const res = await fetch(`/api/availability?date=${dateStr}${staffIdParam}`);
+      // Include serviceId to get duration-based availability
+      const serviceIdParam = selectedServiceId !== null ? `&serviceId=${selectedServiceId}` : '';
+      const res = await fetch(`/api/availability?date=${dateStr}${staffIdParam}${serviceIdParam}`);
       if (res.ok) {
         const data = await res.json();
         availableSlots = data.slots || [];
@@ -125,10 +128,11 @@
     loadingSlots = false;
   }
 
-  function selectService(id: number, name: string, price: number) {
+  function selectService(id: number, name: string, price: number, duration: number = 0) {
     selectedServiceId = id;
     selectedService = name;
     selectedPrice = price;
+    selectedDuration = duration;
   }
 
   function selectBarber(id: number | null) {
@@ -194,7 +198,12 @@
       submitting = false;
       return;
     }
-    if (clientPhone.trim() && !/^[\d\s\-+()]{6,20}$/.test(clientPhone)) {
+    if (!clientPhone.trim()) {
+      formError = 'Voer je telefoonnummer in';
+      submitting = false;
+      return;
+    }
+    if (!/^[\d\s\-+()]{6,20}$/.test(clientPhone)) {
       formError = 'Voer een geldig telefoonnummer in (bijv. 06 12345678)';
       submitting = false;
       return;
@@ -279,6 +288,7 @@
     selectedServiceId = null;
     selectedService = '';
     selectedPrice = 0;
+    selectedDuration = 0;
     selectedStaffId = null;
     selectedBarberName = '';
     selectedDate = null;
@@ -292,6 +302,15 @@
   function formatSlotTime(time: string): string {
     const [h, m] = time.split(':').map(Number);
     return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+  }
+
+  function calculateEndTime(startTime: string, durationMinutes: number): string {
+    if (!startTime || !durationMinutes) return '';
+    const [h, m] = startTime.split(':').map(Number);
+    const totalMinutes = h * 60 + m + durationMinutes;
+    const endH = Math.floor(totalMinutes / 60) % 24;
+    const endM = totalMinutes % 60;
+    return `${String(endH).padStart(2, '0')}:${String(endM).padStart(2, '0')}`;
   }
 </script>
 
@@ -327,11 +346,12 @@
                       <ServiceItem
                         name={svc.name}
                         price={Number(svc.price)}
+                        duration={svc.duration}
                         description={svc.description || undefined}
                         selected={selectedService === svc.name}
                         signature={svc.isSignature}
                         revealOpts={{ delay: i + 1 }}
-                        onclick={() => selectService(svc.id, svc.name, Number(svc.price))}
+                        onclick={() => selectService(svc.id, svc.name, Number(svc.price), svc.duration)}
                       />
                     {/each}
                   </div>
@@ -351,11 +371,12 @@
                       <ServiceItem
                         name={svc.name}
                         price={Number(svc.price)}
+                        duration={svc.duration}
                         description={svc.description || undefined}
                         selected={selectedService === svc.name}
                         signature={svc.isSignature}
                         revealOpts={{ delay: i + 1 }}
-                        onclick={() => selectService(svc.id, svc.name, Number(svc.price))}
+                        onclick={() => selectService(svc.id, svc.name, Number(svc.price), svc.duration)}
                       />
                     {/each}
                   </div>
@@ -370,6 +391,7 @@
                   <ServiceItem
                     name={svc.name}
                     price={Number(svc.price)}
+                    duration={svc.duration}
                     description={svc.description || undefined}
                     selected={selectedService === svc.name}
                     signature={true}
@@ -385,9 +407,9 @@
         <!-- Step 2: Barber Selection -->
         {#if currentStep === 2}
           <div class="booking-step" style="animation: fadeStep 0.5s ease-out">
-            <h3 use:reveal class="font-display text-subheading text-bone uppercase tracking-tight mb-8">Kies je Kapper</h3>
+            <h3 use:reveal class="font-display text-subheading text-bone uppercase tracking-tight mb-8">Kies je Barber</h3>
             {#if loadingBarbers}
-              <p class="text-bone-muted font-body text-body">Kappers laden...</p>
+              <p class="text-bone-muted font-body text-body">Barbers laden...</p>
             {:else}
               <BarberSelection
                 {barbers}
@@ -427,7 +449,7 @@
             <form class="grid md:grid-cols-2 gap-8" onsubmit={submitBooking}>
               <FieldGroup id="bName" label="Volledige Naam" value={clientName} onchange={(v) => clientName = v} required />
               <FieldGroup type="email" id="bEmail" label="E-mailadres" value={clientEmail} onchange={(v) => clientEmail = v} required />
-              <FieldGroup type="tel" id="bPhone" label="Telefoonnummer" value={clientPhone} onchange={(v) => clientPhone = v} pattern="[0-9\s\-+()]{6,20}" />
+              <FieldGroup type="tel" id="bPhone" label="Telefoonnummer" value={clientPhone} onchange={(v) => clientPhone = v} pattern="[0-9\s\-+()]{6,20}" required />
               <FieldGroup id="bNotes" label="Opmerkingen" value={clientNotes} onchange={(v) => clientNotes = v} />
             </form>
           </div>
@@ -451,6 +473,8 @@
           {summaryDate}
           {summaryTime}
           {summaryTotal}
+          summaryDuration={selectedDuration}
+          summaryEndTime={selectedTime && selectedDuration ? calculateEndTime(selectedTime, selectedDuration) : ''}
           {canConfirm}
           onConfirm={confirmBooking}
         />

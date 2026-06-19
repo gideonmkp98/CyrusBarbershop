@@ -5,11 +5,13 @@
     summaryDate: string;
     summaryTime: string;
     summaryTotal: string;
+    summaryDuration?: number;
+    summaryEndTime?: string;
     canConfirm: boolean;
     onConfirm: () => void;
   }
 
-  let { summaryService, summaryBarber, summaryDate, summaryTime, summaryTotal, canConfirm, onConfirm } = $props<Props>();
+  let { summaryService, summaryBarber, summaryDate, summaryTime, summaryTotal, summaryDuration, summaryEndTime, canConfirm, onConfirm } = $props<Props>();
 </script>
 
 <div class="lg:sticky lg:top-32 bg-surface-base p-8 border border-gold-500/15">
@@ -19,8 +21,14 @@
       <span class="font-body text-label text-bone-muted">BEHANDELING</span>
       <span class="font-body text-body text-right">{summaryService}</span>
     </div>
+    {#if summaryDuration}
+      <div class="flex justify-between items-start">
+        <span class="font-body text-label text-bone-muted">DUUR</span>
+        <span class="font-body text-body text-right">{summaryDuration} min</span>
+      </div>
+    {/if}
     <div class="flex justify-between items-start">
-      <span class="font-body text-label text-bone-muted">KAPPER</span>
+      <span class="font-body text-label text-bone-muted">BARBER</span>
       <span class="font-body text-body text-right">{summaryBarber}</span>
     </div>
     <div class="flex justify-between items-start">
@@ -31,6 +39,12 @@
       <span class="font-body text-label text-bone-muted">MOMENT</span>
       <span class="font-body text-body text-right">{summaryTime}</span>
     </div>
+    {#if summaryEndTime}
+      <div class="flex justify-between items-start">
+        <span class="font-body text-label text-bone-muted">VERWACHT KLAAR</span>
+        <span class="font-body text-body text-right text-gold-500">{summaryEndTime}</span>
+      </div>
+    {/if}
     <div class="border-t border-white/10 pt-5 flex justify-between items-center">
       <span class="font-body text-label text-gold-500">TOTAAL</span>
       <span class="font-display text-heading text-bone">{summaryTotal}</span>

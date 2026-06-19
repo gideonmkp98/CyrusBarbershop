@@ -35,9 +35,9 @@
 
 <div class="field-group {cls}">
   {#if rows}
-    <textarea {id} {value} on:change={handleChange} on:input={handleChange} {placeholder} {rows} class="resize-none" required={required || undefined}></textarea>
+    <textarea {id} {value} onchange={handleChange} oninput={handleChange} {placeholder} {rows} class="resize-none" required={required || undefined}></textarea>
   {:else}
-    <input {type} {id} {value} on:change={handleChange} on:input={handleChange} {placeholder} {pattern} required={required || undefined} />
+    <input {type} {id} {value} onchange={handleChange} oninput={handleChange} {placeholder} {pattern} required={required || undefined} />
   {/if}
   <label for={id}>{label}</label>
 </div>

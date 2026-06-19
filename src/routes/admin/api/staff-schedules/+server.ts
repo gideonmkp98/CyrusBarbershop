@@ -8,7 +8,18 @@ function timeToMinutes(time: string): number {
   return h * 60 + m;
 }
 
-export const GET: RequestHandler = async ({ url }) => {
+function canManageStaffSchedules(role: App.Locals['user']['role'] | undefined): boolean {
+  return role === 'owner' || role === 'manager';
+}
+
+export const GET: RequestHandler = async ({ url, locals }) => {
+  if (!canManageStaffSchedules(locals.user?.role)) {
+    return new Response(JSON.stringify({ error: 'Toegang geweigerd' }), {
+      status: locals.user ? 403 : 401,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+
   const staffId = url.searchParams.get('staffId');
 
   if (!staffId) {
@@ -26,7 +37,14 @@ export const GET: RequestHandler = async ({ url }) => {
   });
 };
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+  if (!canManageStaffSchedules(locals.user?.role)) {
+    return new Response(JSON.stringify({ error: 'Toegang geweigerd' }), {
+      status: locals.user ? 403 : 401,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+
   const body = await request.json();
   const { staffId, dayOfWeek, openTime, closeTime, isActive = true } = body;
 
@@ -104,7 +122,14 @@ export const POST: RequestHandler = async ({ request }) => {
   });
 };
 
-export const DELETE: RequestHandler = async ({ url }) => {
+export const DELETE: RequestHandler = async ({ url, locals }) => {
+  if (!canManageStaffSchedules(locals.user?.role)) {
+    return new Response(JSON.stringify({ error: 'Toegang geweigerd' }), {
+      status: locals.user ? 403 : 401,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+
   const staffId = url.searchParams.get('staffId');
   const dayOfWeek = url.searchParams.get('dayOfWeek');
 

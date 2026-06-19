@@ -10,11 +10,11 @@
 
   let { onSubmit = (e: Event) => {}, onNewsletterSubmit = (e: Event) => {} } = $props<Props>();
 
-  let cName: string = '';
-  let cEmail: string = '';
-  let cMessage: string = '';
-  let submitting: boolean = false;
-  let submitted: boolean = false;
+  let cName = $state('');
+  let cEmail = $state('');
+  let cMessage = $state('');
+  let submitting = $state(false);
+  let submitted = $state(false);
 
   // Opening hours state
   type OpeningHour = {
@@ -112,10 +112,10 @@
 
 <section id="contact" class="py-section bg-surface">
   <div class="max-w-[1200px] mx-auto px-6 md:px-8">
-    <div class="flex flex-col md:flex-row gap-12 md:gap-16 items-end mb-16 md:mb-24">
+    <div class="flex flex-col md:flex-row gap-12 md:gap-16 items-start mb-16 md:mb-24">
       <div>
         <span use:reveal class="font-body text-label text-gold-500 block mb-4">BEREIK ONS</span>
-        <h2 use:reveal={{ delay: 1 }} class="font-display text-heading text-bone">Contact</h2>
+        <h1 use:reveal={{ delay: 1 }} class="font-display text-heading text-bone">Contact</h1>
       </div>
       <p use:reveal={{ delay: 2 }} class="font-body text-body-lg text-bone-warm max-w-md" style="font-size: 1.125rem; line-height: 1.7; letter-spacing: 0.01em;">
         Neem contact op met vragen, of kom langs voor advies en styling. Altijd graag behulpzaam.
@@ -194,9 +194,9 @@
         <div use:reveal={{ direction: 'right' }}>
           <h3 class="font-display text-subheading text-bone mb-8">Stuur ons een Bericht</h3>
           <form class="grid md:grid-cols-2 gap-8" onsubmit={handleSubmit}>
-            <FieldGroup id="cName" label="Naam" bind:value={cName} required />
-            <FieldGroup type="email" id="cEmail" label="E-mailadres" bind:value={cEmail} required />
-            <FieldGroup id="cMessage" label="Bericht" bind:value={cMessage} rows={4} cls="md:col-span-2" />
+            <FieldGroup id="cName" label="Naam" value={cName} onchange={(v) => cName = v} required />
+            <FieldGroup type="email" id="cEmail" label="E-mailadres" value={cEmail} onchange={(v) => cEmail = v} required />
+            <FieldGroup id="cMessage" label="Bericht" value={cMessage} onchange={(v) => cMessage = v} rows={4} cls="md:col-span-2" />
             <div class="md:col-span-2 pt-2">
               {#if submitted}
                 <p class="text-gold-500 font-body text-label">Bedankt! Je bericht is ontvangen.</p>
@@ -218,13 +218,13 @@
   <div class="max-w-[1200px] mx-auto px-6 md:px-8 text-center">
     <h3 use:reveal class="font-display text-subheading text-bone mb-10" style="font-size: clamp(1.25rem, 2vw, 1.5rem); line-height: 1.3; font-weight: 500;">Volg ons op social media</h3>
     <div class="flex justify-center gap-10">
-      <a href="#" use:reveal={{ delay: 1 }} class="group flex flex-col items-center gap-3">
+      <a href="/contact" use:reveal={{ delay: 1 }} class="group flex flex-col items-center gap-3">
         <div class="w-14 h-14 rounded-full border border-bone-muted/20 flex items-center justify-center group-hover:border-gold-500 transition-colors">
           <span class="text-bone-warm group-hover:text-gold-500 transition-colors text-lg">IG</span>
         </div>
         <span class="font-body text-label text-bone-muted group-hover:text-gold-500 transition-colors">Instagram</span>
       </a>
-      <a href="#" use:reveal={{ delay: 2 }} class="group flex flex-col items-center gap-3">
+      <a href="/contact" use:reveal={{ delay: 2 }} class="group flex flex-col items-center gap-3">
         <div class="w-14 h-14 rounded-full border border-bone-muted/20 flex items-center justify-center group-hover:border-gold-500 transition-colors">
           <span class="text-bone-warm group-hover:text-gold-500 transition-colors text-lg">FB</span>
         </div>

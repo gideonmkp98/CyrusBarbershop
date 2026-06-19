@@ -3,8 +3,13 @@ import { db } from '$lib/server/db';
 import { appointments, services, users } from '$lib/server/db/schema';
 import { appointmentSchema } from '$lib/utils/validation';
 import { eq, and, sql, desc } from 'drizzle-orm';
+import type { RequestHandler } from './$types';
 
-export async function POST({ request }) {
+export const POST: RequestHandler = async ({ request, locals }) => {
+  if (!locals.user) {
+    return json({ error: 'Niet ingelogd' }, { status: 401 });
+  }
+
   try {
     const body = await request.json();
     const parsed = appointmentSchema.safeParse(body);
@@ -47,9 +52,13 @@ export async function POST({ request }) {
     console.error('Fout bij aanmaken afspraak:', error);
     return json({ error: 'Er is iets misgegaan bij het aanmaken van de afspraak' }, { status: 500 });
   }
-}
+};
 
-export async function GET({ url }) {
+export const GET: RequestHandler = async ({ url, locals }) => {
+  if (!locals.user) {
+    return json({ error: 'Niet ingelogd' }, { status: 401 });
+  }
+
   try {
     const startDate = url.searchParams.get('startDate');
     const endDate = url.searchParams.get('endDate');
@@ -162,4 +171,4 @@ export async function GET({ url }) {
     console.error('Fout bij ophalen data:', error);
     return json({ error: 'Er is iets misgegaan bij het ophalen van de gegevens' }, { status: 500 });
   }
-}
+};

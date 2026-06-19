@@ -22,6 +22,25 @@
 
   let { appointments, staff, onSelect, onStatusChange, onWeekChange, isLoading = false }: Props = $props();
 
+  // Tooltip state
+  let tooltipText = $state('');
+  let tooltipVisible = $state(false);
+  let tooltipPosition = $state({ x: 0, y: 0 });
+
+  function showTooltip(e: MouseEvent, text: string) {
+    const rect = (e.target as HTMLElement).getBoundingClientRect();
+    tooltipPosition = {
+      x: rect.left + rect.width / 2,
+      y: rect.top - 8
+    };
+    tooltipText = text;
+    tooltipVisible = true;
+  }
+
+  function hideTooltip() {
+    tooltipVisible = false;
+  }
+
   // Week navigation
   let currentWeekStart = $state(getMonday(new Date()));
 
@@ -112,13 +131,31 @@
   <!-- Week navigation -->
   <div class="flex items-center justify-between">
     <div class="flex items-center gap-2">
-      <button onclick={prevWeek} disabled={isLoading} class="px-3 py-1.5 bg-surface-base border border-white/10 text-bone hover:border-gold-500 transition-colors text-sm font-body disabled:opacity-40">
+      <button
+        onclick={prevWeek}
+        disabled={isLoading}
+        onmouseenter={(e) => showTooltip(e, 'Vorige week')}
+        onmouseleave={hideTooltip}
+        class="px-3 py-1.5 bg-surface-base border border-white/10 text-bone hover:border-gold-500 transition-colors text-sm font-body disabled:opacity-40"
+      >
         ←
       </button>
-      <button onclick={goToday} disabled={isLoading} class="px-3 py-1.5 bg-surface-base border border-white/10 text-bone hover:border-gold-500 transition-colors text-sm font-body disabled:opacity-40">
+      <button
+        onclick={goToday}
+        disabled={isLoading}
+        onmouseenter={(e) => showTooltip(e, 'Ga naar vandaag')}
+        onmouseleave={hideTooltip}
+        class="px-3 py-1.5 bg-surface-base border border-white/10 text-bone hover:border-gold-500 transition-colors text-sm font-body disabled:opacity-40"
+      >
         Vandaag
       </button>
-      <button onclick={nextWeek} disabled={isLoading} class="px-3 py-1.5 bg-surface-base border border-white/10 text-bone hover:border-gold-500 transition-colors text-sm font-body disabled:opacity-40">
+      <button
+        onclick={nextWeek}
+        disabled={isLoading}
+        onmouseenter={(e) => showTooltip(e, 'Volgende week')}
+        onmouseleave={hideTooltip}
+        class="px-3 py-1.5 bg-surface-base border border-white/10 text-bone hover:border-gold-500 transition-colors text-sm font-body disabled:opacity-40"
+      >
         →
       </button>
       {#if isLoading}
@@ -163,4 +200,14 @@
       </div>
     {/each}
   </div>
+
+  <!-- Custom Tooltip -->
+  {#if tooltipVisible}
+    <div
+      class="fixed px-3 py-1.5 bg-surface-base text-bone text-xs font-body whitespace-nowrap z-[100] pointer-events-none border border-white/10 shadow-xl"
+      style="left: {tooltipPosition.x}px; top: {tooltipPosition.y}px; transform: translate(-50%, -100%);"
+    >
+      {tooltipText}
+    </div>
+  {/if}
 </div>

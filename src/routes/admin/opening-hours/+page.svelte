@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { CheckCircle, Clock3, XCircle } from 'lucide-svelte';
+
   let { data } = $props();
 
   const dayNames: Record<number, string> = {
@@ -11,176 +13,244 @@
     7: 'Zondag'
   };
 
-  let error = $state('');
-  let success = $state('');
-  let saving = $state(false);
+  let saving = $state<Record<number, boolean>>({});
+  let saveStatus = $state<Record<number, 'success' | 'error' | null>>({});
+  let errorMessage = $state('');
+  let flashMessage = $state('');
+  let flashType = $state<'success' | 'error' | null>(null);
+  let flashTimeout: ReturnType<typeof setTimeout> | null = null;
 
-  // Work with normalized time data directly
-  let days = $derived.by(() => {
-    if (!data?.openingHours) return [];
-    
-    // Create a map of dayOfWeek to hours data
-    const dayMap = new Map();
-    
-    data.openingHours.forEach(h => {
-      dayMap.set(h.dayOfWeek, {
-        ...h,
-        openTime: h.openTime?.substring(0, 5) || '00:00',
-        closeTime: h.closeTime?.substring(0, 5) || '00:00'
+  let days = $state<Array<{
+    dayOfWeek: number;
+    openTime: string;
+    closeTime: string;
+    isActive: boolean;
+  }>>([]);
+
+  $effect(() => {
+    if (data?.openingHours && data.openingHours.length > 0) {
+      const hoursMap = new Map(data.openingHours.map(h => [h.dayOfWeek, h]));
+
+      days = Array.from({ length: 7 }, (_, i) => {
+        const dayOfWeek = i + 1;
+        const existing = hoursMap.get(dayOfWeek);
+        return {
+          dayOfWeek,
+          openTime: existing?.openTime?.substring(0, 5) ?? '09:00',
+          closeTime: existing?.closeTime?.substring(0, 5) ?? '17:00',
+          isActive: existing?.isActive ?? true
+        };
       });
-    });
-    
-    // Ensure all 7 days exist
-    for (let day = 1; day <= 7; day++) {
-      if (!dayMap.has(day)) {
-        dayMap.set(day, {
-          id: 0,
-          dayOfWeek: day,
-          openTime: day <= 5 ? '09:00' : day === 6 ? '10:00' : '10:00',
-          closeTime: day <= 5 ? '20:00' : day === 6 ? '18:00' : '10:00',
-          isActive: day <= 6
-        });
-      }
+    } else {
+      days = Array.from({ length: 7 }, (_, i) => {
+        const dayOfWeek = i + 1;
+        const isWeekend = dayOfWeek === 6 || dayOfWeek === 7;
+        return {
+          dayOfWeek,
+          openTime: isWeekend ? '10:00' : '09:00',
+          closeTime: isWeekend ? '16:00' : '17:00',
+          isActive: dayOfWeek <= 6
+        };
+      });
     }
-    
-    // Convert to array and sort
-    return Array.from(dayMap.values()).sort((a, b) => a.dayOfWeek - b.dayOfWeek);
   });
 
-  async function saveAllHours() {
-    error = '';
-    success = '';
-    saving = true;
+  function showFlash(message: string, type: 'success' | 'error') {
+    flashMessage = message;
+    flashType = type;
 
-    // Validate
-    const validationErrors: string[] = [];
-    for (const h of days) {
-      if (h.isActive) {
-        if (!h.openTime || !h.closeTime) {
-          validationErrors.push(`${dayNames[h.dayOfWeek]}: beide tijden zijn verplicht`);
-        } else if (h.closeTime <= h.openTime) {
-          validationErrors.push(`${dayNames[h.dayOfWeek]}: sluitingstijd moet na openingstijd liggen`);
-        }
-      }
-    }
-
-    if (validationErrors.length > 0) {
-      error = validationErrors.join(', ');
-      saving = false;
-      return;
-    }
-
-    try {
-      const promises = days.map((h) =>
-        fetch('/admin/api/opening-hours', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            dayOfWeek: h.dayOfWeek,
-            openTime: h.isActive ? h.openTime : '00:00',
-            closeTime: h.isActive ? h.closeTime : '00:00',
-            isActive: h.isActive
-          })
-        })
-      );
-
-      const responses = await Promise.all(promises);
-      const hasErrors = responses.some((res) => !res.ok);
-
-      if (hasErrors) {
-        const firstError = await responses.find((res) => !res.ok)?.json();
-        error = firstError?.error || 'Opslaan mislukt';
-      } else {
-        success = 'Alle openingstijden bijgewerkt!';
-        setTimeout(() => (success = ''), 3000);
-      }
-    } catch (err) {
-      error = 'Netwerkfout';
-    }
-    saving = false;
+    if (flashTimeout) clearTimeout(flashTimeout);
+    flashTimeout = setTimeout(() => {
+      flashMessage = '';
+      flashType = null;
+    }, 2600);
   }
 
-  function toggleActive(day: number) {
-    const idx = days.findIndex((h) => h.dayOfWeek === day);
-    if (idx >= 0) {
-      days[idx].isActive = !days[idx].isActive;
+  async function saveDay(day: typeof days[0]) {
+    const dayNum = day.dayOfWeek;
+    saving[dayNum] = true;
+    saveStatus[dayNum] = null;
+    errorMessage = '';
+
+    try {
+      const body: Record<string, unknown> = {
+        dayOfWeek: day.dayOfWeek,
+        isActive: day.isActive
+      };
+
+      if (day.isActive) {
+        body.openTime = day.openTime;
+        body.closeTime = day.closeTime;
+
+        if (!day.openTime || !day.closeTime) {
+          errorMessage = `${dayNames[day.dayOfWeek]}: Vul beide tijden in`;
+          saving[dayNum] = false;
+          return;
+        }
+
+        if (day.closeTime <= day.openTime) {
+          errorMessage = `${dayNames[day.dayOfWeek]}: Sluitingstijd moet na openingstijd liggen`;
+          saving[dayNum] = false;
+          return;
+        }
+      } else {
+        body.openTime = '00:00';
+        body.closeTime = '00:00';
+      }
+
+      const res = await fetch('/admin/api/opening-hours', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+
+      const result = await res.json();
+
+      if (res.ok) {
+        saveStatus[dayNum] = 'success';
+        showFlash(`${dayNames[day.dayOfWeek]} opgeslagen`, 'success');
+        setTimeout(() => { saveStatus[dayNum] = null; }, 2000);
+      } else {
+        saveStatus[dayNum] = 'error';
+        errorMessage = result.error || `Fout bij opslaan ${dayNames[day.dayOfWeek]}`;
+        showFlash(errorMessage, 'error');
+      }
+    } catch {
+      saveStatus[dayNum] = 'error';
+      errorMessage = 'Netwerkfout. Probeer opnieuw.';
+      showFlash(errorMessage, 'error');
     }
+
+    saving[dayNum] = false;
+  }
+
+  function toggleActive(dayOfWeek: number) {
+    const day = days.find(d => d.dayOfWeek === dayOfWeek);
+    if (day) {
+      const nextActive = !day.isActive;
+      day.isActive = nextActive;
+
+      if (nextActive && (!day.openTime || !day.closeTime || day.closeTime <= day.openTime)) {
+        const isWeekend = day.dayOfWeek === 6 || day.dayOfWeek === 7;
+        day.openTime = isWeekend ? '10:00' : '09:00';
+        day.closeTime = isWeekend ? '16:00' : '17:00';
+      }
+
+      saveDay(day);
+    }
+  }
+
+  function updateTime(dayOfWeek: number, field: 'openTime' | 'closeTime', value: string) {
+    const day = days.find(d => d.dayOfWeek === dayOfWeek);
+    if (day) {
+      day[field] = value;
+    }
+  }
+
+  function formatHours(day: typeof days[0]): string {
+    if (!day.isActive) return 'Gesloten';
+    return `${day.openTime} - ${day.closeTime}`;
   }
 </script>
 
 <svelte:head>
-  <title>Openingstijden — Cyrus Beheer</title>
+  <title>Openingstijden - Cyrus Beheer</title>
 </svelte:head>
 
-<h1 class="font-display text-heading text-bone mb-8">Openingstijden Beheer</h1>
+<div class="space-y-6">
+  <section class="border border-white/5 bg-surface-base p-6 md:p-8">
+    <span class="font-body text-label text-gold-500">BESCHIKBAARHEID</span>
+    <h1 class="mt-3 font-display text-heading text-bone">Openingstijden</h1>
+    <p class="mt-3 max-w-xl font-body text-sm leading-7 text-bone-muted">
+      Stel per dag in wanneer klanten afspraken kunnen boeken.
+    </p>
+  </section>
 
-{#if error}
-  <div class="bg-red-900/20 border border-red-500/30 p-4 text-sm text-red-400 mb-6">{error}</div>
-{/if}
-{#if success}
-  <div class="bg-green-900/20 border border-green-500/30 p-4 text-sm text-green-400 mb-6">{success}</div>
-{/if}
+  {#if errorMessage}
+    <div class="bg-red-500/10 border border-red-500/20 p-4 text-sm text-red-400 flex items-start gap-3">
+      <XCircle class="shrink-0 mt-0.5" size={18} />
+      <span>{errorMessage}</span>
+    </div>
+  {/if}
 
-<div class="bg-surface-base border border-white/5 overflow-hidden">
-  <table class="w-full text-sm">
-    <thead>
-      <tr class="border-b border-white/5">
-        <th class="text-left p-4 font-body text-label text-bone-muted">Dag</th>
-        <th class="text-left p-4 font-body text-label text-bone-muted">Openingstijd</th>
-        <th class="text-left p-4 font-body text-label text-bone-muted">Sluitingstijd</th>
-        <th class="text-left p-4 font-body text-label text-bone-muted">Status</th>
-      </tr>
-    </thead>
-    <tbody>
-      {#each days as h}
-        <tr class="border-b border-white/5 last:border-0">
-          <td class="p-4 font-body text-bone">{dayNames[h.dayOfWeek]}</td>
-          <td class="p-4">
-            <input
-              type="time"
-              value={h.openTime}
-              onchange={(e) => (h.openTime = e.currentTarget.value)}
-              disabled={!h.isActive}
-              class="bg-surface-low border border-white/10 px-3 py-2 text-bone font-body text-sm disabled:opacity-50"
-            />
-          </td>
-          <td class="p-4">
-            <input
-              type="time"
-              value={h.closeTime}
-              onchange={(e) => (h.closeTime = e.currentTarget.value)}
-              disabled={!h.isActive}
-              class="bg-surface-low border border-white/10 px-3 py-2 text-bone font-body text-sm disabled:opacity-50"
-            />
-          </td>
-          <td class="p-4">
-            <label class="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={h.isActive}
-                onchange={() => toggleActive(h.dayOfWeek)}
-                class="w-4 h-4 accent-gold-500"
-              />
-              <span class="font-body text-sm {h.isActive ? 'text-green-500' : 'text-bone-muted'}">
-                {h.isActive ? 'Actief' : 'Gesloten'}
+  {#if flashMessage && flashType}
+    <div
+      class="fixed right-6 top-6 z-50 flex items-center gap-3 border px-4 py-3 shadow-xl {flashType === 'success'
+        ? 'border-gold-500/25 bg-surface-base text-bone'
+        : 'border-red-500/25 bg-surface-base text-red-400'}"
+      role="status"
+    >
+      {#if flashType === 'success'}
+        <CheckCircle size={18} class="text-gold-500" />
+      {:else}
+        <XCircle size={18} class="text-red-400" />
+      {/if}
+      <span class="font-body text-sm">{flashMessage}</span>
+    </div>
+  {/if}
+
+  <section class="grid gap-4 xl:grid-cols-2">
+    {#each days as day}
+      <article class="border border-white/5 bg-surface-base p-5 transition-opacity {day.isActive ? '' : 'opacity-70'}">
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <h2 class="font-display text-subheading text-bone">{dayNames[day.dayOfWeek]}</h2>
+            <div class="mt-3 flex flex-wrap items-center gap-2">
+              <span class="inline-flex items-center gap-2 border px-2.5 py-1 font-body text-xs {day.isActive ? 'border-gold-500/20 bg-gold-500/10 text-gold-500' : 'border-white/10 bg-surface-low text-bone-muted'}">
+                <Clock3 size={13} />
+                {day.isActive ? 'Open' : 'Gesloten'}
               </span>
-            </label>
-          </td>
-        </tr>
-      {/each}
-    </tbody>
-  </table>
-</div>
+              <span class="font-body text-sm text-bone-muted">{formatHours(day)}</span>
+            </div>
+          </div>
 
-<div class="mt-6 flex gap-4">
-  <button onclick={saveAllHours} disabled={saving} class="btn-primary py-2 px-6">
-    {#if saving}
-      Opslaan...
-    {:else}
-      Alles Opslaan
-    {/if}
-  </button>
-  <p class="text-sm text-bone-muted self-center">
-    Tip: Schakel "Gesloten" uit voor dagen dat de zaak gesloten is. De tijden worden dan genegeerd.
-  </p>
+          <div class="flex items-center gap-3">
+            <button
+              onclick={() => toggleActive(day.dayOfWeek)}
+              class="relative h-6 w-12 rounded-full transition-colors {day.isActive ? 'bg-gold-500' : 'bg-surface-low border border-white/10'}"
+              aria-label="{day.isActive ? 'Sluiten' : 'Openen'} {dayNames[day.dayOfWeek]}"
+            >
+              <span class="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-surface transition-transform {day.isActive ? 'translate-x-6' : 'translate-x-0'}"></span>
+            </button>
+          </div>
+        </div>
+
+        <div class="mt-6 grid grid-cols-[1fr_auto_1fr] items-end gap-3">
+          <div>
+            <label for="open-{day.dayOfWeek}" class="mb-2 block font-body text-xs text-bone-muted">Opening</label>
+            <input
+              id="open-{day.dayOfWeek}"
+              type="time"
+              value={day.openTime}
+              oninput={(e) => updateTime(day.dayOfWeek, 'openTime', e.currentTarget.value)}
+              onchange={() => saveDay(day)}
+              disabled={!day.isActive}
+              class="w-full bg-surface-low border border-white/10 px-4 py-3 font-body text-base text-bone transition-colors focus:border-gold-500 focus:outline-none disabled:opacity-40"
+            />
+          </div>
+
+          <span class="pb-3 font-body text-sm text-bone-muted">tot</span>
+
+          <div>
+            <label for="close-{day.dayOfWeek}" class="mb-2 block font-body text-xs text-bone-muted">Sluiting</label>
+            <input
+              id="close-{day.dayOfWeek}"
+              type="time"
+              value={day.closeTime}
+              oninput={(e) => updateTime(day.dayOfWeek, 'closeTime', e.currentTarget.value)}
+              onchange={() => saveDay(day)}
+              disabled={!day.isActive}
+              class="w-full bg-surface-low border border-white/10 px-4 py-3 font-body text-base text-bone transition-colors focus:border-gold-500 focus:outline-none disabled:opacity-40"
+            />
+          </div>
+        </div>
+      </article>
+    {/each}
+  </section>
+
+  <div class="border border-white/5 bg-surface-low p-4">
+    <p class="font-body text-sm text-bone-muted">
+      <span class="font-semibold text-gold-500">Opslaan:</span> wijzigingen worden automatisch opgeslagen wanneer je een tijd wijzigt of een dag opent/sluit.
+    </p>
+  </div>
 </div>

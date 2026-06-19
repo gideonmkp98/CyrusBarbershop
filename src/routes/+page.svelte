@@ -16,9 +16,12 @@
     window.addEventListener('scroll', onScroll, { passive: true });
 
     // Trigger hero reveal animation after initial load
-    setTimeout(() => heroRevealed = true, 100);
+    const timer = setTimeout(() => heroRevealed = true, 100);
 
-    return () => window.removeEventListener('scroll', onScroll);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      clearTimeout(timer);
+    };
   });
 
   const featureCards = [
@@ -49,6 +52,8 @@
 <svelte:head>
   <title>Cyrus Kapsalon - Precision Cuts, Timeless Style</title>
   <meta name="description" content="Cyrus Kapsalon — Vakwerk sinds 1994. Boek een afspraak voor haarsneden, skin fades, warme scheerbeurt en exclusieve grooming services." />
+  <link rel="preload" as="image" href="/images/storefrombehind.jpeg" />
+  <link rel="preload" as="image" href="/images/logo.jpeg" />
 </svelte:head>
 
 <HeroSection {heroRevealed} {heroOffset} />

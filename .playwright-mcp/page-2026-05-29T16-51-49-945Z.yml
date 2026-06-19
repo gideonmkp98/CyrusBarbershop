@@ -1,0 +1,120 @@
+- generic [ref=e2]:
+  - banner [ref=e5]:
+    - navigation [ref=e6]:
+      - link "Cyrus Barbershop" [ref=e7] [cursor=pointer]:
+        - /url: /
+        - img "Cyrus Barbershop" [ref=e8]
+      - generic [ref=e9]:
+        - link "Home" [ref=e10] [cursor=pointer]:
+          - /url: /
+        - link "Behandelingen" [ref=e11] [cursor=pointer]:
+          - /url: /services
+        - link "Over" [ref=e12] [cursor=pointer]:
+          - /url: /about
+        - link "Contact" [ref=e13] [cursor=pointer]:
+          - /url: /contact
+      - link "Maak een Afspraak" [ref=e15] [cursor=pointer]:
+        - /url: /booking
+  - main [ref=e16]:
+    - generic [ref=e18]:
+      - generic [ref=e19]:
+        - generic [ref=e20]: ONZE BEHANDELINGEN
+        - heading "Vakwerk Met Precisie" [level=2] [ref=e21]
+      - generic [ref=e23]:
+        - generic [ref=e24]:
+          - generic [ref=e25]:
+            - paragraph [ref=e26]: We combineren klassieke barbering met moderne technieken. Elke behandeling begint met een goed gesprek over wat jij wilt.
+            - generic [ref=e27]:
+              - generic [ref=e28]:
+                - img [ref=e29]
+                - generic [ref=e35]: Perfecte Kapsels
+              - generic [ref=e36]:
+                - img [ref=e37]
+                - generic [ref=e39]: Premium Producten
+              - generic [ref=e40]:
+                - img [ref=e41]
+                - generic [ref=e43]: Ontspannen Atmosfeer
+          - img "Barber chair" [ref=e45]
+        - generic [ref=e46]:
+          - generic [ref=e47]:
+            - heading "01 Haarwerk" [level=3] [ref=e48]:
+              - generic [ref=e49]: "01"
+              - generic [ref=e51]: Haarwerk
+            - generic [ref=e52]:
+              - generic [ref=e53] [cursor=pointer]:
+                - generic [ref=e56]:
+                  - heading "Haarknippen" [level=4] [ref=e57]
+                  - generic [ref=e59]: €35
+                - paragraph [ref=e60]: Een vakkundige snit op maat. Schaarwerk, tondeuse en styling. Inclusief wassen en föhnen.
+              - generic [ref=e61] [cursor=pointer]:
+                - generic [ref=e64]:
+                  - heading "Fade" [level=4] [ref=e65]
+                  - generic [ref=e67]: €45
+                - paragraph [ref=e68]: Vloeiende overgang van huid naar haar. Verschillende fademogelijkheden met scheermesafwerking.
+              - generic [ref=e69] [cursor=pointer]:
+                - generic [ref=e72]:
+                  - heading "De Klassieke" [level=4] [ref=e73]
+                  - generic [ref=e75]: €45
+                - paragraph [ref=e76]: Gerespecteerd klassiek werk. Hals netjes afgewerkt met warme handdoek. De standaard.
+          - generic [ref=e77]:
+            - heading "02 Baardverzorging" [level=3] [ref=e78]:
+              - generic [ref=e79]: "02"
+              - generic [ref=e81]: Baardverzorging
+            - generic [ref=e82]:
+              - generic [ref=e83] [cursor=pointer]:
+                - generic [ref=e86]:
+                  - heading "Baardtrim & Vorm" [level=4] [ref=e87]
+                  - generic [ref=e89]: €25
+                - paragraph [ref=e90]: Vakkundig trimmen en vormen naar je gezichtsstructuur. Afgewerkt met premium baardolie.
+              - generic [ref=e91] [cursor=pointer]:
+                - generic [ref=e94]:
+                  - heading "Warme Scheerbeurt" [level=4] [ref=e95]
+                  - generic [ref=e97]: €40
+                - paragraph [ref=e98]: Klassieke scheerervaring. Stoom, zeep en scheermeswerk met de nodige finesse.
+              - generic [ref=e99] [cursor=pointer]:
+                - generic [ref=e102]:
+                  - heading "Baard Design" [level=4] [ref=e103]
+                  - generic [ref=e105]: €30
+                - paragraph [ref=e106]: Fijne vorming en linenwerk. Voor wie waarde hecht aan perfecte details en vakwerk.
+          - generic [ref=e107]:
+            - img [ref=e108]
+            - generic [ref=e110]: COMPLEET PAKKET
+            - generic [ref=e111]:
+              - heading "The Works" [level=4] [ref=e112]
+              - generic [ref=e114]: €75.00
+            - paragraph [ref=e115]: Het volledige Cyrus-programma. Premium haarknippen of fade, baardwerk en gezichtsmassage.
+            - link "Kies dit Pakket" [ref=e116] [cursor=pointer]:
+              - /url: /booking
+    - generic [ref=e118]:
+      - heading "Kom bij ons langs" [level=2] [ref=e119]
+      - paragraph [ref=e120]: Je bent altijd welkom om binnen te lopen, maar een afspraak garandeert dat je de volle aandacht krijgt die je verdient.
+      - link "Maak een Afspraak" [ref=e122] [cursor=pointer]:
+        - /url: /booking
+  - contentinfo [ref=e123]:
+    - generic [ref=e125]:
+      - generic [ref=e126]:
+        - generic [ref=e127]:
+          - img "Cyrus Barbershop" [ref=e128]
+          - generic [ref=e129]: CYRUS BARBERSHOP
+        - paragraph [ref=e130]: © 2025 CYRUS BARBERSHOP.
+      - generic [ref=e131]:
+        - generic [ref=e132]:
+          - generic [ref=e133]: OPENINGSTIJDEN
+          - 'link "Ma–Vr: Gesloten" [ref=e134] [cursor=pointer]':
+            - /url: /contact
+          - 'link "Za: Gesloten" [ref=e135] [cursor=pointer]':
+            - /url: /contact
+          - 'link "Zo: Gesloten" [ref=e136] [cursor=pointer]':
+            - /url: /contact
+        - generic [ref=e137]:
+          - generic [ref=e138]: CONTACT
+          - link "Locatie" [ref=e139] [cursor=pointer]:
+            - /url: /contact
+          - link "Maak een afspraak" [ref=e140] [cursor=pointer]:
+            - /url: /booking
+        - generic [ref=e141]:
+          - generic [ref=e142]: SOCIALS
+          - link "Instagram" [ref=e143] [cursor=pointer]:
+            - /url: /contact
+          - link "Facebook" [ref=e144] [cursor=pointer]:
+            - /url: /contact

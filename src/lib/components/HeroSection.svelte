@@ -15,7 +15,7 @@
 
 <section id="hero" class="relative min-h-screen flex items-center justify-center overflow-hidden">
   <div class="absolute inset-0 z-0">
-    <img src="/images/storefrombehind.jpeg" alt="Cyrus Barbershop interior" class="hero-image w-full h-full object-cover scale-110 opacity-60" style="transform: scale(1.1) translateY({heroOffset}px)"/>
+    <img src="/images/storefrombehind.jpeg" alt="Cyrus Barbershop interior" class="hero-image w-full h-full object-cover scale-110 opacity-60" style="transform: scale(1.1) translateY({heroOffset}px)" fetchpriority="high" loading="eager" sizes="100vw" />
     <div class="hero-overlay absolute inset-0"></div>
   </div>
 

@@ -12,16 +12,16 @@
 
     <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
       <div use:reveal class="gallery-item relative aspect-[3/4]">
-        <img src="/images/barberchair2.jpeg" alt="Vintage barber chair" class="w-full h-full object-cover"/>
+        <img src="/images/barberchair2.jpeg" alt="Vintage barber chair" class="w-full h-full object-cover" loading="lazy" width="300" height="400" />
       </div>
       <div use:reveal={{ delay: 1 }} class="gallery-item relative aspect-[3/4] mt-6 md:mt-10">
-        <img src="/images/storefromdesk.jpeg" alt="Barbershop workspace" class="w-full h-full object-cover"/>
+        <img src="/images/storefromdesk.jpeg" alt="Barbershop workspace" class="w-full h-full object-cover" loading="lazy" width="300" height="400" />
       </div>
       <div use:reveal={{ delay: 2 }} class="gallery-item relative aspect-[3/4]">
-        <img src="/images/barberchair1.jpeg" alt="Classic barber interior" class="w-full h-full object-cover"/>
+        <img src="/images/barberchair1.jpeg" alt="Classic barber interior" class="w-full h-full object-cover" loading="lazy" width="300" height="400" />
       </div>
       <div use:reveal={{ delay: 3 }} class="gallery-item relative aspect-[3/4] mt-6 md:mt-10">
-        <img src="/images/storefrombehind.jpeg" alt="Barbershop from behind" class="w-full h-full object-cover"/>
+        <img src="/images/storefrombehind.jpeg" alt="Barbershop from behind" class="w-full h-full object-cover" loading="lazy" width="300" height="400" />
       </div>
     </div>
   </div>

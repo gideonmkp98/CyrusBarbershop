@@ -1,0 +1,155 @@
+- generic [ref=e2]:
+  - banner [ref=e5]:
+    - navigation [ref=e6]:
+      - link "Cyrus Barbershop" [ref=e7] [cursor=pointer]:
+        - /url: /
+        - img "Cyrus Barbershop" [ref=e8]
+      - generic [ref=e9]:
+        - link "Home" [ref=e10] [cursor=pointer]:
+          - /url: /
+        - link "Behandelingen" [ref=e11] [cursor=pointer]:
+          - /url: /services
+        - link "Over" [ref=e12] [cursor=pointer]:
+          - /url: /about
+        - link "Contact" [ref=e13] [cursor=pointer]:
+          - /url: /contact
+      - link "Maak een Afspraak" [ref=e15] [cursor=pointer]:
+        - /url: /booking
+  - main [ref=e16]:
+    - generic [ref=e18]:
+      - generic [ref=e19]:
+        - generic [ref=e20]: MAAK JE AFSPRAAK
+        - heading "Tijd voor een nieuwe look" [level=1] [ref=e21]
+        - paragraph [ref=e22]: Stap voor stap naar je volgende Cyrus-ervaring. Kies je behandeling, selecteer datum en moment, en we zien je snel.
+      - generic [ref=e23]:
+        - generic [ref=e24]: "01"
+        - generic [ref=e26]: "02"
+        - generic [ref=e28]: "03"
+      - generic [ref=e29]:
+        - generic [ref=e30]:
+          - generic [ref=e196]:
+            - heading "Selecteer Datum & Moment" [level=3] [ref=e197]
+            - generic [ref=e198]:
+              - generic [ref=e199]:
+                - generic [ref=e200]:
+                  - generic [ref=e201]: MEI 2026
+                  - generic [ref=e202]:
+                    - button "←" [ref=e203]
+                    - button "→" [ref=e204]
+                - generic [ref=e205]:
+                  - generic [ref=e206]: MA
+                  - generic [ref=e207]: DI
+                  - generic [ref=e208]: WO
+                  - generic [ref=e209]: DO
+                  - generic [ref=e210]: VR
+                  - generic [ref=e211]: ZA
+                  - generic [ref=e212]: ZO
+                - generic [ref=e213]:
+                  - button "1" [disabled] [ref=e218]
+                  - button "2" [disabled] [ref=e219]
+                  - button "3" [disabled] [ref=e220]
+                  - button "4" [disabled] [ref=e221]
+                  - button "5" [disabled] [ref=e222]
+                  - button "6" [disabled] [ref=e223]
+                  - button "7" [disabled] [ref=e224]
+                  - button "8" [disabled] [ref=e225]
+                  - button "9" [disabled] [ref=e226]
+                  - button "10" [disabled] [ref=e227]
+                  - button "11" [disabled] [ref=e228]
+                  - button "12" [disabled] [ref=e229]
+                  - button "13" [disabled] [ref=e230]
+                  - button "14" [disabled] [ref=e231]
+                  - button "15" [disabled] [ref=e232]
+                  - button "16" [disabled] [ref=e233]
+                  - button "17" [disabled] [ref=e234]
+                  - button "18" [disabled] [ref=e235]
+                  - button "19" [disabled] [ref=e236]
+                  - button "20" [disabled] [ref=e237]
+                  - button "21" [disabled] [ref=e238]
+                  - button "22" [disabled] [ref=e239]
+                  - button "23" [disabled] [ref=e240]
+                  - button "24" [disabled] [ref=e241]
+                  - button "25" [disabled] [ref=e242]
+                  - button "26" [disabled] [ref=e243]
+                  - button "27" [disabled] [ref=e244]
+                  - button "28" [disabled] [ref=e245]
+                  - button "29" [ref=e246] [cursor=pointer]
+                  - button "30" [disabled] [ref=e247]
+                  - button "31" [disabled] [ref=e248]
+              - generic [ref=e251]:
+                - generic [ref=e252]: BESCHIKBARE MOMENTEN
+                - generic [ref=e253]:
+                  - button "09:00" [disabled] [ref=e254]
+                  - button "09:30" [disabled] [ref=e255]
+                  - button "10:00" [disabled] [ref=e256]
+                  - button "10:30" [disabled] [ref=e257]
+                  - button "11:00" [disabled] [ref=e258]
+                  - button "11:30" [disabled] [ref=e259]
+                  - button "12:00" [disabled] [ref=e260]
+                  - button "12:30" [disabled] [ref=e261]
+                  - button "13:00" [disabled] [ref=e262]
+                  - button "13:30" [disabled] [ref=e263]
+                  - button "14:00" [disabled] [ref=e264]
+                  - button "14:30" [disabled] [ref=e265]
+                  - button "15:00" [disabled] [ref=e266]
+                  - button "15:30" [disabled] [ref=e267]
+                  - button "16:00" [disabled] [ref=e268]
+                  - button "16:30" [disabled] [ref=e269]
+                  - button "17:00" [disabled] [ref=e270]
+                  - button "17:30" [disabled] [ref=e271]
+                  - button "18:00" [disabled] [ref=e272]
+                  - button "18:30" [disabled] [ref=e273]
+                  - button "19:00" [active] [ref=e274] [cursor=pointer]
+                  - button "19:30" [ref=e275] [cursor=pointer]
+          - generic [ref=e117]:
+            - button "Terug" [ref=e195] [cursor=pointer]
+            - button "Doorgaan" [ref=e118] [cursor=pointer]
+        - complementary [ref=e119]:
+          - generic [ref=e120]:
+            - heading "Jouw afspraak" [level=3] [ref=e121]
+            - generic [ref=e122]:
+              - generic [ref=e123]:
+                - generic [ref=e124]: BEHANDELING
+                - generic [ref=e125]: Haarknippen
+              - generic [ref=e126]:
+                - generic [ref=e127]: BARBER
+                - generic [ref=e128]: ─
+              - generic [ref=e129]:
+                - generic [ref=e130]: DATUM
+                - generic [ref=e131]: 29 mei 2026
+              - generic [ref=e132]:
+                - generic [ref=e133]: MOMENT
+                - generic [ref=e134]: 19:00
+              - generic [ref=e135]:
+                - generic [ref=e136]: TOTAAL
+                - generic [ref=e137]: €35
+            - button "BEVESTIG AFSPRAAK" [disabled] [ref=e138] [cursor=pointer]
+            - paragraph [ref=e139]: Door te bevestigen ga je akkoord met ons annuleringsbeleid van 24 uur. Er wordt spoedig een bevestigingsmail verzonden.
+  - contentinfo [ref=e140]:
+    - generic [ref=e142]:
+      - generic [ref=e143]:
+        - generic [ref=e144]:
+          - img "Cyrus Barbershop" [ref=e145]
+          - generic [ref=e146]: CYRUS BARBERSHOP
+        - paragraph [ref=e147]: © 2025 CYRUS BARBERSHOP.
+      - generic [ref=e148]:
+        - generic [ref=e149]:
+          - generic [ref=e150]: OPENINGSTIJDEN
+          - 'link "Ma–Vr: 09:00 – 20:00 uur" [ref=e162] [cursor=pointer]':
+            - /url: /contact
+          - 'link "Za: 10:00 – 18:00 uur" [ref=e163] [cursor=pointer]':
+            - /url: /contact
+          - 'link "Zo: Gesloten" [ref=e153] [cursor=pointer]':
+            - /url: /contact
+        - generic [ref=e154]:
+          - generic [ref=e155]: CONTACT
+          - link "Locatie" [ref=e156] [cursor=pointer]:
+            - /url: /contact
+          - link "Maak een afspraak" [ref=e157] [cursor=pointer]:
+            - /url: /booking
+        - generic [ref=e158]:
+          - generic [ref=e159]: SOCIALS
+          - link "Instagram" [ref=e160] [cursor=pointer]:
+            - /url: /contact
+          - link "Facebook" [ref=e161] [cursor=pointer]:
+            - /url: /contact
