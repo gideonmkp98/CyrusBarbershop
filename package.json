@@ -13,6 +13,7 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:seed": "tsx src/lib/server/db/seed.ts",
+    "db:reset-admin-password": "tsx src/lib/server/db/reset-admin-password.ts",
     "vercel-build": "node scripts/vercel-deploy.js && npm run build"
   },
   "type": "module",
