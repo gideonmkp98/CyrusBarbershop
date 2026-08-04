@@ -1,23 +1,28 @@
 <script lang="ts">
   import { enhance } from '$app/forms';
   import { goto } from '$app/navigation';
+  import type { ActionResult } from '@sveltejs/kit';
 
   let email = $state('');
   let password = $state('');
   let error = $state<string | null>(null);
   let loading = $state(false);
 
-  function handleFormSubmit({ update }: { update: () => void }) {
-    return async (result: { result?: { type: string; location?: string; status?: number }; data?: { error?: string } }) => {
+  function handleFormSubmit() {
+    return async ({ result, update }: { result: ActionResult; update: () => Promise<void> }) => {
       loading = false;
 
-      // SvelteKit enhance passes redirect info in result.result
-      if (result.result?.type === 'redirect' && result.result.location) {
-        await goto(result.result.location);
+      if (result.type === 'redirect' && result.location) {
+        await goto(result.location);
         return;
       }
 
-      error = result.data?.error ?? 'Ongeldig e-mailadres of wachtwoord';
+      if (result.type === 'failure') {
+        error = result.data?.error ?? 'Ongeldig e-mailadres of wachtwoord';
+        return;
+      }
+
+      await update();
     };
   }
 

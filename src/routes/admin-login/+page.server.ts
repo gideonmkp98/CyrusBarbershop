@@ -1,6 +1,6 @@
 import { db } from '$lib/server/db/index';
 import { users } from '$lib/server/db/schema';
-import { verifyPassword, createSession } from '$lib/server/auth';
+import { verifyPassword, createSession, signSessionToken } from '$lib/server/auth';
 import { loginSchema } from '$lib/utils/validation';
 import { eq } from 'drizzle-orm';
 import { fail, redirect } from '@sveltejs/kit';
@@ -47,9 +47,10 @@ export const actions: Actions = {
     }
 
     const token = await createSession(user.id);
+    const signedToken = signSessionToken(token);
     console.log('[LOGIN] Session created, token:', token.substring(0, 8) + '...');
 
-    cookies.set('session_token', token, {
+    cookies.set('session_token', signedToken, {
       path: '/',
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
