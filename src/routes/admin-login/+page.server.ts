@@ -13,7 +13,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 };
 
 export const actions: Actions = {
-  default: async ({ request, cookies }) => {
+  default: async ({ request, cookies, url }) => {
     const formData = await request.formData();
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
@@ -50,13 +50,15 @@ export const actions: Actions = {
     const signedToken = signSessionToken(token);
     console.log('[LOGIN] Session created, token:', token.substring(0, 8) + '...');
 
+    const isHttps = url.protocol === 'https:';
     cookies.set('session_token', signedToken, {
       path: '/',
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: isHttps,
       sameSite: 'lax',
       maxAge: 60 * 60 * 24 * 7
     });
+    console.log('[LOGIN] Cookie set. isHttps:', isHttps, 'protocol:', url.protocol);
 
     console.log('[LOGIN] Redirecting to /admin');
     throw redirect(302, '/admin');

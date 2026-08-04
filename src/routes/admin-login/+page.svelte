@@ -12,13 +12,19 @@
     return async ({ result, update }: { result: ActionResult; update: () => Promise<void> }) => {
       loading = false;
 
-      if (result.type === 'redirect' && result.location) {
-        await goto(result.location);
+      // Let SvelteKit handle redirects (e.g. to /admin) and page updates normally.
+      if (result.type === 'redirect' || result.type === 'success') {
+        await update();
         return;
       }
 
       if (result.type === 'failure') {
         error = result.data?.error ?? 'Ongeldig e-mailadres of wachtwoord';
+        return;
+      }
+
+      if (result.type === 'error') {
+        error = 'Er is een fout opgetreden. Probeer het opnieuw.';
         return;
       }
 
