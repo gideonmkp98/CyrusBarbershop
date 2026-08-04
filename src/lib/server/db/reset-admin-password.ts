@@ -12,10 +12,19 @@ async function hashPassword(plain: string): Promise<string> {
   return bcrypt.hash(plain, SALT_ROUNDS);
 }
 
+function stripQuotes(value: string | undefined): string | undefined {
+  if (!value) return value;
+  const trimmed = value.trim();
+  if ((trimmed.startsWith('"') && trimmed.endsWith('"')) || (trimmed.startsWith("'") && trimmed.endsWith("'"))) {
+    return trimmed.slice(1, -1);
+  }
+  return trimmed;
+}
+
 async function resetAdminPassword() {
-  const ADMIN_EMAIL = process.env.OWNER_EMAIL || process.env.MASTER_EMAIL;
-  const ADMIN_PASSWORD = process.env.OWNER_PASSWORD || process.env.MASTER_PASSWORD;
-  const ADMIN_DISPLAY_NAME = process.env.OWNER_DISPLAY_NAME || process.env.MASTER_DISPLAY_NAME;
+  const ADMIN_EMAIL = stripQuotes(process.env.OWNER_EMAIL || process.env.MASTER_EMAIL);
+  const ADMIN_PASSWORD = stripQuotes(process.env.OWNER_PASSWORD || process.env.MASTER_PASSWORD);
+  const ADMIN_DISPLAY_NAME = stripQuotes(process.env.OWNER_DISPLAY_NAME || process.env.MASTER_DISPLAY_NAME);
 
   const DATABASE_URL = process.env.DATABASE_URL;
   if (!DATABASE_URL) {
@@ -34,6 +43,7 @@ async function resetAdminPassword() {
   }
 
   console.log(`Resetting password for ${ADMIN_EMAIL}...`);
+  console.log(`Password length: ${ADMIN_PASSWORD.length}`);
 
   const connection = await mysql.createConnection(DATABASE_URL);
   const db = drizzle(connection, { schema, mode: 'default' });
