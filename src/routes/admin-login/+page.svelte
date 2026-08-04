@@ -1,6 +1,5 @@
 <script lang="ts">
   import { enhance } from '$app/forms';
-  import { goto } from '$app/navigation';
   import type { ActionResult } from '@sveltejs/kit';
 
   let email = $state('');
@@ -12,14 +11,14 @@
     return async ({ result, update }: { result: ActionResult; update: () => Promise<void> }) => {
       loading = false;
 
-      // Let SvelteKit handle redirects (e.g. to /admin) and page updates normally.
+      // SvelteKit's default enhance will follow redirects for us if we call update().
       if (result.type === 'redirect' || result.type === 'success') {
         await update();
         return;
       }
 
       if (result.type === 'failure') {
-        error = result.data?.error ?? 'Ongeldig e-mailadres of wachtwoord';
+        error = (result.data?.error as string | undefined) ?? 'Ongeldig e-mailadres of wachtwoord';
         return;
       }
 
