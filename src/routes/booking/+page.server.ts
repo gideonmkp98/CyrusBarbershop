@@ -10,5 +10,7 @@ export const load: PageServerLoad = async () => {
     .where(eq(services.isActive, true))
     .orderBy(asc(services.displayOrder));
 
-  return { services: result };
+  const bookingEnabled = process.env.BOOKING_ENABLED !== 'false';
+
+  return { services: result, bookingEnabled };
 };

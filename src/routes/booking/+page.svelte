@@ -8,4 +8,4 @@
   <title>Maak een Afspraak — Cyrus Kapsalon</title>
 </svelte:head>
 
-<BookingSection services={data.services} />
+<BookingSection services={data.services} bookingEnabled={data.bookingEnabled} />

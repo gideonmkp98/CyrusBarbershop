@@ -29,6 +29,12 @@ Ga in de Vercel dashboard naar je project → Settings → Environment Variables
 | `OWNER_EMAIL` | Admin login email | `admin@cyrusbarber.com` |
 | `OWNER_PASSWORD` | Admin login password | `YourSecurePassword123!` |
 | `PUBLIC_SITE_URL` | Your Vercel URL | `https://cyrus-barbershop.vercel.app` |
+| `BOOKING_ENABLED` | Enable/disable public bookings | `true` or `false` |
+| `SMTP_HOST` | Mailcow SMTP server hostname | `mail.cyrusbarbershop.nl` |
+| `SMTP_PORT` | Mailcow SMTP port (usually 587) | `587` |
+| `SMTP_USER` | SMTP login username | `info@cyrusbarbershop.nl` |
+| `SMTP_PASSWORD` | SMTP password or app password | `your-secure-password` |
+| `MAIL_FROM` | Sender address for transactional emails | `info@cyrusbarbershop.nl` |
 
 **Let op:** Deze variabelen moeten zowel voor **Production** als **Preview** worden ingesteld.
 
@@ -90,4 +96,10 @@ npm run db:seed
 
 # Build voor productie
 npm run build
+
+# Test transactional email versturen met mockdata
+npm run test:email
+
+# Direct naar een specifiek adres testen
+npm run test:email -- --to=jouw@email.nl
 ```
