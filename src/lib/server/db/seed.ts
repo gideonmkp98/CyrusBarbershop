@@ -12,6 +12,10 @@ async function hashPassword(plain: string): Promise<string> {
   return bcrypt.hash(plain, SALT_ROUNDS);
 }
 
+async function verifyPassword(plain: string, hash: string): Promise<boolean> {
+  return bcrypt.compare(plain, hash);
+}
+
 async function seed() {
   const OWNER_EMAIL = process.env.OWNER_EMAIL || process.env.MASTER_EMAIL || 'admin@cyrusbarber.com';
   const OWNER_PASSWORD = process.env.OWNER_PASSWORD || process.env.MASTER_PASSWORD || 'Admin123!';
@@ -61,11 +65,20 @@ async function seed() {
 
   console.log('✓ Opening hours seeded');
 
-  // Owner admin - check if exists first, then create or update
+  // Owner admin - check if exists first, then create or update password if needed
   const existingOwner = await db.select().from(users).where(eq(users.email, OWNER_EMAIL)).limit(1);
 
   if (existingOwner.length > 0) {
-    console.log(`✓ Owner account already exists: ${OWNER_EMAIL}`);
+    const passwordMatches = await verifyPassword(OWNER_PASSWORD, existingOwner[0].passwordHash);
+    if (passwordMatches) {
+      console.log(`✓ Owner account already exists: ${OWNER_EMAIL}`);
+    } else {
+      const passwordHash = await hashPassword(OWNER_PASSWORD);
+      await db.update(users)
+        .set({ passwordHash, displayName: OWNER_DISPLAY_NAME })
+        .where(eq(users.email, OWNER_EMAIL));
+      console.log(`✓ Owner password updated for: ${OWNER_EMAIL}`);
+    }
   } else {
     const passwordHash = await hashPassword(OWNER_PASSWORD);
     await db.insert(users).values({

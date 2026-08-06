@@ -1,9 +1,10 @@
 import { db } from '$lib/server/db/index';
 import { users } from '$lib/server/db/schema';
-import { verifyPassword, createSession } from '$lib/server/auth';
+import { verifyPassword, createSession, signSessionToken } from '$lib/server/auth';
 import { loginSchema } from '$lib/utils/validation';
 import { eq } from 'drizzle-orm';
 import { fail, redirect } from '@sveltejs/kit';
+import { PUBLIC_SITE_URL } from '$env/static/public';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
@@ -13,7 +14,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 };
 
 export const actions: Actions = {
-  default: async ({ request, cookies }) => {
+  default: async ({ request, cookies, url }) => {
     const formData = await request.formData();
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
@@ -47,15 +48,21 @@ export const actions: Actions = {
     }
 
     const token = await createSession(user.id);
+    const signedToken = signSessionToken(token);
     console.log('[LOGIN] Session created, token:', token.substring(0, 8) + '...');
 
-    cookies.set('session_token', token, {
+    // Use PUBLIC_SITE_URL to determine if cookies should be secure. This is more
+    // reliable than url.protocol behind reverse proxies, which may report https
+    // even when the browser is on http.
+    const isHttps = PUBLIC_SITE_URL?.toLowerCase().startsWith('https://') ?? false;
+    cookies.set('session_token', signedToken, {
       path: '/',
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: isHttps,
       sameSite: 'lax',
       maxAge: 60 * 60 * 24 * 7
     });
+    console.log('[LOGIN] Cookie set. isHttps:', isHttps, 'PUBLIC_SITE_URL:', PUBLIC_SITE_URL);
 
     console.log('[LOGIN] Redirecting to /admin');
     throw redirect(302, '/admin');
