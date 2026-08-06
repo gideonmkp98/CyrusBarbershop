@@ -1,6 +1,8 @@
 import { db } from '$lib/server/db/index';
-import { appointments, services } from '$lib/server/db/schema';
+import { appointments, services, users } from '$lib/server/db/schema';
 import { appointmentSchema } from '$lib/utils/validation';
+import { sendBookingConfirmation } from '$lib/server/mail/sendBookingConfirmation';
+import { PUBLIC_SITE_URL } from '$env/static/public';
 import { sql, ne, eq, and, isNull } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 
@@ -16,6 +18,16 @@ function hasOverlap(start1: number, end1: number, start2: number, end2: number):
 }
 
 export const POST: RequestHandler = async ({ request }) => {
+  // Allow disabling public bookings while keeping the website live.
+  if (process.env.BOOKING_ENABLED === 'false') {
+    return new Response(
+      JSON.stringify({
+        error: 'Online boeken is momenteel niet mogelijk. Bel of app ons om een afspraak te maken.'
+      }),
+      { status: 503, headers: { 'Content-Type': 'application/json' } }
+    );
+  }
+
   const body = await request.json();
   const parsed = appointmentSchema.safeParse(body);
 
@@ -28,9 +40,9 @@ export const POST: RequestHandler = async ({ request }) => {
 
   const { serviceId, staffId, date, timeSlot, clientName, clientEmail, clientPhone, notes } = parsed.data;
 
-  // Get duration of the service being booked
+  // Get details of the service being booked
   const serviceResult = await db
-    .select({ duration: services.duration })
+    .select({ name: services.name, price: services.price, duration: services.duration })
     .from(services)
     .where(eq(services.id, serviceId));
 
@@ -41,7 +53,8 @@ export const POST: RequestHandler = async ({ request }) => {
     });
   }
 
-  const newServiceDuration = serviceResult[0].duration;
+  const bookedService = serviceResult[0];
+  const newServiceDuration = bookedService.duration;
   const newStartMinutes = timeToMinutes(timeSlot);
   const newEndMinutes = newStartMinutes + newServiceDuration;
 
@@ -99,7 +112,43 @@ export const POST: RequestHandler = async ({ request }) => {
     notes: notes || null
   });
 
-  return new Response(JSON.stringify({ success: true, id: result[0].insertId }), {
+  const appointmentId = result[0].insertId;
+
+  // Send confirmation email after the booking has been persisted.
+  // Email failures are logged but never fail the booking itself.
+  try {
+    let barberName: string | null = null;
+    if (staffId) {
+      const barberResult = await db
+        .select({ displayName: users.displayName })
+        .from(users)
+        .where(eq(users.id, staffId))
+        .limit(1);
+      barberName = barberResult[0]?.displayName ?? null;
+    }
+
+    const mailResult = await sendBookingConfirmation({
+      to: clientEmail,
+      clientName,
+      serviceName: bookedService.name,
+      barberName,
+      date,
+      time: timeSlot,
+      duration: bookedService.duration,
+      price: bookedService.price,
+      notes: notes || null,
+      siteUrl: PUBLIC_SITE_URL || 'https://cyrusbarbershop.nl',
+      appointmentId
+    });
+
+    if (!mailResult.ok) {
+      console.error('[BOOKING] Confirmation email not sent:', mailResult.reason);
+    }
+  } catch (mailError) {
+    console.error('[BOOKING] Unexpected error while sending confirmation email:', mailError);
+  }
+
+  return new Response(JSON.stringify({ success: true, id: appointmentId }), {
     status: 201,
     headers: { 'Content-Type': 'application/json' }
   });

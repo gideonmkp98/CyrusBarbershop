@@ -26,7 +26,7 @@
     email: string;
   }
 
-  let { services }: { services: ServiceData[] | undefined } = $props();
+  let { services, bookingEnabled = true }: { services: ServiceData[] | undefined; bookingEnabled?: boolean } = $props();
 
   // Default services matching original HTML when none provided
   const defaultServices: ServiceData[] = [
@@ -324,6 +324,25 @@
       </p>
     </header>
 
+    {#if !bookingEnabled}
+      <div class="bg-surface-base border border-gold-500/20 rounded-lg p-8 md:p-12 text-center" style="animation: fadeStep 0.5s ease-out">
+        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gold-500/10 mb-6">
+          <span class="text-3xl" aria-hidden="true">✂</span>
+        </div>
+        <h3 class="font-display text-subheading text-bone mb-4">Online boeken is momenteel gesloten</h3>
+        <p class="font-body text-body text-bone-warm max-w-lg mx-auto mb-8">
+          We zijn druk bezig met de laatste voorbereidingen. Bel of app ons gerust om direct een afspraak te maken.
+        </p>
+        <a
+          href="https://wa.me/31629231030"
+          class="inline-flex items-center gap-2 px-6 py-3 bg-gold-500 text-surface-low font-body font-semibold rounded hover:bg-gold-400 transition-colors"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Afspraak via WhatsApp
+        </a>
+      </div>
+    {:else}
     <StepIndicators currentStep={currentStep} totalSteps={4} />
 
     <div class="grid lg:grid-cols-12 gap-12 lg:gap-16">
@@ -480,6 +499,7 @@
         />
       </aside>
     </div>
+    {/if}
   </div>
 </section>
 
