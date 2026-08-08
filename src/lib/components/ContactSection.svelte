@@ -287,7 +287,7 @@
             onclick={() => (submitted = false)}
             class="btn-outline border-gold-500/40 text-gold-500 hover:bg-gold-500 hover:text-surface"
           >
-            Nog een bericht sturen
+            Sluiten
           </button>
         </div>
       </div>
