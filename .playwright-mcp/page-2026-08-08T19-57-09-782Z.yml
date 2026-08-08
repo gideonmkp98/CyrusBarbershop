@@ -1,0 +1,111 @@
+- generic [ref=f4e2]:
+  - banner [ref=f4e3]:
+    - navigation [ref=f4e4]:
+      - link [ref=f4e5] [cursor=pointer]:
+        - /url: /
+        - img "Cyrus Barbershop" [ref=f4e6]
+      - generic [ref=f4e7]:
+        - link "Home" [ref=f4e8] [cursor=pointer]:
+          - /url: /
+        - link "Behandelingen" [ref=f4e9] [cursor=pointer]:
+          - /url: /services
+        - link "Over" [ref=f4e10] [cursor=pointer]:
+          - /url: /about
+        - link "Contact" [ref=f4e11] [cursor=pointer]:
+          - /url: /contact
+      - link "Maak een Afspraak" [ref=f4e13] [cursor=pointer]:
+        - /url: /booking
+  - main [ref=f4e14]:
+    - generic [ref=f4e16]:
+      - generic [ref=f4e17]:
+        - generic [ref=f4e18]:
+          - generic [ref=f4e19]: BEREIK ONS
+          - heading "Contact" [level=1] [ref=f4e20]
+        - paragraph [ref=f4e21]: Neem contact op met vragen, of kom langs voor advies en styling. Altijd graag behulpzaam.
+      - generic [ref=f4e22]:
+        - generic [ref=f4e23]:
+          - generic [ref=f4e24]:
+            - generic [ref=f4e29]:
+              - generic [ref=f4e30]: Telefoon
+              - paragraph [ref=f4e31]: "0629231030"
+            - generic [ref=f4e36]:
+              - generic [ref=f4e37]: WhatsApp
+              - link "Chat met ons" [ref=f4e38] [cursor=pointer]:
+                - /url: https://wa.me/31629231030
+            - generic [ref=f4e44]:
+              - generic [ref=f4e45]: E-mail
+              - paragraph [ref=f4e46]: info@cyrusbarbershop.nl
+            - generic [ref=f4e52]:
+              - generic [ref=f4e53]: Locatie
+              - paragraph [ref=f4e54]: Kennedylaan 9e2324ER, Leiden
+          - generic [ref=f4e55]:
+            - heading "Openingstijden" [level=3] [ref=f4e56]
+            - generic [ref=f4e57]:
+              - generic [ref=f4e58]:
+                - generic [ref=f4e59]: Maandag – Vrijdag
+                - generic [ref=f4e61]: 09:00 – 20:00 uur
+              - generic [ref=f4e62]:
+                - generic [ref=f4e63]: Zaterdag
+                - generic [ref=f4e65]: 10:00 – 18:00 uur
+              - generic [ref=f4e66]:
+                - generic [ref=f4e67]: Zondag
+                - generic [ref=f4e69]: Gesloten
+        - generic [ref=f4e71]:
+          - heading "Stuur ons een Bericht" [level=3] [ref=f4e72]
+          - generic [ref=f4e73]:
+            - generic:
+              - text: Laat dit veld leeg
+              - textbox
+            - generic [ref=f4e74]:
+              - generic [ref=f4e76]:
+                - textbox "Naam" [ref=f4e77]:
+                  - /placeholder: " "
+                - generic: Naam
+              - generic [ref=f4e79]:
+                - textbox "E-mailadres" [ref=f4e80]:
+                  - /placeholder: " "
+                - generic: E-mailadres
+            - generic [ref=f4e82]:
+              - textbox "Bericht" [ref=f4e83]:
+                - /placeholder: " "
+              - generic: Bericht
+            - button "Verzend Bericht" [ref=f4e85] [cursor=pointer]
+    - generic [ref=f4e87]:
+      - heading "Volg ons op social media" [level=3] [ref=f4e88]
+      - generic [ref=f4e89]:
+        - link "IG Instagram" [ref=f4e90] [cursor=pointer]:
+          - /url: /contact
+          - generic [ref=f4e91]: IG
+          - generic [ref=f4e93]: Instagram
+        - link "FB Facebook" [ref=f4e94] [cursor=pointer]:
+          - /url: /contact
+          - generic [ref=f4e95]: FB
+          - generic [ref=f4e97]: Facebook
+  - contentinfo [ref=f4e98]:
+    - generic [ref=f4e100]:
+      - generic [ref=f4e101]:
+        - generic [ref=f4e102]:
+          - img "Cyrus Barbershop" [ref=f4e103]
+          - generic [ref=f4e104]: CYRUS BARBERSHOP
+        - paragraph [ref=f4e105]: © 2025 CYRUS BARBERSHOP.
+      - generic [ref=f4e106]:
+        - generic [ref=f4e107]:
+          - generic [ref=f4e108]: OPENINGSTIJDEN
+          - 'link "Ma–Vr: 09:00 – 20:00 uur" [ref=f4e109] [cursor=pointer]':
+            - /url: /contact
+          - 'link "Za: 10:00 – 18:00 uur" [ref=f4e110] [cursor=pointer]':
+            - /url: /contact
+          - 'link "Zo: Gesloten" [ref=f4e111] [cursor=pointer]':
+            - /url: /contact
+        - generic [ref=f4e112]:
+          - generic [ref=f4e113]: CONTACT
+          - link "Locatie" [ref=f4e114] [cursor=pointer]:
+            - /url: /contact
+          - link "Maak een afspraak" [ref=f4e115] [cursor=pointer]:
+            - /url: /booking
+        - generic [ref=f4e116]:
+          - generic [ref=f4e117]: SOCIALS
+          - link "Instagram" [ref=f4e118] [cursor=pointer]:
+            - /url: /contact
+          - link "Facebook" [ref=f4e119] [cursor=pointer]:
+            - /url: /contact

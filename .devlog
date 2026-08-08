@@ -1,0 +1,12 @@
+﻿
+> cyrus-barbershop@1.0.0 dev
+> vite dev
+
+
+  VITE v8.2.0  ready in 1444 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: use --host to expose
+[contact] received body: {"name":"Gideon Test","email":"gideonmkp98+test@gmail.com","message":"Dit is een testbericht om te controleren of de emails correct worden verstuurd na de fix naar de klant en eigenaar.","hp":"","renderTime":11842}
+[MAIL] Contact confirmation sent to gideonmkp98+test@gmail.com: <342df1c1-d2ee-5fd3-7526-96e212dcf101@cyrusbarbershop.nl>
+[MAIL] Contact notification sent to info@cyrusbarbershop.nl: <1ae39da9-8d1b-51db-6d7c-0a8f23a65eaf@cyrusbarbershop.nl>
