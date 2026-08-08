@@ -3,6 +3,7 @@
   import { Scissors, Star } from 'lucide-svelte';
   import StepIndicators from './StepIndicators.svelte';
   import ServiceItem from './ServiceItem.svelte';
+  import AddOnItem from './AddOnItem.svelte';
   import BarberSelection from './BarberSelection.svelte';
   import Calendar from './Calendar.svelte';
   import TimeSlots from './TimeSlots.svelte';
@@ -17,6 +18,7 @@
     duration: number;
     description: string | null;
     isSignature: boolean;
+    isActive?: boolean;
     category?: string;
   }
 
@@ -44,12 +46,14 @@
   const signatureServices = $derived(servicesList.filter(s => s.isSignature));
   const hairServices = $derived(servicesList.filter(s => s.category === 'hair' && !s.isSignature));
   const beardServices = $derived(servicesList.filter(s => s.category === 'beard' && !s.isSignature));
+  const extraServices = $derived(servicesList.filter(s => s.category === 'extra' && s.isActive !== false));
 
   let currentStep = $state(1);
   let selectedServiceId = $state<number | null>(null);
   let selectedService = $state('');
   let selectedPrice = $state(0);
   let selectedDuration = $state(0);
+  let selectedAddOnIds = $state<number[]>([]);
   let selectedStaffId = $state<number | null>(null);
   let selectedBarberName = $state('');
   let selectedDate = $state<Date | null>(null);
@@ -88,7 +92,30 @@
   }
 
   let summaryService = $derived(selectedService || '─');
-  let summaryTotal = $derived(selectedPrice ? `€${selectedPrice}` : '€0');
+
+  // Add-on details lookup + totals
+  const selectedAddOns = $derived(
+    selectedAddOnIds
+      .map(id => extraServices.find(s => s.id === id))
+      .filter((s): s is ServiceData => Boolean(s))
+  );
+  const addOnTotalPrice = $derived(
+    selectedAddOns.reduce((sum, a) => sum + Number(a.price), 0)
+  );
+  const addOnTotalDuration = $derived(
+    selectedAddOns.reduce((sum, a) => sum + a.duration, 0)
+  );
+
+  let summaryAddOns = $derived(
+    selectedAddOns.map(a => ({ name: a.name, price: Number(a.price) }))
+  );
+  let summaryTotalPrice = $derived(selectedPrice + addOnTotalPrice);
+  let summaryTotalDuration = $derived(selectedDuration + addOnTotalDuration);
+  let summaryTotal = $derived(
+    selectedServiceId || addOnTotalPrice > 0
+      ? `€${summaryTotalPrice.toFixed(summaryTotalPrice % 1 === 0 ? 0 : 2)}`
+      : '€0'
+  );
   let summaryDate = $derived(
     selectedDate
       ? selectedDate.toLocaleDateString('nl-NL', { month: 'short', day: 'numeric', year: 'numeric' })
@@ -133,6 +160,14 @@
     selectedService = name;
     selectedPrice = price;
     selectedDuration = duration;
+  }
+
+  function toggleAddOn(id: number) {
+    if (selectedAddOnIds.includes(id)) {
+      selectedAddOnIds = selectedAddOnIds.filter(x => x !== id);
+    } else {
+      selectedAddOnIds = [...selectedAddOnIds, id];
+    }
   }
 
   function selectBarber(id: number | null) {
@@ -258,7 +293,8 @@
           clientName,
           clientEmail,
           clientPhone,
-          notes: clientNotes || undefined
+          notes: clientNotes || undefined,
+          addOnIds: selectedAddOnIds.length > 0 ? selectedAddOnIds : undefined
         })
       });
 
@@ -289,6 +325,7 @@
     selectedService = '';
     selectedPrice = 0;
     selectedDuration = 0;
+    selectedAddOnIds = [];
     selectedStaffId = null;
     selectedBarberName = '';
     selectedDate = null;
@@ -419,6 +456,34 @@
                   />
                 </div>
               {/each}
+
+              <!-- Extra / Add-on Services -->
+              {#if extraServices.length > 0}
+                <div>
+                  <h4 use:reveal class="font-body text-label text-bone-muted uppercase tracking-[0.2em] mb-6 flex items-center gap-3">
+                    <span class="h-px bg-bone-muted/20 flex-grow"></span>
+                    <span>Voeg Extra's Toe</span>
+                    <span class="h-px bg-bone-muted/20 flex-grow"></span>
+                  </h4>
+                  <p class="font-body text-xs text-bone-muted/80 mb-4 -mt-2 max-w-xl">
+                    Optioneel. Meerdere extras tegelijk mogelijk. Wordt opgeteld bij je behandeling.
+                  </p>
+                  <div class="space-y-2">
+                    {#each extraServices as addon, i}
+                      <AddOnItem
+                        id={addon.id}
+                        name={addon.name}
+                        price={Number(addon.price)}
+                        duration={addon.duration}
+                        description={addon.description || undefined}
+                        checked={selectedAddOnIds.includes(addon.id)}
+                        revealOpts={{ delay: i + 1 }}
+                        onToggle={toggleAddOn}
+                      />
+                    {/each}
+                  </div>
+                </div>
+              {/if}
             </div>
           </div>
         {/if}
@@ -492,8 +557,10 @@
           {summaryDate}
           {summaryTime}
           {summaryTotal}
-          summaryDuration={selectedDuration}
-          summaryEndTime={selectedTime && selectedDuration ? calculateEndTime(selectedTime, selectedDuration) : ''}
+          summaryDuration={summaryTotalDuration}
+          summaryAddOns={summaryAddOns}
+          summaryAddOnTotal={addOnTotalPrice}
+          summaryEndTime={selectedTime && summaryTotalDuration ? calculateEndTime(selectedTime, summaryTotalDuration) : ''}
           {canConfirm}
           onConfirm={confirmBooking}
         />

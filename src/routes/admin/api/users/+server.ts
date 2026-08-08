@@ -138,7 +138,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     if (e.code === 'ER_DUP_ENTRY') {
       return jsonResponse({ error: 'Dit e-mailadres is al in gebruik' }, 409);
     }
-    return jsonResponse({ error: e.message || 'Database fout' }, 500);
+    console.error('[users] INSERT error:', e);
+    return jsonResponse({ error: 'Interne fout' }, 500);
   }
 };
 
@@ -165,6 +166,7 @@ export const DELETE: RequestHandler = async ({ request, locals }) => {
     await db.delete(users).where(eq(users.id, body.id));
     return jsonResponse({ success: true });
   } catch (e: any) {
-    return jsonResponse({ error: e.message || 'Verwijderen mislukt' }, 500);
+    console.error('[users] DELETE error:', e);
+    return jsonResponse({ error: 'Interne fout' }, 500);
   }
 };

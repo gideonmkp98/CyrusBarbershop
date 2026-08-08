@@ -8,7 +8,8 @@ export const appointmentSchema = z.object({
   clientName: z.string().min(2).max(100),
   clientEmail: z.string().email(),
   clientPhone: z.string().regex(/^[\d\s\-\+\(\)]{6,20}$/, 'Ongeldig telefoonnummer').optional(),
-  notes: z.string().max(1000).optional()
+  notes: z.string().max(1000).optional(),
+  addOnIds: z.array(z.number().int().positive()).optional().default([])
 });
 
 export const contactSchema = z.object({

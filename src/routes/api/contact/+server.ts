@@ -6,7 +6,8 @@ export const POST: RequestHandler = async ({ request }) => {
   const parsed = contactSchema.safeParse(body);
 
   if (!parsed.success) {
-    return new Response(JSON.stringify({ error: 'Validatie mislukt', issues: parsed.error.issues }), {
+    console.warn('[contact] validation failed:', parsed.error.issues);
+    return new Response(JSON.stringify({ error: 'Ongeldige invoer' }), {
       status: 400,
       headers: { 'Content-Type': 'application/json' }
     });
