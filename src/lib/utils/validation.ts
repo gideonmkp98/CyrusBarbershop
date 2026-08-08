@@ -13,9 +13,13 @@ export const appointmentSchema = z.object({
 });
 
 export const contactSchema = z.object({
-  name: z.string().min(2).max(100),
-  email: z.string().email(),
-  message: z.string().min(10).max(2000)
+  name: z.string().trim().min(2).max(100),
+  email: z.string().trim().email(),
+  message: z.string().trim().min(3).max(2000),
+  // Anti-spam: honeypot must be empty, render_time must be >= 1500ms (bots
+  // fill the form instantly or skip the field). Both are validated server-side.
+  hp: z.string().max(0).optional().default(''),
+  renderTime: z.number().int().min(1500).optional()
 });
 
 export const loginSchema = z.object({
