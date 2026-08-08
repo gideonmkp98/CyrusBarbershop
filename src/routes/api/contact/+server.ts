@@ -9,6 +9,12 @@ import type { RequestHandler } from './$types';
 // to avoid spam + log floods once email sending is wired up.
 const RATE_LIMIT = { capacity: 5, refillPerSecond: 5 / 60 };
 
+// Anti-spam: honeypot + time-trap. Bots fill all fields including hidden ones,
+// and submit instantly. We silently drop these without telling the spammer
+// anything useful — the API returns success so they don't iterate.
+const MIN_MESSAGE_WORDS = 10;
+const MIN_RENDER_MS = 1500;
+
 export const POST: RequestHandler = async ({ request }) => {
   const ip = getClientIp(request.headers);
   const limit = rateLimit(`contact:${ip}`, RATE_LIMIT);
@@ -46,6 +52,28 @@ export const POST: RequestHandler = async ({ request }) => {
     }
   }
 
+  // Anti-spam gates. Run BEFORE Zod so we never leak validation feedback to
+  // bots (they'd iterate). Silently return success on spam hits so the bot
+  // can't tell its submission was rejected.
+  if (body && typeof body === 'object') {
+    const b = body as Record<string, unknown>;
+    // Honeypot: hidden field must be empty. Bots fill every input they see.
+    if (typeof b.hp === 'string' && b.hp.length > 0) {
+      console.warn('[contact] spam: honeypot filled from ip=%s', ip);
+      return new Response(JSON.stringify({ success: true }), {
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+    // Time-trap: humans take >1.5s to fill a form; bots submit instantly.
+    const rt = typeof b.renderTime === 'number' ? b.renderTime : 0;
+    if (rt < MIN_RENDER_MS) {
+      console.warn('[contact] spam: renderTime too low (%dms) from ip=%s', rt, ip);
+      return new Response(JSON.stringify({ success: true }), {
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+  }
+
   const parsed = contactSchema.safeParse(body);
 
   if (!parsed.success) {
@@ -74,17 +102,39 @@ export const POST: RequestHandler = async ({ request }) => {
         fieldMessages[field] = 'Ongeldige invoer';
       }
     }
+    // Don't expose the generic "Ongeldige invoer" banner when we already have
+    // field-level messages — otherwise the user sees the same complaint twice.
+    const hasFieldErrors = Object.keys(fieldMessages).length > 0;
     const errorBody = dev
       ? {
-          error: 'Ongeldige invoer',
+          error: hasFieldErrors ? undefined : 'Ongeldige invoer',
           issues: parsed.error.issues.map((i) => ({ path: i.path, message: i.message })),
           fields: fieldMessages
         }
-      : { error: 'Ongeldige invoer', fields: fieldMessages };
+      : {
+          error: hasFieldErrors ? undefined : 'Ongeldige invoer',
+          fields: fieldMessages
+        };
     return new Response(JSON.stringify(errorBody), {
       status: 400,
       headers: { 'Content-Type': 'application/json' }
     });
+  }
+
+  // Word-count gate (only after Zod passes so message is sanitized). Bots can
+  // pass the schema but still spam with one-word junk; require a real question.
+  const wordCount = parsed.data.message.split(/\s+/).filter(Boolean).length;
+  if (wordCount < MIN_MESSAGE_WORDS) {
+    console.warn('[contact] message too short: %d words from ip=%s', wordCount, ip);
+    return new Response(
+      JSON.stringify({
+        error: undefined,
+        fields: {
+          message: `Bericht is te kort (minimaal ${MIN_MESSAGE_WORDS} woorden)`
+        }
+      }),
+      { status: 400, headers: { 'Content-Type': 'application/json' } }
+    );
   }
 
   // Send the customer confirmation + owner notification. Email failures are

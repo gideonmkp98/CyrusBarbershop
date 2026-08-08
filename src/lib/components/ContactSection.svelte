@@ -13,6 +13,7 @@
   let cName = $state('');
   let cEmail = $state('');
   let cMessage = $state('');
+  let cHp = $state(''); // honeypot — must stay empty (bots fill it)
   let submitting = $state(false);
   let submitted = $state(false);
   let formError = $state<string | null>(null);
@@ -29,6 +30,10 @@
 
   let openingHours = $state<OpeningHour[]>([]);
   let hoursLoaded = $state(false);
+
+  // Anti-spam: capture render timestamp when component mounts. Humans take
+  // seconds to fill the form; bots submit instantly. Server rejects <1500ms.
+  const renderedAt = Date.now();
 
   // Fetch opening hours on mount
   $effect(() => {
@@ -101,13 +106,20 @@
       const res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: cName, email: cEmail, message: cMessage })
+        body: JSON.stringify({
+          name: cName,
+          email: cEmail,
+          message: cMessage,
+          hp: cHp,
+          renderTime: Date.now() - renderedAt
+        })
       });
       if (res.ok) {
         submitted = true;
         cName = '';
         cEmail = '';
         cMessage = '';
+        cHp = '';
       } else {
         let data: { error?: string; fields?: { name?: string; email?: string; message?: string } } | null = null;
         try {
@@ -115,7 +127,7 @@
         } catch {
           /* non-JSON response */
         }
-        formError = data?.error ?? `Verzenden mislukt (${res.status})`;
+        formError = data?.error ?? null;
         if (data?.fields) fieldErrors = data.fields;
       }
     } catch (err) {
@@ -210,6 +222,19 @@
         <div use:reveal={{ direction: 'right' }}>
           <h3 class="font-display text-subheading text-bone mb-8">Stuur ons een Bericht</h3>
           <form class="grid md:grid-cols-2 gap-8" onsubmit={handleSubmit} novalidate>
+            <!-- Honeypot: invisible to humans, irresistible to bots. Real users
+                 won't fill it because the label says "leave this empty". -->
+            <div class="hp-field" aria-hidden="true">
+              <label for="cHp">Laat dit veld leeg</label>
+              <input
+                id="cHp"
+                type="text"
+                bind:value={cHp}
+                tabindex="-1"
+                autocomplete="off"
+                name="hp"
+              />
+            </div>
             <div class="md:col-span-2 md:grid md:grid-cols-2 md:gap-8 md:col-span-2">
               <div>
                 <FieldGroup id="cName" label="Naam" bind:value={cName} required />
@@ -231,7 +256,7 @@
               {/if}
             </div>
             <div class="md:col-span-2 pt-2 space-y-4">
-              {#if formError}
+              {#if formError && Object.keys(fieldErrors).length === 0}
                 <p class="text-red-400 font-body text-label" role="alert">{formError}</p>
               {/if}
               <button
