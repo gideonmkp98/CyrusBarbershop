@@ -155,7 +155,7 @@ export function contactNotificationTemplate(data: ContactNotificationData): Emai
               </table>
 
               <p style="margin:0;font-size:12px;color:#666;line-height:1.5;">
-                Ontvangen op ${escapeHtml(receivedAtText)} · ${escapeHtml(formatDutchDate(new Date()))}
+                Ontvangen op ${escapeHtml(receivedAtText)}
               </p>
             </td>
           </tr>
