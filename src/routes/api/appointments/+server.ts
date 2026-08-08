@@ -2,6 +2,7 @@ import { db } from '$lib/server/db/index';
 import { appointments, appointmentAddOns, services, users } from '$lib/server/db/schema';
 import { appointmentSchema } from '$lib/utils/validation';
 import { sendBookingConfirmation } from '$lib/server/mail/sendBookingConfirmation';
+import { rateLimit, getClientIp } from '$lib/server/rateLimit';
 import { PUBLIC_SITE_URL } from '$env/static/public';
 import { sql, ne, eq, and, isNull, inArray } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
@@ -17,7 +18,23 @@ function hasOverlap(start1: number, end1: number, start2: number, end2: number):
   return start1 < end2 && start2 < end1;
 }
 
+// Public booking endpoint: 10 attempts / minute / IP.
+// Caps casual abuse (scripted attempts to find open slots) without affecting real users.
+const RATE_LIMIT = { capacity: 10, refillPerSecond: 10 / 60 };
+
 export const POST: RequestHandler = async ({ request }) => {
+  const ip = getClientIp(request.headers);
+  const limit = rateLimit(`booking:${ip}`, RATE_LIMIT);
+  if (!limit.allowed) {
+    return new Response(JSON.stringify({ error: 'Te veel verzoeken, probeer later opnieuw' }), {
+      status: 429,
+      headers: {
+        'Content-Type': 'application/json',
+        'Retry-After': String(Math.ceil(limit.retryAfterMs / 1000))
+      }
+    });
+  }
+
   // Allow disabling public bookings while keeping the website live.
   if (process.env.BOOKING_ENABLED === 'false') {
     return new Response(
@@ -28,7 +45,16 @@ export const POST: RequestHandler = async ({ request }) => {
     );
   }
 
-  const body = await request.json();
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    return new Response(JSON.stringify({ error: 'Ongeldige invoer' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+
   const parsed = appointmentSchema.safeParse(body);
 
   if (!parsed.success) {
