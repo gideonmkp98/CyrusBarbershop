@@ -15,7 +15,7 @@ export const appointmentSchema = z.object({
 export const contactSchema = z.object({
   name: z.string().trim().min(2).max(100),
   email: z.string().trim().email(),
-  message: z.string().trim().min(10).max(2000)
+  message: z.string().trim().min(3).max(2000)
 });
 
 export const loginSchema = z.object({

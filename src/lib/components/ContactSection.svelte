@@ -1,6 +1,6 @@
 <script lang="ts">
   import { reveal } from '$lib/actions/reveal';
-  import { Phone, Mail, MapPin, Scissors } from 'lucide-svelte';
+  import { Phone, Mail, MapPin, Check } from 'lucide-svelte';
   import FieldGroup from './FieldGroup.svelte';
 
   interface Props {
@@ -15,6 +15,8 @@
   let cMessage = $state('');
   let submitting = $state(false);
   let submitted = $state(false);
+  let formError = $state<string | null>(null);
+  let fieldErrors = $state<{ name?: string; email?: string; message?: string }>({});
 
   // Opening hours state
   type OpeningHour = {
@@ -93,6 +95,8 @@
     e.preventDefault();
     if (submitting) return;
     submitting = true;
+    formError = null;
+    fieldErrors = {};
     try {
       const res = await fetch('/api/contact', {
         method: 'POST',
@@ -104,9 +108,21 @@
         cName = '';
         cEmail = '';
         cMessage = '';
+      } else {
+        let data: { error?: string; fields?: { name?: string; email?: string; message?: string } } | null = null;
+        try {
+          data = await res.json();
+        } catch {
+          /* non-JSON response */
+        }
+        formError = data?.error ?? `Verzenden mislukt (${res.status})`;
+        if (data?.fields) fieldErrors = data.fields;
       }
-    } catch { /* ignore */ }
-    submitting = false;
+    } catch (err) {
+      formError = 'Kan geen verbinding maken met de server. Probeer het opnieuw.';
+    } finally {
+      submitting = false;
+    }
   }
 </script>
 
@@ -193,21 +209,64 @@
       <div class="md:col-span-7 space-y-10">
         <div use:reveal={{ direction: 'right' }}>
           <h3 class="font-display text-subheading text-bone mb-8">Stuur ons een Bericht</h3>
-          <form class="grid md:grid-cols-2 gap-8" onsubmit={handleSubmit}>
-            <FieldGroup id="cName" label="Naam" bind:value={cName} required />
-            <FieldGroup type="email" id="cEmail" label="E-mailadres" bind:value={cEmail} required />
-            <FieldGroup id="cMessage" label="Bericht" bind:value={cMessage} rows={4} cls="md:col-span-2" />
-            <div class="md:col-span-2 pt-2">
-              {#if submitted}
-                <p class="text-gold-500 font-body text-label">Bedankt! Je bericht is ontvangen.</p>
-              {:else}
-                <button type="submit" class="btn-outline px-12 py-4 border-gold-500/40 text-gold-500 hover:bg-gold-500 hover:text-surface" disabled={submitting}>Verzend Bericht</button>
+          <form class="grid md:grid-cols-2 gap-8" onsubmit={handleSubmit} novalidate>
+            <div class="md:col-span-2 md:grid md:grid-cols-2 md:gap-8 md:col-span-2">
+              <div>
+                <FieldGroup id="cName" label="Naam" bind:value={cName} required />
+                {#if fieldErrors.name}
+                  <p class="mt-2 text-sm text-red-400 font-body">{fieldErrors.name}</p>
+                {/if}
+              </div>
+              <div>
+                <FieldGroup type="email" id="cEmail" label="E-mailadres" bind:value={cEmail} required />
+                {#if fieldErrors.email}
+                  <p class="mt-2 text-sm text-red-400 font-body">{fieldErrors.email}</p>
+                {/if}
+              </div>
+            </div>
+            <div class="md:col-span-2">
+              <FieldGroup id="cMessage" label="Bericht" bind:value={cMessage} rows={4} cls="md:col-span-2" />
+              {#if fieldErrors.message}
+                <p class="mt-2 text-sm text-red-400 font-body">{fieldErrors.message}</p>
               {/if}
+            </div>
+            <div class="md:col-span-2 pt-2 space-y-4">
+              {#if formError}
+                <p class="text-red-400 font-body text-label" role="alert">{formError}</p>
+              {/if}
+              <button
+                type="submit"
+                class="btn-outline px-12 py-4 border-gold-500/40 text-gold-500 hover:bg-gold-500 hover:text-surface disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={submitting}
+              >
+                {submitting ? 'Verzenden…' : 'Verzend Bericht'}
+              </button>
             </div>
           </form>
         </div>
       </div>
     </div>
+
+    <!-- Contact Success Modal -->
+    {#if submitted}
+      <div class="booking-success show" aria-modal="true" role="dialog">
+        <div class="max-w-md text-center p-12 border border-gold-500/20 bg-surface-base">
+          <div class="flex justify-center items-center text-6xl text-gold-500 mb-6">
+            <Check size={96} stroke-width={1.5} />
+          </div>
+          <h2 class="font-display text-heading text-bone mb-4">Bericht Verstuurd</h2>
+          <p class="text-bone-warm font-body mb-8">
+            Dank je wel. We hebben je bericht ontvangen en nemen zo snel mogelijk contact met je op.
+          </p>
+          <button
+            onclick={() => (submitted = false)}
+            class="btn-outline border-gold-500/40 text-gold-500 hover:bg-gold-500 hover:text-surface"
+          >
+            Nog een bericht sturen
+          </button>
+        </div>
+      </div>
+    {/if}
 
     <!-- Social Links -->
    

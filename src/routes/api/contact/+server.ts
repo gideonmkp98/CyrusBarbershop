@@ -50,15 +50,37 @@ export const POST: RequestHandler = async ({ request }) => {
 
   if (!parsed.success) {
     console.warn('[contact] validation failed:', parsed.error.issues);
+    // Translate Zod issues to Dutch, field-specific messages for the UI.
+    // Keep the schema details server-side (don't expose paths/limits in prod).
+    const fieldMessages: Record<string, string> = {};
+    for (const issue of parsed.error.issues) {
+      const field = String(issue.path[0] ?? '');
+      if (!field || fieldMessages[field]) continue;
+      if (issue.code === 'too_small') {
+        fieldMessages[field] =
+          field === 'name'
+            ? 'Naam is te kort (minimaal 2 tekens)'
+            : field === 'message'
+              ? 'Bericht is te kort (minimaal 3 tekens)'
+              : 'Veld is te kort';
+      } else if (issue.code === 'too_big') {
+        fieldMessages[field] =
+          field === 'name'
+            ? 'Naam is te lang (maximaal 100 tekens)'
+            : 'Bericht is te lang (maximaal 2000 tekens)';
+      } else if (issue.code === 'invalid_string' && field === 'email') {
+        fieldMessages[field] = 'Ongeldig e-mailadres';
+      } else {
+        fieldMessages[field] = 'Ongeldige invoer';
+      }
+    }
     const errorBody = dev
       ? {
           error: 'Ongeldige invoer',
-          issues: parsed.error.issues.map((i) => ({
-            path: i.path,
-            message: i.message
-          }))
+          issues: parsed.error.issues.map((i) => ({ path: i.path, message: i.message })),
+          fields: fieldMessages
         }
-      : { error: 'Ongeldige invoer' };
+      : { error: 'Ongeldige invoer', fields: fieldMessages };
     return new Response(JSON.stringify(errorBody), {
       status: 400,
       headers: { 'Content-Type': 'application/json' }
