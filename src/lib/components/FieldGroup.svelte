@@ -16,7 +16,7 @@
     type = 'text',
     id = '',
     label = '',
-    value = '',
+    value = $bindable(''),
     required = false,
     rows = undefined,
     placeholder = ' ',
@@ -25,19 +25,21 @@
     onchange
   } = $props<Props>();
 
-  function handleChange(e: Event) {
+  function handleInput(e: Event) {
     const target = e.target as HTMLInputElement | HTMLTextAreaElement;
-    if (onchange) {
-      onchange(target.value);
-    }
+    // Sync the bound parent state.
+    value = target.value;
+    // Also notify the legacy onchange callback so existing callers that pass
+    // `value={x} onchange={(v) => x = v}` keep working.
+    if (onchange) onchange(target.value);
   }
 </script>
 
 <div class="field-group {cls}">
   {#if rows}
-    <textarea {id} {value} onchange={handleChange} oninput={handleChange} {placeholder} {rows} class="resize-none" required={required || undefined}></textarea>
+    <textarea {id} {value} oninput={handleInput} {placeholder} {rows} class="resize-none" required={required || undefined}></textarea>
   {:else}
-    <input {type} {id} {value} onchange={handleChange} oninput={handleChange} {placeholder} {pattern} required={required || undefined} />
+    <input {type} {id} {value} oninput={handleInput} {placeholder} {pattern} required={required || undefined} />
   {/if}
   <label for={id}>{label}</label>
 </div>
