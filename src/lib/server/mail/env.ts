@@ -1,28 +1,32 @@
 // Provide a single source for private environment variables used by the mail module.
-// We pull from SvelteKit's `$env/static/private` so values are loaded from
-// `.env` reliably across dev/prod. Plain Node/TSX scripts can still use
-// `process.env` (see `scripts/test-email.ts`) — they're outside the SvelteKit
-// runtime and don't need this module.
+//
+// We use SvelteKit's `$env/dynamic/private`:
+// - In dev it reads values from `.env` files (so local dev works out of the box).
+// - In prod (adapter-node) it reads from `process.env` at runtime, i.e. the
+//   environment injected by the deployment platform (Coolify).
+//
+// Using the *dynamic* module (instead of `$env/static/private`) is important
+// because the static module injects values at BUILD time and requires every
+// imported variable to be present during the build. Optional vars such as
+// `CONTACT_NOTIFY_EMAIL` are not guaranteed to exist on the build server, which
+// caused `MISSING_EXPORT` build failures. The dynamic module has no such
+// requirement — a missing var simply resolves to `undefined` at runtime, which
+// `getContactNotifyEmail()` handles via its `OWNER_EMAIL` fallback.
+//
+// Plain Node/TSX scripts (e.g. `scripts/test-email.ts`) are outside the
+// SvelteKit runtime and keep using `process.env` directly.
 
-import {
-	SMTP_HOST,
-	SMTP_PORT,
-	SMTP_USER,
-	SMTP_PASSWORD,
-	MAIL_FROM,
-	CONTACT_NOTIFY_EMAIL,
-	OWNER_EMAIL
-} from '$env/static/private';
+import { env } from '$env/dynamic/private';
 
 export function getMailEnv(): Record<string, string | undefined> {
 	return {
-		SMTP_HOST,
-		SMTP_PORT,
-		SMTP_USER,
-		SMTP_PASSWORD,
-		MAIL_FROM,
-		CONTACT_NOTIFY_EMAIL,
-		OWNER_EMAIL
+		SMTP_HOST: env.SMTP_HOST,
+		SMTP_PORT: env.SMTP_PORT,
+		SMTP_USER: env.SMTP_USER,
+		SMTP_PASSWORD: env.SMTP_PASSWORD,
+		MAIL_FROM: env.MAIL_FROM,
+		CONTACT_NOTIFY_EMAIL: env.CONTACT_NOTIFY_EMAIL,
+		OWNER_EMAIL: env.OWNER_EMAIL
 	};
 }
 
@@ -32,9 +36,9 @@ export function getMailEnv(): Record<string, string | undefined> {
  * dedicated env var is not set. Returns undefined when neither is configured.
  */
 export function getContactNotifyEmail(): string | undefined {
-	const dedicated = CONTACT_NOTIFY_EMAIL?.trim();
+	const dedicated = env.CONTACT_NOTIFY_EMAIL?.trim();
 	if (dedicated) return dedicated;
-	const fallback = OWNER_EMAIL?.trim();
+	const fallback = env.OWNER_EMAIL?.trim();
 	if (fallback) return fallback;
 	return undefined;
 }
