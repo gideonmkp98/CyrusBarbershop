@@ -29,7 +29,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       await db.delete(services).where(eq(services.id, id));
       return jsonResponse({ success: true, action: 'delete' });
     } catch (e: any) {
-      return jsonResponse({ error: e.message || 'Database fout' }, 500);
+      console.error('[services] DELETE error:', e);
+      return jsonResponse({ error: 'Interne fout' }, 500);
     }
   }
 
@@ -44,7 +45,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       await db.update(services).set({ isActive: !isActive }).where(eq(services.id, id));
       return jsonResponse({ success: true, action: 'toggle' });
     } catch (e: any) {
-      return jsonResponse({ error: e.message || 'Database fout' }, 500);
+      console.error('[services] TOGGLE error:', e);
+      return jsonResponse({ error: 'Interne fout' }, 500);
     }
   }
 
@@ -98,6 +100,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     if (e.code === 'ER_DUP_ENTRY') {
       return jsonResponse({ error: 'Een service met deze naam bestaat al' }, 409);
     }
-    return jsonResponse({ error: e.message || 'Database fout' }, 500);
+    console.error('[services] INSERT/UPDATE error:', e);
+    return jsonResponse({ error: 'Interne fout' }, 500);
   }
 };

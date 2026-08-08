@@ -102,7 +102,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       headers: { 'Content-Type': 'application/json' }
     });
   } catch (e: any) {
-    return new Response(JSON.stringify({ error: e.message || 'Database fout' }), {
+    console.error('[opening-hours] DB error:', e);
+    return new Response(JSON.stringify({ error: 'Interne fout' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
     });
@@ -135,7 +136,8 @@ export const DELETE: RequestHandler = async ({ request, locals }) => {
       headers: { 'Content-Type': 'application/json' }
     });
   } catch (e: any) {
-    return new Response(JSON.stringify({ error: e.message || 'Verwijderen mislukt' }), {
+    console.error('[opening-hours] DELETE error:', e);
+    return new Response(JSON.stringify({ error: 'Interne fout' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
     });

@@ -77,15 +77,47 @@ export const load: PageServerLoad = async () => {
 };
 
 export const actions: Actions = {
-  default: async ({ request }) => {
-    const body = await request.json();
+  default: async ({ request, locals }) => {
+    // Auth gate: form actions are POST endpoints reachable directly,
+    // so the +layout.server.ts redirect does NOT protect this handler.
+    if (!locals.user) {
+      return new Response(JSON.stringify({ error: 'Niet ingelogd' }), { status: 401 });
+    }
+
+    let body: any;
+    try {
+      body = await request.json();
+    } catch {
+      return new Response(JSON.stringify({ error: 'Ongeldige aanvraag' }), { status: 400 });
+    }
+
     const { id, status } = body;
 
     if (!id || !['completed', 'cancelled', 'no_show'].includes(status)) {
       return new Response(JSON.stringify({ error: 'Ongeldige aanvraag' }), { status: 400 });
     }
 
-    await db.update(appointments).set({ status }).where(eq(appointments.id, id));
+    const appointmentId = parseInt(String(id), 10);
+    if (!appointmentId) {
+      return new Response(JSON.stringify({ error: 'Ongeldig ID' }), { status: 400 });
+    }
+
+    // Staff may only modify appointments assigned to themselves.
+    const target = await db
+      .select({ staffId: appointments.staffId })
+      .from(appointments)
+      .where(eq(appointments.id, appointmentId))
+      .limit(1);
+
+    if (target.length === 0) {
+      return new Response(JSON.stringify({ error: 'Afspraak niet gevonden' }), { status: 404 });
+    }
+
+    if (locals.user.role === 'staff' && target[0].staffId !== locals.user.id) {
+      return new Response(JSON.stringify({ error: 'Geen toegang tot deze afspraak' }), { status: 403 });
+    }
+
+    await db.update(appointments).set({ status }).where(eq(appointments.id, appointmentId));
     return new Response(JSON.stringify({ success: true }));
   }
 };

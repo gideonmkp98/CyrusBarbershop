@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Pencil, Trash2, Plus, Scissors, Eye, EyeOff, Sparkles, User, ClipboardList, AlertTriangle, CheckCircle, Gem } from 'lucide-svelte';
+  import { Pencil, Trash2, Plus, Scissors, Eye, EyeOff, Sparkles, User, ClipboardList, AlertTriangle, CheckCircle, Gem, Layers } from 'lucide-svelte';
 
   let { data } = $props();
 
@@ -248,6 +248,7 @@
       case 'hair': return 'Haar';
       case 'beard': return 'Baard';
       case 'signature': return 'Signature';
+      case 'extra': return 'Extra';
       default: return category;
     }
   }
@@ -257,6 +258,7 @@
       case 'hair': return 'text-blue-400 bg-blue-500/10 border-blue-500/20';
       case 'beard': return 'text-amber-400 bg-amber-500/10 border-amber-500/20';
       case 'signature': return 'text-gold-500 bg-gold-500/10 border-gold-500/20';
+      case 'extra': return 'text-purple-400 bg-purple-500/10 border-purple-500/20';
       default: return 'text-bone-muted bg-bone-muted/10 border-bone-muted/20';
     }
   }
@@ -266,6 +268,7 @@
       case 'hair': return Scissors;
       case 'beard': return User;
       case 'signature': return Sparkles;
+      case 'extra': return Layers;
       default: return ClipboardList;
     }
   }
@@ -302,6 +305,7 @@
         <option value="hair">Haar</option>
         <option value="beard">Baard</option>
         <option value="signature">Signature</option>
+        <option value="extra">Extra</option>
       </select>
       <div class="absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-bone-muted">
         <ClipboardList size={14} />
@@ -362,6 +366,10 @@
             {#if service.isSignature}
               <div onmouseenter={(e) => showTooltip(e, 'Signature Behandeling')} onmouseleave={hideTooltip}>
                 <Sparkles class="text-gold-500" size={16} />
+              </div>
+            {:else if service.category === 'extra'}
+              <div onmouseenter={(e) => showTooltip(e, 'Extra — te kiezen bovenop een behandeling')} onmouseleave={hideTooltip}>
+                <Plus class="text-purple-400" size={16} />
               </div>
             {/if}
           </div>
@@ -614,6 +622,7 @@
                 <option value="hair">Haar</option>
                 <option value="beard">Baard</option>
                 <option value="signature">Signature</option>
+                <option value="extra">Extra</option>
               </select>
             </div>
           </div>
