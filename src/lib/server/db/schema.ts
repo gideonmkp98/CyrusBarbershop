@@ -71,3 +71,11 @@ export const staffSchedules = mysqlTable('staff_schedules', {
   closeTime: time('close_time'),
   isActive: boolean('is_active').notNull().default(true)
 });
+
+export const appointmentAddOns = mysqlTable('appointment_add_ons', {
+  id: int('id').primaryKey().autoincrement(),
+  appointmentId: int('appointment_id').notNull().references(() => appointments.id, { onDelete: 'cascade' }),
+  serviceId: int('service_id').notNull().references(() => services.id),
+  price: decimal('price', { precision: 10, scale: 2 }).notNull(),
+  duration: int('duration').notNull()
+});

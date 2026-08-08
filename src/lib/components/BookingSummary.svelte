@@ -6,12 +6,14 @@
     summaryTime: string;
     summaryTotal: string;
     summaryDuration?: number;
+    summaryAddOns?: { name: string; price: number }[];
+    summaryAddOnTotal?: number;
     summaryEndTime?: string;
     canConfirm: boolean;
     onConfirm: () => void;
   }
 
-  let { summaryService, summaryBarber, summaryDate, summaryTime, summaryTotal, summaryDuration, summaryEndTime, canConfirm, onConfirm } = $props<Props>();
+  let { summaryService, summaryBarber, summaryDate, summaryTime, summaryTotal, summaryDuration, summaryAddOns = [], summaryAddOnTotal = 0, summaryEndTime, canConfirm, onConfirm } = $props<Props>();
 </script>
 
 <div class="lg:sticky lg:top-32 bg-surface-base p-8 border border-gold-500/15">
@@ -21,6 +23,16 @@
       <span class="font-body text-label text-bone-muted">BEHANDELING</span>
       <span class="font-body text-body text-right">{summaryService}</span>
     </div>
+    {#if summaryAddOns && summaryAddOns.length > 0}
+      <div class="flex justify-between items-start">
+        <span class="font-body text-label text-bone-muted shrink-0 pr-2">EXTRA'S</span>
+        <span class="font-body text-body text-right">
+          {#each summaryAddOns as addon, i}
+            <span class="block text-bone-warm">{addon.name} <span class="text-bone-muted">+€{addon.price}</span></span>
+          {/each}
+        </span>
+      </div>
+    {/if}
     {#if summaryDuration}
       <div class="flex justify-between items-start">
         <span class="font-body text-label text-bone-muted">DUUR</span>

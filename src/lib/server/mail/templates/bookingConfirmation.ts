@@ -29,6 +29,8 @@ export interface BookingConfirmationData {
   siteUrl: string;
   /** Optional appointment ID for support references. */
   appointmentId?: number | string | null;
+  /** Optional list of selected add-on services (rendered under the main service). */
+  addOns?: { name: string; price: string | number }[];
 }
 
 interface EmailContent {
@@ -82,6 +84,15 @@ export function bookingConfirmationTemplate(data: BookingConfirmationData): Emai
   const notesHtml = data.notes ? escapeHtml(data.notes) : '';
   const appointmentRefHtml = data.appointmentId ? `Afspraaknummer: ${escapeHtml(data.appointmentId)}` : '';
 
+  // Add-ons: render only if any were selected
+  const addOnsHtml = (data.addOns ?? [])
+    .filter(a => a && a.name)
+    .map(a => `<tr><td style="padding:6px 0 6px 24px;color:#d0c5af;font-size:15px;">+ ${escapeHtml(a.name)} <span style="color:#99907c;font-size:13px;margin-left:6px;">(${escapeHtml(formatPrice(a.price))})</span></td></tr>`)
+    .join('');
+  const addOnsSectionHtml = addOnsHtml
+    ? `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin:6px 0 14px;border-left:2px solid rgba(212,175,55,0.25);padding-left:14px;">${addOnsHtml}</table>`
+    : '';
+
   // Raw values for the plain text body
   const firstNameText = extractFirstName(data.clientName);
   const serviceNameText = data.serviceName;
@@ -92,6 +103,10 @@ export function bookingConfirmationTemplate(data: BookingConfirmationData): Emai
   const priceTextText = formatPrice(data.price);
   const notesText = data.notes || '';
   const appointmentRefText = data.appointmentId ? `Afspraaknummer: ${data.appointmentId}` : '';
+  const addOnsTextList = (data.addOns ?? []).filter(a => a && a.name);
+  const addOnsText = addOnsTextList.length > 0
+    ? addOnsTextList.map(a => `  - ${a.name} (${formatPrice(a.price)})`).join('\n') + '\n'
+    : '';
 
   const socialLinks: string[] = [];
   if (SOCIAL_LINKS.instagram) {
@@ -151,6 +166,7 @@ export function bookingConfirmationTemplate(data: BookingConfirmationData): Emai
                     <h2 style="margin:0 0 22px;font-family:Georgia,'Times New Roman',serif;font-size:15px;color:#D4AF37;letter-spacing:0.12em;text-transform:uppercase;font-weight:600;">Afspraakdetails</h2>
                     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
                       ${detailRow(ICONS.scissors, 'Behandeling', data.serviceName)}
+                      ${addOnsSectionHtml}
                       ${detailRow(ICONS.user, 'Barber', data.barberName || 'Geen voorkeur')}
                       ${detailRow(ICONS.calendar, 'Datum', dateTextHtml)}
                       ${detailRow(ICONS.clock, 'Tijd', timeTextHtml)}
@@ -222,7 +238,7 @@ Bedankt voor je afspraak bij ${BUSINESS_NAME}. We kijken ernaar uit je binnenkor
 
 AFSPRAAKDETAILS
 - Behandeling: ${serviceNameText}
-- Barber: ${barberNameText}
+${addOnsText}- Barber: ${barberNameText}
 - Datum: ${dateTextText}
 - Tijd: ${timeTextText}
 - Duur: ${durationTextText}

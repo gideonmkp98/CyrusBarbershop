@@ -4,6 +4,7 @@ import { verifyPassword, createSession, signSessionToken } from '$lib/server/aut
 import { loginSchema } from '$lib/utils/validation';
 import { eq } from 'drizzle-orm';
 import { fail, redirect } from '@sveltejs/kit';
+import { dev } from '$app/environment';
 import { PUBLIC_SITE_URL } from '$env/static/public';
 import type { Actions, PageServerLoad } from './$types';
 
@@ -19,27 +20,23 @@ export const actions: Actions = {
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
 
-    console.log('[LOGIN] Attempt:', { email, passwordLength: password?.length });
-
     const parsed = loginSchema.safeParse({ email, password });
 
     if (!parsed.success) {
-      console.log('[LOGIN] Validation failed:', parsed.error);
       return fail(400, { error: 'Ongeldig e-mailadres of wachtwoord' });
     }
 
     const result = await db.select().from(users).where(eq(users.email, email)).limit(1);
     if (result.length === 0) {
-      console.log('[LOGIN] User not found:', email);
+      // Same error as below to avoid email enumeration.
       return fail(401, { error: 'Ongeldig e-mailadres of wachtwoord' });
     }
 
     const user = result[0];
-    console.log('[LOGIN] User found:', { id: user.id, email: user.email, isActive: user.isActive });
 
     const valid = await verifyPassword(password, user.passwordHash);
-    console.log('[LOGIN] Password valid:', valid);
     if (!valid) {
+      // Same error as "user not found" to avoid leaking which emails are registered.
       return fail(401, { error: 'Ongeldig e-mailadres of wachtwoord' });
     }
 
@@ -49,7 +46,10 @@ export const actions: Actions = {
 
     const token = await createSession(user.id);
     const signedToken = signSessionToken(token);
-    console.log('[LOGIN] Session created, token:', token.substring(0, 8) + '...');
+
+    if (dev) {
+      console.log('[LOGIN] success userId=' + user.id);
+    }
 
     // Use PUBLIC_SITE_URL to determine if cookies should be secure. This is more
     // reliable than url.protocol behind reverse proxies, which may report https
@@ -62,9 +62,7 @@ export const actions: Actions = {
       sameSite: 'lax',
       maxAge: 60 * 60 * 24 * 7
     });
-    console.log('[LOGIN] Cookie set. isHttps:', isHttps, 'PUBLIC_SITE_URL:', PUBLIC_SITE_URL);
 
-    console.log('[LOGIN] Redirecting to /admin');
     throw redirect(302, '/admin');
   }
 };

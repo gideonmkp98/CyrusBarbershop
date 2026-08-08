@@ -15,11 +15,14 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     const parsed = appointmentSchema.safeParse(body);
 
     if (!parsed.success) {
-      return json({ error: 'Validatie mislukt', issues: parsed.error.issues }, { status: 400 });
+      return json({ error: 'Validatie mislukt' }, { status: 400 });
     }
 
     const { serviceId, staffId, date, timeSlot, clientName, clientEmail, clientPhone, notes } = parsed.data;
     const appointmentDate = new Date(date + 'T00:00:00');
+
+    // Staff may only create appointments assigned to themselves.
+    const assignedStaffId = locals.user.role === 'staff' ? locals.user.id : staffId;
 
     // Controleer of het tijdstip niet al bezet is
     const existingAppointment = await db.query.appointments.findFirst({
@@ -37,7 +40,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     // Maak de afspraak aan
     const result = await db.insert(appointments).values({
       serviceId,
-      staffId: staffId || null,
+      staffId: assignedStaffId || null,
       date: appointmentDate,
       timeSlot,
       clientName,
@@ -69,7 +72,12 @@ export const GET: RequestHandler = async ({ url, locals }) => {
     if (startDate || endDate) {
       const startCond = startDate ? sql`${appointments.date} >= ${startDate}` : undefined;
       const endCond = endDate ? sql`${appointments.date} <= ${endDate}` : undefined;
-      const whereClause = startCond && endCond ? and(startCond, endCond) : startCond || endCond;
+      const dateWhere = startCond && endCond ? and(startCond, endCond) : startCond || endCond;
+      // Staff are scoped to their own appointments only.
+      const staffScope = locals.user.role === 'staff' ? eq(appointments.staffId, locals.user.id) : undefined;
+      const whereClause = dateWhere && staffScope
+        ? and(dateWhere, staffScope)
+        : dateWhere || staffScope;
 
       const result = await db
         .select({
@@ -114,7 +122,11 @@ export const GET: RequestHandler = async ({ url, locals }) => {
     // Cursor-based pagination for infinite scroll
     if (cursor) {
       const cursorId = parseInt(cursor, 10);
-      const whereClause = cursorId ? sql`${appointments.id} < ${cursorId}` : undefined;
+      const cursorCond = cursorId ? sql`${appointments.id} < ${cursorId}` : undefined;
+      const staffScope = locals.user.role === 'staff' ? eq(appointments.staffId, locals.user.id) : undefined;
+      const whereClause = cursorCond && staffScope
+        ? and(cursorCond, staffScope)
+        : cursorCond || staffScope;
 
       const result = await db
         .select({

@@ -1,5 +1,9 @@
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
+// Side-effect import: validates SESSION_SECRET/DATABASE_URL/PUBLIC_SITE_URL at boot.
+// Throws in production if any required env var is missing or malformed.
+import './env';
+import { dev } from '$app/environment';
 import { db } from './db/index';
 import { users, sessions } from './db/schema';
 import { eq, and, gt } from 'drizzle-orm';
@@ -11,9 +15,11 @@ const SESSION_SECRET_MIN_LENGTH = 32;
 
 const signingEnabled = SESSION_SECRET && SESSION_SECRET.length >= SESSION_SECRET_MIN_LENGTH;
 
-if (!signingEnabled) {
+// Env validator already throws in production when SESSION_SECRET is missing/short.
+// Keep a dev-only warning for clarity.
+if (!signingEnabled && dev) {
   console.warn(
-    '[AUTH] SESSION_SECRET is missing or shorter than 32 characters. Session cookies will not be signed, which is insecure in production.'
+    '[AUTH] SESSION_SECRET is missing or shorter than 32 characters. Session cookies will not be signed.'
   );
 }
 
