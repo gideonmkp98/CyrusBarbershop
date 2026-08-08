@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { tick } from 'svelte';
   import { reveal } from '$lib/actions/reveal';
   import { Scissors, Star } from 'lucide-svelte';
   import StepIndicators from './StepIndicators.svelte';
@@ -71,6 +72,16 @@
   let loadingSlots = $state(false);
   let barbers = $state<Barber[]>([]);
   let loadingBarbers = $state(false);
+
+  // Ref to the booking flow wrapper (step indicators + step content).
+  // Used to scroll the user back to the top of the current step on step change,
+  // so on mobile they don't get stuck looking at the bottom of the previous step.
+  let bookingFlowRef = $state<HTMLElement | null>(null);
+
+  async function scrollToStepTop() {
+    await tick();
+    bookingFlowRef?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
 
   // Fetch barbers on mount
   $effect(() => {
@@ -205,11 +216,17 @@
     if (currentStep === 1 && !selectedService) return;
     // Step 2: allow proceeding with no preference (selectedStaffId === null is valid)
     if (currentStep === 3 && (!selectedDate || !selectedTime)) return;
-    if (currentStep < 4) currentStep++;
+    if (currentStep < 4) {
+      currentStep++;
+      scrollToStepTop();
+    }
   }
 
   function prevStep() {
-    if (currentStep > 1) currentStep--;
+    if (currentStep > 1) {
+      currentStep--;
+      scrollToStepTop();
+    }
   }
 
   async function submitBooking(e?: Event) {
@@ -380,6 +397,7 @@
         </a>
       </div>
     {:else}
+    <div bind:this={bookingFlowRef}>
     <StepIndicators currentStep={currentStep} totalSteps={4} />
 
     <div class="grid lg:grid-cols-12 gap-12 lg:gap-16">
@@ -565,6 +583,7 @@
           onConfirm={confirmBooking}
         />
       </aside>
+    </div>
     </div>
     {/if}
   </div>
