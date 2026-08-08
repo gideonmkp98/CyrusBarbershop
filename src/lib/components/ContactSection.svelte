@@ -194,9 +194,9 @@
         <div use:reveal={{ direction: 'right' }}>
           <h3 class="font-display text-subheading text-bone mb-8">Stuur ons een Bericht</h3>
           <form class="grid md:grid-cols-2 gap-8" onsubmit={handleSubmit}>
-            <FieldGroup id="cName" label="Naam" value={cName} onchange={(v) => cName = v} required />
-            <FieldGroup type="email" id="cEmail" label="E-mailadres" value={cEmail} onchange={(v) => cEmail = v} required />
-            <FieldGroup id="cMessage" label="Bericht" value={cMessage} onchange={(v) => cMessage = v} rows={4} cls="md:col-span-2" />
+            <FieldGroup id="cName" label="Naam" bind:value={cName} required />
+            <FieldGroup type="email" id="cEmail" label="E-mailadres" bind:value={cEmail} required />
+            <FieldGroup id="cMessage" label="Bericht" bind:value={cMessage} rows={4} cls="md:col-span-2" />
             <div class="md:col-span-2 pt-2">
               {#if submitted}
                 <p class="text-gold-500 font-body text-label">Bedankt! Je bericht is ontvangen.</p>
