@@ -1,6 +1,7 @@
 <script lang="ts">
   import { reveal } from '$lib/actions/reveal';
   import { Phone, Mail, MapPin, Check } from 'lucide-svelte';
+  import SocialIcon from './SocialIcon.svelte';
   import FieldGroup from './FieldGroup.svelte';
 
   interface Props {
@@ -302,15 +303,15 @@
   <div class="max-w-[1200px] mx-auto px-6 md:px-8 text-center">
     <h3 use:reveal class="font-display text-subheading text-bone mb-10" style="font-size: clamp(1.25rem, 2vw, 1.5rem); line-height: 1.3; font-weight: 500;">Volg ons op social media</h3>
     <div class="flex justify-center gap-10">
-      <a href="/contact" use:reveal={{ delay: 1 }} class="group flex flex-col items-center gap-3">
+      <a href="/contact" use:reveal={{ delay: 1 }} aria-label="Instagram" class="group flex flex-col items-center gap-3">
         <div class="w-14 h-14 rounded-full border border-bone-muted/20 flex items-center justify-center group-hover:border-gold-500 transition-colors">
-          <span class="text-bone-warm group-hover:text-gold-500 transition-colors text-lg">IG</span>
+          <SocialIcon name="instagram" size={24} class="text-bone-warm group-hover:text-gold-500 transition-colors" />
         </div>
         <span class="font-body text-label text-bone-muted group-hover:text-gold-500 transition-colors">Instagram</span>
       </a>
-      <a href="/contact" use:reveal={{ delay: 2 }} class="group flex flex-col items-center gap-3">
+      <a href="/contact" use:reveal={{ delay: 2 }} aria-label="Facebook" class="group flex flex-col items-center gap-3">
         <div class="w-14 h-14 rounded-full border border-bone-muted/20 flex items-center justify-center group-hover:border-gold-500 transition-colors">
-          <span class="text-bone-warm group-hover:text-gold-500 transition-colors text-lg">FB</span>
+          <SocialIcon name="facebook" size={24} class="text-bone-warm group-hover:text-gold-500 transition-colors" />
         </div>
         <span class="font-body text-label text-bone-muted group-hover:text-gold-500 transition-colors">Facebook</span>
       </a>
