@@ -1,4 +1,6 @@
 <script lang="ts">
+  import SocialIcon from './SocialIcon.svelte';
+
   let { onNewsletterSubmit }: { onNewsletterSubmit: (e: Event) => void } = $props();
 
   type OpeningHour = {
@@ -106,8 +108,14 @@
         </div>
         <div class="flex flex-col gap-3">
           <span class="font-body text-label text-gold-500">SOCIALS</span>
-          <a href="/contact" class="font-display text-caption text-bone-muted hover:text-bone transition-colors">Instagram</a>
-          <a href="/contact" class="font-display text-caption text-bone-muted hover:text-bone transition-colors">Facebook</a>
+          <div class="flex items-center gap-4 mt-1">
+            <a href="/contact" aria-label="Instagram" class="text-bone-muted hover:text-gold-500 transition-colors">
+              <SocialIcon name="instagram" size={20} />
+            </a>
+            <a href="/contact" aria-label="Facebook" class="text-bone-muted hover:text-gold-500 transition-colors">
+              <SocialIcon name="facebook" size={20} />
+            </a>
+          </div>
         </div>
       </div>
 
