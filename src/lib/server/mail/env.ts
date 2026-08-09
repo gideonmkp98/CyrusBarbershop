@@ -26,6 +26,7 @@ export function getMailEnv(): Record<string, string | undefined> {
 		SMTP_PASSWORD: env.SMTP_PASSWORD,
 		MAIL_FROM: env.MAIL_FROM,
 		CONTACT_NOTIFY_EMAIL: env.CONTACT_NOTIFY_EMAIL,
+		BOOKING_NOTIFY_EMAIL: env.BOOKING_NOTIFY_EMAIL,
 		OWNER_EMAIL: env.OWNER_EMAIL
 	};
 }
@@ -38,6 +39,22 @@ export function getMailEnv(): Record<string, string | undefined> {
 export function getContactNotifyEmail(): string | undefined {
 	const dedicated = env.CONTACT_NOTIFY_EMAIL?.trim();
 	if (dedicated) return dedicated;
+	const fallback = env.OWNER_EMAIL?.trim();
+	if (fallback) return fallback;
+	return undefined;
+}
+
+/**
+ * Returns the email address that receives new-appointment notifications.
+ * Falls back to CONTACT_NOTIFY_EMAIL and then OWNER_EMAIL so the
+ * notification works out of the box without extra configuration.
+ * Returns undefined when none of the three are configured.
+ */
+export function getBookingNotifyEmail(): string | undefined {
+	const dedicated = env.BOOKING_NOTIFY_EMAIL?.trim();
+	if (dedicated) return dedicated;
+	const contact = env.CONTACT_NOTIFY_EMAIL?.trim();
+	if (contact) return contact;
 	const fallback = env.OWNER_EMAIL?.trim();
 	if (fallback) return fallback;
 	return undefined;

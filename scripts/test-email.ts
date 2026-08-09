@@ -7,7 +7,8 @@
 
 import 'dotenv/config';
 import readline from 'node:readline';
-import { sendBookingConfirmation, isMailConfigured } from '../src/lib/server/mail';
+import { sendBookingConfirmation, sendBookingNotification, isMailConfigured } from '../src/lib/server/mail';
+import { getBookingNotifyEmail } from '../src/lib/server/mail/env';
 import { BUSINESS_CONTACT } from '../src/lib/server/mail/config';
 
 interface CliArgs {
@@ -19,6 +20,7 @@ interface CliArgs {
 	duration?: number;
 	price?: number;
 	notes?: string;
+	notify?: boolean;
 }
 
 function parseArgs(): CliArgs {
@@ -42,6 +44,8 @@ function parseArgs(): CliArgs {
 			result.price = Number(arg.slice(8));
 		} else if (arg.startsWith('--notes=')) {
 			result.notes = arg.slice(8);
+		} else if (arg === '--notify' || arg === '--owner') {
+			result.notify = true;
 		} else if (arg === '--help' || arg === '-h') {
 			showHelp();
 			process.exit(0);
@@ -69,6 +73,7 @@ Options:
   --duration=MINUTES  Service duration (default: 90)
   --price=EUR         Service price (default: 75)
   --notes=TEXT        Optional notes (default: mock note)
+  --notify            Also send an owner (new-appointment) notification
   --help, -h          Show this help text
 `);
 }
@@ -151,6 +156,43 @@ async function main(): Promise<void> {
 	} else {
 		console.error(`❌ Failed to send test email: ${result.reason}`);
 		process.exit(1);
+	}
+
+	if (args.notify) {
+		const ownerEmail = getBookingNotifyEmail();
+		if (!ownerEmail) {
+			console.error('❌ --notify requested, but no BOOKING_NOTIFY_EMAIL/CONTACT_NOTIFY_EMAIL/OWNER_EMAIL is set.');
+			process.exit(1);
+		}
+
+		console.log('');
+		console.log('Sending test owner (new-appointment) notification...');
+		console.log(`  To:      ${ownerEmail}`);
+		console.log(`  Reply-To: jan.jansen@example.com`);
+		console.log('');
+
+		const notifyResult = await sendBookingNotification({
+			clientName: mockData.clientName,
+			clientEmail: 'jan.jansen@example.com',
+			clientPhone: '+31 6 1234 5678',
+			serviceName: mockData.serviceName,
+			barberName: mockData.barberName,
+			date: mockData.date,
+			time: mockData.time,
+			duration: mockData.duration,
+			price: mockData.price,
+			notes: mockData.notes,
+			siteUrl: mockData.siteUrl,
+			appointmentId: mockData.appointmentId
+		});
+
+		if (notifyResult.ok) {
+			console.log('✅ Owner notification sent successfully.');
+			console.log(`   Check the inbox of ${ownerEmail} (and spam folder, just in case).`);
+		} else {
+			console.error(`❌ Failed to send owner notification: ${notifyResult.reason}`);
+			process.exit(1);
+		}
 	}
 }
 
