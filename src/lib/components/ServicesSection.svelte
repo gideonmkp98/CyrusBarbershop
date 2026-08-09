@@ -26,6 +26,7 @@
   const signatureServices = $derived(services.filter(s => s.isSignature));
   const hairServices = $derived(services.filter(s => s.category === 'hair' && !s.isSignature));
   const beardServices = $derived(services.filter(s => s.category === 'beard' && !s.isSignature));
+  const extraServices = $derived(services.filter(s => s.category === 'extra' && !s.isSignature));
 </script>
 
 <section id="services" class="py-section bg-surface-low">
@@ -106,6 +107,31 @@
                 />
               {/each}
             </div>
+          </div>
+        {/if}
+
+        <!-- Extras -->
+        {#if extraServices.length > 0}
+          <div>
+            <h3 use:reveal class="font-body text-label text-bone-muted uppercase tracking-[0.3em] mb-10 flex items-center gap-4">
+              <span>03</span>
+              <span class="h-px bg-bone-muted/20 flex-grow"></span>
+              <span>Extra's</span>
+            </h3>
+            <div class="space-y-2">
+              {#each extraServices as service, i}
+                <ServiceItem
+                  name={service.name}
+                  price={+service.price}
+                  duration={service.duration}
+                  description={service.description ?? undefined}
+                  revealOpts={{ delay: i + 1 }}
+                />
+              {/each}
+            </div>
+            <p class="font-body text-sm text-bone-muted/60 mt-4 max-w-lg">
+              Extra's zijn los bij te boeken bovenop een behandeling. Voeg ze aan toe tijdens het boeken.
+            </p>
           </div>
         {/if}
 
