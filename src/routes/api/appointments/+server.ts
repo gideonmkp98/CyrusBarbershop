@@ -2,6 +2,7 @@ import { db } from '$lib/server/db/index';
 import { appointments, appointmentAddOns, services, users } from '$lib/server/db/schema';
 import { appointmentSchema } from '$lib/utils/validation';
 import { sendBookingConfirmation } from '$lib/server/mail/sendBookingConfirmation';
+import { sendBookingNotification } from '$lib/server/mail/sendBookingNotification';
 import { rateLimit, getClientIp } from '$lib/server/rateLimit';
 import { PUBLIC_SITE_URL } from '$env/static/public';
 import { sql, ne, eq, and, isNull, inArray } from 'drizzle-orm';
@@ -228,6 +229,32 @@ export const POST: RequestHandler = async ({ request }) => {
 
     if (!mailResult.ok) {
       console.error('[BOOKING] Confirmation email not sent:', mailResult.reason);
+    }
+
+    // Notify the shop owner about the new booking. Independent of the
+    // customer confirmation — a failure here never affects the booking.
+    const addOnTotalPrice = resolvedAddOns.reduce(
+      (sum, a) => sum + Number.parseFloat(a.price || '0'),
+      Number.parseFloat(bookedService.price || '0')
+    );
+    const notifyResult = await sendBookingNotification({
+      clientName,
+      clientEmail,
+      clientPhone: clientPhone || null,
+      serviceName: bookedService.name,
+      barberName,
+      date,
+      time: timeSlot,
+      duration: newServiceDuration,
+      price: Number.isFinite(addOnTotalPrice) ? addOnTotalPrice : bookedService.price,
+      notes: notes || null,
+      siteUrl: PUBLIC_SITE_URL || 'https://cyrusbarbershop.nl',
+      appointmentId,
+      addOns: resolvedAddOns.map(a => ({ name: a.name, price: a.price }))
+    });
+
+    if (!notifyResult.ok) {
+      console.error('[BOOKING] Owner notification not sent:', notifyResult.reason);
     }
   } catch (mailError) {
     console.error('[BOOKING] Unexpected error while sending confirmation email:', mailError);
