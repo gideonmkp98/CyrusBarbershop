@@ -6,7 +6,7 @@ export const appointmentSchema = z.object({
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   timeSlot: z.string().regex(/^\d{2}:\d{2}$/),
   clientName: z.string().min(2).max(100),
-  clientEmail: z.string().email(),
+  clientEmail: z.string().email().optional(),
   clientPhone: z.string().regex(/^[\d\s\-\+\(\)]{6,20}$/, 'Ongeldig telefoonnummer').optional(),
   notes: z.string().max(1000).optional(),
   addOnIds: z.array(z.number().int().positive()).optional().default([])
