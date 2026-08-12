@@ -453,7 +453,7 @@
         }
         isSubmitting = false;
         toggleForm();
-      }, 1500);
+      }, 700);
     } catch {
       formError = 'Er is iets misgegaan bij het aanmaken van de afspraak';
       isSubmitting = false;
