@@ -1,6 +1,5 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { invalidateAll } from '$app/navigation';
   import WeekCalendar from '$lib/components/admin/WeekCalendar.svelte';
 
   let { data } = $props();
@@ -308,23 +307,19 @@
   }
 
   // ── Actions ──
-  async function refreshData() {
-    // Rerun load functions without a full page reload (no loading-state flash).
-    await invalidateAll();
-    allAppointments = data.appointments;
-    appointmentIds = new Set<number>(data.appointments.map((a: any) => a.id));
-    nextCursor = data.nextCursor || null;
-    hasMore = data.hasMore || false;
-    loadedRanges = [];
-  }
-
   async function updateStatus(id: number, status: string) {
     await fetch('/admin/appointments', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id, status })
     });
-    await refreshData();
+    // Lokale update — geen reload of invalidate.
+    allAppointments = allAppointments.map((a: any) =>
+      a.id === id ? { ...a, status } : a
+    );
+    if (selectedAppointment?.id === id) {
+      selectedAppointment = { ...selectedAppointment, status };
+    }
   }
 
   function toggleForm() {
@@ -446,9 +441,16 @@
         return;
       }
       formSuccess = 'Afspraak succesvol aangemaakt!';
-      setTimeout(async () => {
+      setTimeout(() => {
+        // Nieuwe afspraak lokaal toevoegen — geen reload of invalidate.
+        if (result.appointment) {
+          const appt = result.appointment;
+          if (!appointmentIds.has(appt.id)) {
+            allAppointments = [appt, ...allAppointments];
+            appointmentIds.add(appt.id);
+          }
+        }
         toggleForm();
-        await refreshData();
       }, 1500);
     } catch {
       formError = 'Er is iets misgegaan bij het aanmaken van de afspraak';
