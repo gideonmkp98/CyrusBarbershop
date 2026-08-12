@@ -26,7 +26,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     const parsed = appointmentSchema.safeParse(body);
 
     if (!parsed.success) {
-      return json({ error: 'Validatie mislukt' }, { status: 400 });
+      return json({ error: 'Validatie mislukt', issues: parsed.error.issues }, { status: 400 });
     }
 
     const { serviceId, staffId, date, timeSlot, clientName, clientEmail, clientPhone, notes, addOnIds } = parsed.data;

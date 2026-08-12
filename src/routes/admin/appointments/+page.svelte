@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { invalidateAll } from '$app/navigation';
   import WeekCalendar from '$lib/components/admin/WeekCalendar.svelte';
 
   let { data } = $props();
@@ -307,13 +308,23 @@
   }
 
   // ── Actions ──
+  async function refreshData() {
+    // Rerun load functions without a full page reload (no loading-state flash).
+    await invalidateAll();
+    allAppointments = data.appointments;
+    appointmentIds = new Set<number>(data.appointments.map((a: any) => a.id));
+    nextCursor = data.nextCursor || null;
+    hasMore = data.hasMore || false;
+    loadedRanges = [];
+  }
+
   async function updateStatus(id: number, status: string) {
     await fetch('/admin/appointments', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id, status })
     });
-    window.location.reload();
+    await refreshData();
   }
 
   function toggleForm() {
@@ -435,9 +446,9 @@
         return;
       }
       formSuccess = 'Afspraak succesvol aangemaakt!';
-      setTimeout(() => {
+      setTimeout(async () => {
         toggleForm();
-        window.location.reload();
+        await refreshData();
       }, 1500);
     } catch {
       formError = 'Er is iets misgegaan bij het aanmaken van de afspraak';
