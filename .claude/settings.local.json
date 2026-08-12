@@ -64,7 +64,9 @@
       "Bash(Get-ChildItem \".playwright-mcp\")",
       "Bash(Sort-Object LastWriteTime -Descending)",
       "mcp__plugin_playwright_playwright__browser_resize",
-      "Bash(Select-Object -Last 50)"
+      "Bash(Select-Object -Last 50)",
+      "Bash(git fetch *)",
+      "Bash(git checkout *)"
     ]
   }
 }

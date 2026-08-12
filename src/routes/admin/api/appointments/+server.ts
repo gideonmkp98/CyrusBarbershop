@@ -37,7 +37,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
     // Hoofdbehandeling ophalen
     const serviceResult = await db
-      .select({ id: services.id, duration: services.duration, category: services.category, isActive: services.isActive })
+      .select({ id: services.id, name: services.name, duration: services.duration, category: services.category, isActive: services.isActive })
       .from(services)
       .where(eq(services.id, serviceId))
       .limit(1);
@@ -47,6 +47,17 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     }
 
     const bookedService = serviceResult[0];
+
+    // Barber-displaynaam ophalen voor client-side weergave
+    let barberName: string | null = null;
+    if (assignedStaffId) {
+      const staffResult = await db
+        .select({ displayName: users.displayName })
+        .from(users)
+        .where(eq(users.id, assignedStaffId))
+        .limit(1);
+      if (staffResult.length > 0) barberName = staffResult[0].displayName;
+    }
 
     // Extras valideren (moeten category 'extra' en actief zijn)
     let resolvedAddOns: { id: number; price: string; duration: number }[] = [];
@@ -143,7 +154,25 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       throw txError;
     }
 
-    return json({ success: true, id: appointmentId }, { status: 201 });
+    const dateStr = `${appointmentDate.getFullYear()}-${String(appointmentDate.getMonth() + 1).padStart(2, '0')}-${String(appointmentDate.getDate()).padStart(2, '0')}`;
+
+    return json({
+      success: true,
+      id: appointmentId,
+      appointment: {
+        id: appointmentId,
+        date: dateStr,
+        timeSlot,
+        clientName,
+        clientEmail: clientEmail || '',
+        clientPhone: clientPhone || null,
+        serviceName: bookedService.name,
+        status: 'confirmed',
+        barberName,
+        staffId: assignedStaffId || null,
+        serviceId
+      }
+    }, { status: 201 });
   } catch (error: any) {
     console.error('Fout bij aanmaken afspraak:', error);
     return json({ error: 'Er is iets misgegaan bij het aanmaken van de afspraak' }, { status: 500 });

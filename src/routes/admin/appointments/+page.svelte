@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { invalidateAll } from '$app/navigation';
   import WeekCalendar from '$lib/components/admin/WeekCalendar.svelte';
+  import { toast } from '$lib/stores/toast';
 
   let { data } = $props();
 
@@ -82,8 +82,6 @@
   let clientPhone = $state('');
   let notes = $state('');
   let selectedAddOnIds = $state<number[]>([]);
-  let formError = $state<string | null>(null);
-  let formSuccess = $state<string | null>(null);
   let isSubmitting = $state(false);
   let availableSlots = $state<{ time: string; available: boolean }[]>([]);
   let loadingSlots = $state(false);
@@ -308,23 +306,25 @@
   }
 
   // ── Actions ──
-  async function refreshData() {
-    // Rerun load functions without a full page reload (no loading-state flash).
-    await invalidateAll();
-    allAppointments = data.appointments;
-    appointmentIds = new Set<number>(data.appointments.map((a: any) => a.id));
-    nextCursor = data.nextCursor || null;
-    hasMore = data.hasMore || false;
-    loadedRanges = [];
-  }
-
   async function updateStatus(id: number, status: string) {
-    await fetch('/admin/appointments', {
+    const res = await fetch('/admin/appointments', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id, status })
     });
-    await refreshData();
+    if (!res.ok) {
+      toast.error('Status kon niet worden bijgewerkt');
+      return;
+    }
+    // Lokale update — geen reload of invalidate.
+    allAppointments = allAppointments.map((a: any) =>
+      a.id === id ? { ...a, status } : a
+    );
+    if (selectedAppointment?.id === id) {
+      selectedAppointment = { ...selectedAppointment, status };
+    }
+    const label = statusLabels[status] || status;
+    toast.success(`Afspraak gemarkeerd als ${label.toLowerCase()}`);
   }
 
   function toggleForm() {
@@ -339,9 +339,8 @@
       clientPhone = '';
       notes = '';
       selectedAddOnIds = [];
-      formError = null;
-      formSuccess = null;
       availableSlots = [];
+      isSubmitting = false;
     }
   }
 
@@ -389,32 +388,30 @@
 
   async function createAppointment(event: Event) {
     event.preventDefault();
-    formError = null;
-    formSuccess = null;
     isSubmitting = true;
 
     if (!selectedServiceId) {
-      formError = 'Selecteer een behandeling';
+      toast.error('Selecteer een behandeling');
       isSubmitting = false;
       return;
     }
     if (!appointmentDate) {
-      formError = 'Selecteer een datum';
+      toast.error('Selecteer een datum');
       isSubmitting = false;
       return;
     }
     if (!appointmentTime) {
-      formError = 'Selecteer een tijdstip';
+      toast.error('Selecteer een tijdstip');
       isSubmitting = false;
       return;
     }
     if (!clientName.trim()) {
-      formError = 'Voer een klantnaam in';
+      toast.error('Voer een klantnaam in');
       isSubmitting = false;
       return;
     }
     if (clientPhone.trim() && !/^[\d\s\-+()]{6,20}$/.test(clientPhone)) {
-      formError = 'Voer een geldig telefoonnummer in (bijv. 06 12345678)';
+      toast.error('Voer een geldig telefoonnummer in (bijv. 06 12345678)');
       isSubmitting = false;
       return;
     }
@@ -438,20 +435,26 @@
       const result = await response.json();
       if (!response.ok) {
         if (result.issues && result.issues.length > 0) {
-          formError = result.issues.map((i: any) => i.message).join('. ');
+          toast.error(result.issues.map((i: any) => i.message).join('. '));
         } else {
-          formError = result.error || 'Er is iets misgegaan';
+          toast.error(result.error || 'Er is iets misgegaan');
         }
         isSubmitting = false;
         return;
       }
-      formSuccess = 'Afspraak succesvol aangemaakt!';
-      setTimeout(async () => {
-        toggleForm();
-        await refreshData();
-      }, 1500);
+      // Nieuwe afspraak lokaal toevoegen — geen reload of invalidate.
+      if (result.appointment) {
+        const appt = result.appointment;
+        if (!appointmentIds.has(appt.id)) {
+          allAppointments = [appt, ...allAppointments];
+          appointmentIds.add(appt.id);
+        }
+      }
+      toast.success('Afspraak succesvol aangemaakt');
+      isSubmitting = false;
+      toggleForm();
     } catch {
-      formError = 'Er is iets misgegaan bij het aanmaken van de afspraak';
+      toast.error('Er is iets misgegaan bij het aanmaken van de afspraak');
       isSubmitting = false;
     }
   }
@@ -517,13 +520,6 @@
 {#if showNewAppointmentForm}
   <div class="bg-surface-base border border-white/5 p-6 mb-8">
     <h2 class="font-display text-subheading text-bone mb-4">Nieuwe Afspraak Inplannen</h2>
-
-    {#if formError}
-      <div class="bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 mb-6 text-sm font-body">{formError}</div>
-    {/if}
-    {#if formSuccess}
-      <div class="bg-green-500/10 border border-green-500/30 text-green-400 px-4 py-3 mb-6 text-sm font-body">{formSuccess}</div>
-    {/if}
 
     <form onsubmit={createAppointment} class="grid md:grid-cols-2 gap-4">
       <div>
