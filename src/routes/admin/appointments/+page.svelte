@@ -80,11 +80,43 @@
   let clientEmail = $state('');
   let clientPhone = $state('');
   let notes = $state('');
+  let selectedAddOnIds = $state<number[]>([]);
   let formError = $state<string | null>(null);
   let formSuccess = $state<string | null>(null);
   let isSubmitting = $state(false);
   let availableSlots = $state<{ time: string; available: boolean }[]>([]);
   let loadingSlots = $state(false);
+
+  // ── Services gesplitst: behandelingen vs extras ──
+  // Extras zijn services met category === 'extra' en worden apart gekozen,
+  // niet als hoofdbehandeling.
+  let treatmentServices = $derived(
+    (data.services as any[]).filter((s) => s.category !== 'extra')
+  );
+  let extraServices = $derived(
+    (data.services as any[]).filter((s) => s.category === 'extra')
+  );
+
+  let selectedAddOnTotalPrice = $derived(
+    selectedAddOnIds.reduce((sum, id) => {
+      const ex = extraServices.find((s) => s.id === id);
+      return sum + (ex ? Number(ex.price) : 0);
+    }, 0)
+  );
+  let selectedAddOnTotalDuration = $derived(
+    selectedAddOnIds.reduce((sum, id) => {
+      const ex = extraServices.find((s) => s.id === id);
+      return sum + (ex ? ex.duration : 0);
+    }, 0)
+  );
+
+  function toggleAddOn(id: number) {
+    if (selectedAddOnIds.includes(id)) {
+      selectedAddOnIds = selectedAddOnIds.filter((x) => x !== id);
+    } else {
+      selectedAddOnIds = [...selectedAddOnIds, id];
+    }
+  }
 
   // ── Detail modal ──
   let selectedAppointment = $state<any | null>(null);
@@ -295,6 +327,7 @@
       clientEmail = '';
       clientPhone = '';
       notes = '';
+      selectedAddOnIds = [];
       formError = null;
       formSuccess = null;
       availableSlots = [];
@@ -387,7 +420,8 @@
           clientName,
           clientEmail: clientEmail || undefined,
           clientPhone: clientPhone || undefined,
-          notes: notes || undefined
+          notes: notes || undefined,
+          addOnIds: selectedAddOnIds.length > 0 ? selectedAddOnIds : undefined
         })
       });
       const result = await response.json();
@@ -490,7 +524,7 @@
           required
         >
           <option value="">Selecteer behandeling</option>
-          {#each data.services as service}
+          {#each treatmentServices as service}
             <option value={service.id}>{service.name} – €{service.price} ({service.duration} min)</option>
           {/each}
         </select>
@@ -572,6 +606,34 @@
         <textarea id="appointment-notes" bind:value={notes} placeholder="Optionele notities..." rows="3"
           class="w-full bg-surface-low border border-white/5 px-3 py-2 text-sm font-body text-bone focus:outline-none focus:border-gold-500 resize-none"></textarea>
       </div>
+
+      {#if extraServices.length > 0}
+        <div class="md:col-span-2">
+          <span class="block text-xs font-body text-bone-muted mb-2">Extra's (optioneel)</span>
+          <p class="text-xs font-body text-bone-muted/60 mb-3">Meerdere extras tegelijk mogelijk. Worden opgeteld bij de behandeling.</p>
+          <div class="grid sm:grid-cols-2 gap-2">
+            {#each extraServices as addon}
+              <label
+                class="flex items-center gap-3 bg-surface-low border border-white/5 px-3 py-2 cursor-pointer hover:border-gold-500/30 transition-colors {selectedAddOnIds.includes(addon.id) ? 'border-gold-500/50 bg-gold-500/5' : ''}"
+              >
+                <input
+                  type="checkbox"
+                  checked={selectedAddOnIds.includes(addon.id)}
+                  onchange={() => toggleAddOn(addon.id)}
+                  class="accent-gold-500 w-4 h-4 shrink-0"
+                />
+                <span class="flex-1 text-sm font-body text-bone">{addon.name}</span>
+                <span class="text-xs font-body text-bone-muted">+€{addon.price} · {addon.duration} min</span>
+              </label>
+            {/each}
+          </div>
+          {#if selectedAddOnIds.length > 0}
+            <p class="text-xs font-body text-gold-500 mt-3">
+              +€{selectedAddOnTotalPrice} · +{selectedAddOnTotalDuration} min
+            </p>
+          {/if}
+        </div>
+      {/if}
 
       <div class="md:col-span-2">
         <button type="submit" disabled={isSubmitting}
