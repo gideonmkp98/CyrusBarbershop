@@ -44,13 +44,15 @@ export const load: PageServerLoad = async () => {
       : apt.date
   }));
 
-  // Haal alle actieve services op
+  // Haal alle actieve services op (inclusief category zodat we behandelingen
+  // en extras in het formulier kunnen scheiden)
   const allServices = await db
     .select({
       id: services.id,
       name: services.name,
       price: services.price,
-      duration: services.duration
+      duration: services.duration,
+      category: services.category
     })
     .from(services)
     .where(eq(services.isActive, true))
