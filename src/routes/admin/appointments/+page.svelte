@@ -340,6 +340,7 @@
       notes = '';
       selectedAddOnIds = [];
       availableSlots = [];
+      lastFetchKey = '';
       isSubmitting = false;
     }
   }
@@ -355,10 +356,19 @@
   }
 
   // ── Availability ──
+  // Refetch when datum, behandeling of barber wijzigt zodat het tijdslot-grid
+  // de duration van de gekozen behandeling meeneemt. Zonder dit: 45 min
+  // service toont nog steeds 30 min grid → slot past niet → error bij submit.
+  let lastFetchKey = $state('');
   $effect(() => {
-    if (appointmentDate) {
-      fetchAvailability();
+    if (!appointmentDate) {
+      availableSlots = [];
+      return;
     }
+    const key = `${appointmentDate}|${selectedServiceId ?? ''}|${selectedStaffId ?? ''}`;
+    if (key === lastFetchKey) return;
+    lastFetchKey = key;
+    fetchAvailability();
   });
 
   async function fetchAvailability() {
@@ -369,7 +379,8 @@
     loadingSlots = true;
     try {
       const staffIdParam = selectedStaffId !== null ? `&staffId=${selectedStaffId}` : '&allBarbers=true';
-      const res = await fetch(`/api/availability?date=${appointmentDate}${staffIdParam}`);
+      const serviceIdParam = selectedServiceId !== null ? `&serviceId=${selectedServiceId}` : '';
+      const res = await fetch(`/api/availability?date=${appointmentDate}${staffIdParam}${serviceIdParam}`);
       if (res.ok) {
         const slotData = await res.json();
         availableSlots = slotData.slots || [];
