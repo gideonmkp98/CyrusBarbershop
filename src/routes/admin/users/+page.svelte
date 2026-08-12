@@ -1,6 +1,7 @@
 <script lang="ts">
   // @ts-nocheck - lucide-svelte has type definition issues in this build
   import { UserX, UserCog, Trash2, UserPlus, Search, Filter, Users, UserCheck, Scissors, Clock, MoreVertical } from 'lucide-svelte';
+  import { toast } from '$lib/stores/toast';
   let { data } = $props();
 
   // Define user type
@@ -51,8 +52,6 @@
   let newPassword = $state('');
   let newName = $state('');
   let newIsBarber = $state(false);
-  let formError = $state('');
-  let formSuccess = $state('');
 
   // Delete confirmation modal state
   let showDeleteModal = $state(false);
@@ -69,8 +68,6 @@
   let userSchedules = $state<Record<number, { openTime: string; closeTime: string; isActive: boolean }>>({});
   let loadingSchedule = $state(false);
   let savingSchedule = $state(false);
-  let scheduleMessage = $state('');
-  let scheduleError = $state('');
 
   function toggleUserMenu(id: number) {
     openUserMenuId = openUserMenuId === id ? null : id;
@@ -122,8 +119,6 @@
 
   async function fetchUserSchedule(staffId: number) {
     loadingSchedule = true;
-    scheduleMessage = '';
-    scheduleError = '';
     try {
       const res = await fetch(`/admin/api/staff-schedules?staffId=${staffId}`);
       if (res.ok) {
@@ -154,8 +149,6 @@
   async function saveAllUserSchedules() {
     if (!userToEditSchedule) return;
     savingSchedule = true;
-    scheduleMessage = '';
-    scheduleError = '';
 
     try {
       for (const [dayOfWeek, sched] of Object.entries(userSchedules)) {
@@ -187,11 +180,10 @@
         }
       }
 
-      scheduleMessage = 'Werktijden opgeslagen.';
+      toast.success('Werktijden opgeslagen');
       await fetchUserSchedule(userToEditSchedule.id);
-      scheduleMessage = 'Werktijden opgeslagen.';
     } catch (e: any) {
-      scheduleError = e.message || 'Opslaan mislukt';
+      toast.error(e.message || 'Opslaan mislukt');
     } finally {
       savingSchedule = false;
     }
@@ -215,10 +207,10 @@
         await fetchUserSchedule(userToEditSchedule.id);
       } else {
         const error = await res.json();
-        alert('Fout bij opslaan: ' + (error.error || 'Onbekende fout'));
+        toast.error('Fout bij opslaan: ' + (error.error || 'Onbekende fout'));
       }
     } catch (e: any) {
-      alert('Netwerkfout: ' + (e.message || e));
+      toast.error('Netwerkfout: ' + (e.message || e));
     }
   }
 
@@ -231,10 +223,10 @@
       if (res.ok) {
         await fetchUserSchedule(userToEditSchedule.id);
       } else {
-        alert('Fout bij verwijderen');
+        toast.error('Fout bij verwijderen');
       }
     } catch {
-      alert('Netwerkfout');
+      toast.error('Netwerkfout');
     }
   }
 
@@ -265,10 +257,11 @@
       if (index !== -1) {
         users.splice(index, 1);
       }
+      toast.success('Gebruiker verwijderd');
       closeDeleteModal();
     } else {
       const result = await res.json();
-      alert(result.error || 'Verwijderen mislukt.');
+      toast.error(result.error || 'Verwijderen mislukt.');
     }
   }
 
@@ -299,16 +292,15 @@
       if (user) {
         user.role = selectedRole;
       }
+      toast.success('Rol bijgewerkt');
       closeRoleModal();
     } else {
       const result = await res.json();
-      alert(result.error || 'Rol wijzigen mislukt.');
+      toast.error(result.error || 'Rol wijzigen mislukt.');
     }
   }
 
   function openCreateModal() {
-    formError = '';
-    formSuccess = '';
     newEmail = '';
     newPassword = '';
     newName = '';
@@ -318,14 +310,10 @@
 
   function closeCreateModal() {
     showCreateModal = false;
-    formError = '';
-    formSuccess = '';
   }
 
   async function createUser(e: Event) {
     e.preventDefault();
-    formError = '';
-    formSuccess = '';
 
     try {
       const res = await fetch('/admin/api/users', {
@@ -337,8 +325,6 @@
       const result = await res.json();
 
       if (res.ok && result.success) {
-        formSuccess = 'Gebruiker succesvol aangemaakt.';
-
         users.push({
           id: result.id,
           email: newEmail,
@@ -353,16 +339,14 @@
         newName = '';
         newIsBarber = false;
 
-        setTimeout(() => {
-          closeCreateModal();
-          formSuccess = '';
-        }, 1500);
+        toast.success('Gebruiker succesvol aangemaakt');
+        closeCreateModal();
       } else {
-        formError = result.error || 'Gebruiker aanmaken mislukt.';
+        toast.error(result.error || 'Gebruiker aanmaken mislukt.');
       }
     } catch (e: any) {
       console.error('Create user error:', e);
-      formError = 'Er ging iets mis bij het aanmaken. Probeer het opnieuw.';
+      toast.error('Er ging iets mis bij het aanmaken. Probeer het opnieuw.');
     }
   }
 
@@ -643,20 +627,6 @@
           </div>
         </div>
 
-        {#if formError}
-          <div class="bg-red-500/10 border border-red-500/20 p-3 text-sm text-red-400 mb-4 flex items-start gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0 mt-0.5"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
-            <span>{formError}</span>
-          </div>
-        {/if}
-
-        {#if formSuccess}
-          <div class="bg-green-500/10 border border-green-500/20 p-3 text-sm text-green-400 mb-4 flex items-start gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0 mt-0.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-            <span>{formSuccess}</span>
-          </div>
-        {/if}
-
         <form onsubmit={createUser} class="space-y-5">
           <div class="grid md:grid-cols-2 gap-4">
             <div>
@@ -817,14 +787,6 @@
             <p class="text-bone-muted">Laden...</p>
           </div>
         {:else}
-          {#if scheduleError}
-            <div class="mb-4 border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-400">{scheduleError}</div>
-          {/if}
-
-          {#if scheduleMessage}
-            <div class="mb-4 border border-green-500/20 bg-green-500/10 px-3 py-2 text-sm text-green-400">{scheduleMessage}</div>
-          {/if}
-
           <div class="space-y-2">
             {#each dayNames as day, i}
               {@const dayOfWeek = i + 1}
