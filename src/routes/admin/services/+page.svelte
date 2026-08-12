@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { Pencil, Trash2, Plus, Scissors, Eye, EyeOff, Sparkles, User, ClipboardList, AlertTriangle, CheckCircle, Gem, Layers } from 'lucide-svelte';
+  import { Pencil, Trash2, Plus, Scissors, Eye, EyeOff, Sparkles, User, ClipboardList, AlertTriangle, Gem, Layers } from 'lucide-svelte';
+  import { toast } from '$lib/stores/toast';
 
   let { data } = $props();
 
@@ -82,8 +83,6 @@
     isSignature: false,
     isActive: true
   });
-  let formError = $state('');
-  let formSuccess = $state('');
 
   let showDeleteModal = $state(false);
   let serviceToDelete = $state<{ id: number; name: string } | null>(null);
@@ -91,8 +90,6 @@
   function openCreateModal() {
     editingService = null;
     formData = { name: '', description: '', price: '', duration: 45, category: 'hair', isSignature: false, isActive: true };
-    formError = '';
-    formSuccess = '';
     showFormModal = true;
   }
 
@@ -107,16 +104,12 @@
       isSignature: service.isSignature,
       isActive: service.isActive
     };
-    formError = '';
-    formSuccess = '';
     showFormModal = true;
   }
 
   function closeFormModal() {
     showFormModal = false;
     editingService = null;
-    formError = '';
-    formSuccess = '';
   }
 
   function openDeleteModal(id: number, name: string) {
@@ -131,11 +124,9 @@
 
   async function handleSubmit(e: Event) {
     e.preventDefault();
-    formError = '';
-    formSuccess = '';
 
     if (!formData.name || !formData.price) {
-      formError = 'Naam en prijs zijn verplicht';
+      toast.error('Naam en prijs zijn verplicht');
       return;
     }
 
@@ -161,8 +152,6 @@
       const result = await res.json();
 
       if (res.ok && result.success) {
-        formSuccess = action === 'create' ? 'Behandeling succesvol aangemaakt!' : 'Behandeling succesvol bijgewerkt!';
-
         if (action === 'create') {
           const newService: Service = {
             id: result.id,
@@ -188,15 +177,14 @@
           editingService.isActive = formData.isActive;
         }
 
-        setTimeout(() => {
-          closeFormModal();
-        }, 1200);
+        toast.success(action === 'create' ? 'Behandeling succesvol aangemaakt' : 'Behandeling succesvol bijgewerkt');
+        closeFormModal();
       } else {
-        formError = result.error || 'Fout bij opslaan';
+        toast.error(result.error || 'Fout bij opslaan');
       }
     } catch (e: any) {
       const errorMsg = e instanceof Error ? e.message : String(e);
-      formError = 'Netwerkfout: ' + (errorMsg || 'Onbekende fout');
+      toast.error('Netwerkfout: ' + (errorMsg || 'Onbekende fout'));
     }
   }
 
@@ -214,13 +202,14 @@
 
       if (res.ok && result.success) {
         services = services.filter(s => s.id !== serviceToDelete!.id);
+        toast.success('Behandeling verwijderd');
         closeDeleteModal();
       } else {
-        formError = result.error || 'Verwijderen mislukt';
+        toast.error(result.error || 'Verwijderen mislukt');
       }
     } catch (e: any) {
       const errorMsg = e instanceof Error ? e.message : String(e);
-      formError = 'Netwerkfout: ' + (errorMsg || 'Onbekende fout');
+      toast.error('Netwerkfout: ' + (errorMsg || 'Onbekende fout'));
     }
   }
 
@@ -546,20 +535,6 @@
             </p>
           </div>
         </div>
-
-        {#if formError}
-          <div class="bg-red-500/10 border border-red-500/20 p-3 text-sm text-red-400 mb-4 flex items-start gap-2">
-            <AlertTriangle size={18} class="shrink-0 mt-0.5" />
-            <span>{formError}</span>
-          </div>
-        {/if}
-
-        {#if formSuccess}
-          <div class="bg-green-500/10 border border-green-500/20 p-3 text-sm text-green-400 mb-4 flex items-start gap-2">
-            <CheckCircle size={18} class="shrink-0 mt-0.5" />
-            <span>{formSuccess}</span>
-          </div>
-        {/if}
 
         <form onsubmit={handleSubmit} class="space-y-5">
           <div class="grid md:grid-cols-2 gap-4">

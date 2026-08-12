@@ -7,6 +7,7 @@
   import GrainOverlay from '$lib/components/GrainOverlay.svelte';
   import Loader from '$lib/components/Loader.svelte';
   import ScrollProgress from '$lib/components/ScrollProgress.svelte';
+  import Toast from '$lib/components/Toast.svelte';
   import Navbar from '$lib/components/Navbar.svelte';
   import MobileMenu from '$lib/components/MobileMenu.svelte';
   import Footer from '$lib/components/Footer.svelte';
@@ -23,6 +24,7 @@
 <GrainOverlay />
 <Loader bind:loaderHidden />
 <ScrollProgress />
+<Toast />
 
 {#if $showGlobalNav}
   <Navbar />

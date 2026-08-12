@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { CheckCircle, Clock3, XCircle } from 'lucide-svelte';
+  import { Clock3 } from 'lucide-svelte';
+  import { toast } from '$lib/stores/toast';
 
   let { data } = $props();
 
@@ -15,10 +16,6 @@
 
   let saving = $state<Record<number, boolean>>({});
   let saveStatus = $state<Record<number, 'success' | 'error' | null>>({});
-  let errorMessage = $state('');
-  let flashMessage = $state('');
-  let flashType = $state<'success' | 'error' | null>(null);
-  let flashTimeout: ReturnType<typeof setTimeout> | null = null;
 
   let days = $state<Array<{
     dayOfWeek: number;
@@ -55,22 +52,10 @@
     }
   });
 
-  function showFlash(message: string, type: 'success' | 'error') {
-    flashMessage = message;
-    flashType = type;
-
-    if (flashTimeout) clearTimeout(flashTimeout);
-    flashTimeout = setTimeout(() => {
-      flashMessage = '';
-      flashType = null;
-    }, 2600);
-  }
-
   async function saveDay(day: typeof days[0]) {
     const dayNum = day.dayOfWeek;
     saving[dayNum] = true;
     saveStatus[dayNum] = null;
-    errorMessage = '';
 
     try {
       const body: Record<string, unknown> = {
@@ -83,13 +68,13 @@
         body.closeTime = day.closeTime;
 
         if (!day.openTime || !day.closeTime) {
-          errorMessage = `${dayNames[day.dayOfWeek]}: Vul beide tijden in`;
+          toast.error(`${dayNames[day.dayOfWeek]}: Vul beide tijden in`);
           saving[dayNum] = false;
           return;
         }
 
         if (day.closeTime <= day.openTime) {
-          errorMessage = `${dayNames[day.dayOfWeek]}: Sluitingstijd moet na openingstijd liggen`;
+          toast.error(`${dayNames[day.dayOfWeek]}: Sluitingstijd moet na openingstijd liggen`);
           saving[dayNum] = false;
           return;
         }
@@ -108,17 +93,15 @@
 
       if (res.ok) {
         saveStatus[dayNum] = 'success';
-        showFlash(`${dayNames[day.dayOfWeek]} opgeslagen`, 'success');
+        toast.success(`${dayNames[day.dayOfWeek]} opgeslagen`);
         setTimeout(() => { saveStatus[dayNum] = null; }, 2000);
       } else {
         saveStatus[dayNum] = 'error';
-        errorMessage = result.error || `Fout bij opslaan ${dayNames[day.dayOfWeek]}`;
-        showFlash(errorMessage, 'error');
+        toast.error(result.error || `Fout bij opslaan ${dayNames[day.dayOfWeek]}`);
       }
     } catch {
       saveStatus[dayNum] = 'error';
-      errorMessage = 'Netwerkfout. Probeer opnieuw.';
-      showFlash(errorMessage, 'error');
+      toast.error('Netwerkfout. Probeer opnieuw.');
     }
 
     saving[dayNum] = false;
@@ -165,29 +148,6 @@
       Stel per dag in wanneer klanten afspraken kunnen boeken.
     </p>
   </section>
-
-  {#if errorMessage}
-    <div class="bg-red-500/10 border border-red-500/20 p-4 text-sm text-red-400 flex items-start gap-3">
-      <XCircle class="shrink-0 mt-0.5" size={18} />
-      <span>{errorMessage}</span>
-    </div>
-  {/if}
-
-  {#if flashMessage && flashType}
-    <div
-      class="fixed right-6 top-6 z-50 flex items-center gap-3 border px-4 py-3 shadow-xl {flashType === 'success'
-        ? 'border-gold-500/25 bg-surface-base text-bone'
-        : 'border-red-500/25 bg-surface-base text-red-400'}"
-      role="status"
-    >
-      {#if flashType === 'success'}
-        <CheckCircle size={18} class="text-gold-500" />
-      {:else}
-        <XCircle size={18} class="text-red-400" />
-      {/if}
-      <span class="font-body text-sm">{flashMessage}</span>
-    </div>
-  {/if}
 
   <section class="grid gap-4 xl:grid-cols-2">
     {#each days as day}
