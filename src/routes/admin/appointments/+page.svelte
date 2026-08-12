@@ -337,6 +337,7 @@
       formError = null;
       formSuccess = null;
       availableSlots = [];
+      isSubmitting = false;
     }
   }
 
@@ -450,6 +451,7 @@
             appointmentIds.add(appt.id);
           }
         }
+        isSubmitting = false;
         toggleForm();
       }, 1500);
     } catch {
