@@ -307,8 +307,8 @@
 
   // ── Actions ──
   async function updateStatus(id: number, status: string) {
-    const res = await fetch('/admin/appointments', {
-      method: 'POST',
+    const res = await fetch('/admin/api/appointments', {
+      method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id, status })
     });

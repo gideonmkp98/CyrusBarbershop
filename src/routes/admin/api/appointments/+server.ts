@@ -179,6 +179,51 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   }
 };
 
+export const PATCH: RequestHandler = async ({ request, locals }) => {
+  if (!locals.user) {
+    return json({ error: 'Niet ingelogd' }, { status: 401 });
+  }
+
+  try {
+    const body = await request.json();
+    const { id, status } = body as { id?: unknown; status?: 'completed' | 'cancelled' | 'no_show' };
+
+    if (
+      typeof id === 'undefined' ||
+      typeof status !== 'string' ||
+      !['completed', 'cancelled', 'no_show'].includes(status)
+    ) {
+      return json({ error: 'Ongeldige aanvraag' }, { status: 400 });
+    }
+
+    const appointmentId = parseInt(String(id), 10);
+    if (!appointmentId) {
+      return json({ error: 'Ongeldig ID' }, { status: 400 });
+    }
+
+    // Staff mogen alleen eigen afspraken bijwerken.
+    const target = await db
+      .select({ staffId: appointments.staffId })
+      .from(appointments)
+      .where(eq(appointments.id, appointmentId))
+      .limit(1);
+
+    if (target.length === 0) {
+      return json({ error: 'Afspraak niet gevonden' }, { status: 404 });
+    }
+
+    if (locals.user.role === 'staff' && target[0].staffId !== locals.user.id) {
+      return json({ error: 'Geen toegang tot deze afspraak' }, { status: 403 });
+    }
+
+    await db.update(appointments).set({ status }).where(eq(appointments.id, appointmentId));
+    return json({ success: true });
+  } catch (error: any) {
+    console.error('Fout bij bijwerken status:', error);
+    return json({ error: 'Er is iets misgegaan bij het bijwerken van de status' }, { status: 500 });
+  }
+};
+
 export const GET: RequestHandler = async ({ url, locals }) => {
   if (!locals.user) {
     return json({ error: 'Niet ingelogd' }, { status: 401 });
