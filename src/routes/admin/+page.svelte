@@ -117,8 +117,8 @@
     appointments = appointments.map((appt) => appt.id === id ? { ...appt, status } : appt);
 
     try {
-      const response = await fetch('/admin/appointments', {
-        method: 'POST',
+      const response = await fetch('/admin/api/appointments', {
+        method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id, status })
       });
@@ -340,7 +340,7 @@
                     <X size={14} /> Annuleer
                   </button>
                 {:else}
-                  <span class="font-body text-xs text-bone-muted">Geen snelle actie nodig</span>
+                  <span class="font-body text-xs text-bone-muted">{statusLabels[appt.status] ?? 'Afgehandeld'}</span>
                 {/if}
               </div>
             </article>
