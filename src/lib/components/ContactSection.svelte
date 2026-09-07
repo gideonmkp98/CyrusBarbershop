@@ -29,6 +29,12 @@
     isActive: boolean;
   };
 
+  type HoursDisplayGroup = {
+    label: string;
+    text: string;
+    class: string;
+  };
+
   let openingHours = $state<OpeningHour[]>([]);
   let hoursLoaded = $state(false);
 
@@ -55,44 +61,42 @@
     fetchHours();
   });
 
-  // Group hours by weekday/weekend
-  function getHoursDisplay() {
-    const activeHours = openingHours.filter((h) => h.isActive);
+  function getHoursDisplay(): HoursDisplayGroup[] {
+    const dayLabels = ['Maandag', 'Dinsdag', 'Woensdag', 'Donderdag', 'Vrijdag', 'Zaterdag', 'Zondag'];
 
-    const weekdayHours = activeHours.filter((h) => h.dayOfWeek >= 1 && h.dayOfWeek <= 5);
-    const saturdayHours = activeHours.filter((h) => h.dayOfWeek === 6);
-    const sundayHours = activeHours.filter((h) => h.dayOfWeek === 7);
-
-    // Helper to format time (remove seconds if present)
     const formatTime = (time: string) => {
       if (!time) return '';
-      // Remove seconds if present (HH:MM:SS -> HH:MM)
       return time.split(':').slice(0, 2).join(':');
     };
 
-    const formatTimeRange = (hours: OpeningHour[]) => {
-      if (hours.length === 0) return { text: 'Gesloten', class: 'text-bone-muted' };
+    const formatDay = (dayOfWeek: number) => {
+      const hours = openingHours.find((h) => h.dayOfWeek === dayOfWeek && h.isActive);
+      if (!hours) return { text: 'Gesloten', class: 'text-bone-muted' };
 
-      const allSame = hours.every(
-        (h) => h.openTime === hours[0].openTime && h.closeTime === hours[0].closeTime
-      );
+      return {
+        text: `${formatTime(hours.openTime)} – ${formatTime(hours.closeTime)} uur`,
+        class: 'text-bone'
+      };
+    };
 
-      if (allSame) {
-        const open = formatTime(hours[0].openTime);
-        const close = formatTime(hours[0].closeTime);
-        return { text: `${open} – ${close} uur`, class: 'text-bone' };
+    const dayEntries = dayLabels.map((label, index) => ({
+      label,
+      ...formatDay(index + 1)
+    }));
+
+    const groups: HoursDisplayGroup[] = [];
+
+    for (const day of dayEntries) {
+      const last = groups[groups.length - 1];
+      if (last && last.text === day.text && last.class === day.class) {
+        const startLabel = last.label.split(' – ')[0];
+        last.label = `${startLabel} – ${day.label}`;
+      } else {
+        groups.push({ ...day });
       }
+    }
 
-      // Multiple time ranges - show earliest to latest
-      const times = hours.map((h) => ({ open: formatTime(h.openTime), close: formatTime(h.closeTime) }));
-      return { text: `${times[0].open} – ${times[times.length - 1].close} uur`, class: 'text-bone' };
-    };
-
-    return {
-      weekday: formatTimeRange(weekdayHours),
-      saturday: formatTimeRange(saturdayHours),
-      sunday: formatTimeRange(sundayHours)
-    };
+    return groups;
   }
 
   let hoursDisplay = $derived(getHoursDisplay());
@@ -202,18 +206,12 @@
         <div use:reveal={{ delay: 2 }} class="p-8 md:p-10 bg-surface-low border border-white/5">
           <h3 class="font-display text-subheading text-gold-500 mb-8 pb-4 border-b border-gold-500/15" style="font-size: clamp(1.25rem, 2vw, 1.5rem); line-height: 1.3; font-weight: 500;">Openingstijden</h3>
           <div class="space-y-5">
-            <div class="flex justify-between items-end font-body text-label uppercase">
-              <span class="flex items-center w-full">Maandag &ndash; Vrijdag<div class="leader"></div></span>
-              <span class="whitespace-nowrap {hoursDisplay.weekday.class}">{hoursDisplay.weekday.text}</span>
-            </div>
-            <div class="flex justify-between items-end font-body text-label uppercase">
-              <span class="flex items-center w-full">Zaterdag<div class="leader"></div></span>
-              <span class="whitespace-nowrap {hoursDisplay.saturday.class}">{hoursDisplay.saturday.text}</span>
-            </div>
-            <div class="flex justify-between items-end font-body text-label uppercase">
-              <span class="flex items-center w-full">Zondag<div class="leader"></div></span>
-              <span class="whitespace-nowrap {hoursDisplay.sunday.class}">{hoursDisplay.sunday.text}</span>
-            </div>
+            {#each hoursDisplay as group}
+              <div class="flex justify-between items-end font-body text-label uppercase">
+                <span class="flex items-center w-full">{group.label}<div class="leader"></div></span>
+                <span class="whitespace-nowrap {group.class}">{group.text}</span>
+              </div>
+            {/each}
           </div>
         </div>
       </div>
@@ -303,17 +301,11 @@
   <div class="max-w-[1200px] mx-auto px-6 md:px-8 text-center">
     <h3 use:reveal class="font-display text-subheading text-bone mb-10" style="font-size: clamp(1.25rem, 2vw, 1.5rem); line-height: 1.3; font-weight: 500;">Volg ons op social media</h3>
     <div class="flex justify-center gap-10">
-      <a href="/contact" use:reveal={{ delay: 1 }} aria-label="Instagram" class="group flex flex-col items-center gap-3">
+      <a href="https://www.instagram.com/cyrusbarbershop/" target="_blank" rel="noopener noreferrer" use:reveal={{ delay: 1 }} aria-label="Instagram" class="group flex flex-col items-center gap-3">
         <div class="w-14 h-14 rounded-full border border-bone-muted/20 flex items-center justify-center group-hover:border-gold-500 transition-colors">
           <SocialIcon name="instagram" size={24} class="text-bone-warm group-hover:text-gold-500 transition-colors" />
         </div>
         <span class="font-body text-label text-bone-muted group-hover:text-gold-500 transition-colors">Instagram</span>
-      </a>
-      <a href="/contact" use:reveal={{ delay: 2 }} aria-label="Facebook" class="group flex flex-col items-center gap-3">
-        <div class="w-14 h-14 rounded-full border border-bone-muted/20 flex items-center justify-center group-hover:border-gold-500 transition-colors">
-          <SocialIcon name="facebook" size={24} class="text-bone-warm group-hover:text-gold-500 transition-colors" />
-        </div>
-        <span class="font-body text-label text-bone-muted group-hover:text-gold-500 transition-colors">Facebook</span>
       </a>
       <!-- <a href="#" use:reveal={{ delay: 3 }} class="group flex flex-col items-center gap-3">
         <div class="w-14 h-14 rounded-full border border-bone-muted/20 flex items-center justify-center group-hover:border-gold-500 transition-colors">

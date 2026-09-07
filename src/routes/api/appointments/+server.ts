@@ -1,5 +1,5 @@
 import { db } from '$lib/server/db/index';
-import { appointments, appointmentAddOns, services, users } from '$lib/server/db/schema';
+import { appointments, appointmentAddOns, blockedTimes, openingHours, services, staffSchedules, users } from '$lib/server/db/schema';
 import { appointmentSchema } from '$lib/utils/validation';
 import { sendBookingConfirmation } from '$lib/server/mail/sendBookingConfirmation';
 import { sendBookingNotification } from '$lib/server/mail/sendBookingNotification';
@@ -17,6 +17,23 @@ function timeToMinutes(time: string): number {
 /** Check if two time ranges overlap */
 function hasOverlap(start1: number, end1: number, start2: number, end2: number): boolean {
   return start1 < end2 && start2 < end1;
+}
+
+function startOfLocalDay(date: Date): Date {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+function parseLocalDate(date: string): Date {
+  const [year, month, day] = date.split('-').map(Number);
+  return new Date(year, month - 1, day);
+}
+
+function isWithinBookingWindow(date: Date): boolean {
+  const today = startOfLocalDay(new Date());
+  const maxDate = new Date(today);
+  maxDate.setDate(maxDate.getDate() + 10 * 7);
+
+  return date >= today && date <= maxDate;
 }
 
 // Public booking endpoint: 10 attempts / minute / IP.
@@ -119,6 +136,93 @@ export const POST: RequestHandler = async ({ request }) => {
   const newServiceDuration = bookedService.duration + addOnTotalDuration;
   const newStartMinutes = timeToMinutes(timeSlot);
   const newEndMinutes = newStartMinutes + newServiceDuration;
+  const requestedDate = parseLocalDate(date);
+
+  if (!isWithinBookingWindow(requestedDate)) {
+    return new Response(JSON.stringify({ error: 'Boeken kan maximaal 10 weken vooruit' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+
+  const dayOfWeek = requestedDate.getDay() === 0 ? 7 : requestedDate.getDay();
+  const businessHours = await db
+    .select()
+    .from(openingHours)
+    .where(and(eq(openingHours.dayOfWeek, dayOfWeek), eq(openingHours.isActive, true)))
+    .limit(1);
+
+  if (businessHours.length === 0) {
+    return new Response(JSON.stringify({ error: 'De zaak is gesloten op deze dag' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+
+  const businessOpen = timeToMinutes(businessHours[0].openTime);
+  const businessClose = timeToMinutes(businessHours[0].closeTime);
+  if (newStartMinutes < businessOpen || newEndMinutes > businessClose) {
+    return new Response(JSON.stringify({ error: 'Dit moment valt buiten de openingstijden' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+
+  const blocked = await db
+    .select({ id: blockedTimes.id })
+    .from(blockedTimes)
+    .where(and(sql`${blockedTimes.date} = ${date}`, eq(blockedTimes.timeSlot, timeSlot)))
+    .limit(1);
+
+  if (blocked.length > 0) {
+    return new Response(JSON.stringify({ error: 'Dit moment is niet beschikbaar' }), {
+      status: 409,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+
+  if (staffId) {
+    const barber = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(and(eq(users.id, staffId), eq(users.isBarber, true), eq(users.isActive, true)))
+      .limit(1);
+
+    if (barber.length === 0) {
+      return new Response(JSON.stringify({ error: 'Deze medewerker is niet beschikbaar voor boekingen' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    const schedule = await db
+      .select()
+      .from(staffSchedules)
+      .where(
+        and(
+          eq(staffSchedules.staffId, staffId),
+          eq(staffSchedules.dayOfWeek, dayOfWeek),
+          eq(staffSchedules.isActive, true)
+        )
+      )
+      .limit(1);
+
+    if (schedule.length === 0 || !schedule[0].openTime || !schedule[0].closeTime) {
+      return new Response(JSON.stringify({ error: 'Deze medewerker werkt niet op deze dag' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    const staffOpen = timeToMinutes(schedule[0].openTime);
+    const staffClose = timeToMinutes(schedule[0].closeTime);
+    if (newStartMinutes < staffOpen || newEndMinutes > staffClose) {
+      return new Response(JSON.stringify({ error: 'Dit moment valt buiten de werktijden van de medewerker' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+  }
 
   // The overlap check and insert run inside a single transaction so concurrent
   // requests cannot both observe an empty slot and create double bookings.
@@ -150,7 +254,13 @@ export const POST: RequestHandler = async ({ request }) => {
           .select({ duration: services.duration })
           .from(services)
           .where(eq(services.id, appt.serviceId));
-        const existingDuration = durResult.length > 0 ? durResult[0].duration : 30;
+        const existingAddOns = await tx
+          .select({ duration: appointmentAddOns.duration })
+          .from(appointmentAddOns)
+          .where(eq(appointmentAddOns.appointmentId, appt.id));
+        const existingDuration =
+          (durResult.length > 0 ? durResult[0].duration : 30) +
+          existingAddOns.reduce((sum, addOn) => sum + addOn.duration, 0);
         const existingStart = timeToMinutes(appt.timeSlot);
         const existingEnd = existingStart + existingDuration;
 
