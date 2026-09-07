@@ -3,7 +3,6 @@
     id: number;
     displayName: string;
     email: string;
-    imageUrl?: string | null;
   }
 
   interface Props {
@@ -68,11 +67,7 @@
         >
           <div class="flex items-center gap-4">
             <div class="w-12 h-12 rounded-full bg-bone-muted/20 flex items-center justify-center text-bone font-display text-xl">
-              {#if barber.imageUrl}
-                <img src={barber.imageUrl} alt={barber.displayName} class="h-full w-full rounded-full object-cover" />
-              {:else}
-                {barber.displayName.charAt(0).toUpperCase()}
-              {/if}
+              {barber.displayName.charAt(0).toUpperCase()}
             </div>
             <div class="text-left flex-1">
               <p class="font-body text-body-lg text-bone">{barber.displayName}</p>

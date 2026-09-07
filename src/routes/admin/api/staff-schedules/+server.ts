@@ -54,7 +54,6 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
   const staffIdNum = parseInt(staffId, 10);
   const dayOfWeekNum = parseInt(dayOfWeek, 10);
-  const scheduleIsActive = isActive === true || isActive === 'true';
 
   // Validate dayOfWeek (1-7)
   if (dayOfWeekNum < 1 || dayOfWeekNum > 7) {
@@ -62,36 +61,29 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   }
 
   // Validate times: staff schedule must be within business opening hours
-  if (scheduleIsActive) {
-    const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
-    if (!timeRegex.test(openTime || '') || !timeRegex.test(closeTime || '')) {
-      return new Response(JSON.stringify({ error: 'Vul geldige begin- en eindtijden in' }), { status: 400 });
-    }
-
+  if (openTime && closeTime) {
     const businessHours = await db
       .select()
       .from(openingHours)
       .where(and(eq(openingHours.dayOfWeek, dayOfWeekNum), eq(openingHours.isActive, true)));
 
-    if (businessHours.length === 0) {
-      return new Response(JSON.stringify({ error: 'De zaak is gesloten op deze dag' }), { status: 400 });
-    }
+    if (businessHours.length > 0) {
+      const bizOpen = timeToMinutes(businessHours[0].openTime);
+      const bizClose = timeToMinutes(businessHours[0].closeTime);
+      const staffOpen = timeToMinutes(openTime);
+      const staffClose = timeToMinutes(closeTime);
 
-    const bizOpen = timeToMinutes(businessHours[0].openTime);
-    const bizClose = timeToMinutes(businessHours[0].closeTime);
-    const staffOpen = timeToMinutes(openTime);
-    const staffClose = timeToMinutes(closeTime);
+      // Staff cannot work before business opens or after business closes
+      if (staffOpen < bizOpen || staffClose > bizClose) {
+        return new Response(JSON.stringify({
+          error: `Werktijd moet binnen openingstijden vallen (${businessHours[0].openTime} - ${businessHours[0].closeTime})`
+        }), { status: 400 });
+      }
 
-    // Staff cannot work before business opens or after business closes
-    if (staffOpen < bizOpen || staffClose > bizClose) {
-      return new Response(JSON.stringify({
-        error: `Werktijd moet binnen openingstijden vallen (${businessHours[0].openTime} - ${businessHours[0].closeTime})`
-      }), { status: 400 });
-    }
-
-    // Staff close time must be after open time
-    if (staffClose <= staffOpen) {
-      return new Response(JSON.stringify({ error: 'Sluitingstijd moet na openingstijd zijn' }), { status: 400 });
+      // Staff close time must be after open time
+      if (staffClose <= staffOpen) {
+        return new Response(JSON.stringify({ error: 'Sluitingstijd moet na openingstijd zijn' }), { status: 400 });
+      }
     }
   }
 
@@ -108,9 +100,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     result = await db
       .update(staffSchedules)
       .set({
-        openTime: scheduleIsActive ? openTime : null,
-        closeTime: scheduleIsActive ? closeTime : null,
-        isActive: scheduleIsActive
+        openTime: openTime || null,
+        closeTime: closeTime || null,
+        isActive
       })
       .where(and(eq(staffSchedules.staffId, staffIdNum), eq(staffSchedules.dayOfWeek, dayOfWeekNum)));
   } else {
@@ -118,9 +110,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     result = await db.insert(staffSchedules).values({
       staffId: staffIdNum,
       dayOfWeek: dayOfWeekNum,
-      openTime: scheduleIsActive ? openTime : null,
-      closeTime: scheduleIsActive ? closeTime : null,
-      isActive: scheduleIsActive
+      openTime: openTime || null,
+      closeTime: closeTime || null,
+      isActive
     });
   }
 

@@ -17,13 +17,12 @@ export const load: PageServerLoad = async ({ locals }) => {
     id: users.id,
     email: users.email,
     displayName: users.displayName,
-    imageUrl: users.imageUrl,
     role: users.role,
     isActive: users.isActive,
     isBarber: users.isBarber
   }).from(users);
 
-  return { canManageUsers, currentUserRole: locals.user?.role, users: allUsers };
+  return { canManageUsers, users: allUsers };
 };
 
 export const actions: Actions = {

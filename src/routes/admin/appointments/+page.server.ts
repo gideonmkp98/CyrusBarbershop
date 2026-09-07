@@ -5,11 +5,9 @@ import type { PageServerLoad, Actions } from './$types';
 
 const PAGE_SIZE = 50;
 
-export const load: PageServerLoad = async ({ locals }) => {
-  const staffScope = locals.user?.role === 'staff' ? eq(appointments.staffId, locals.user.id) : undefined;
-
+export const load: PageServerLoad = async () => {
   // Haal de meest recente afspraken (pagina 1)
-  let appointmentsQuery = db
+  const appointmentsResult = await db
     .select({
       id: appointments.id,
       date: appointments.date,
@@ -26,13 +24,6 @@ export const load: PageServerLoad = async ({ locals }) => {
     .from(appointments)
     .innerJoin(services, eq(appointments.serviceId, services.id))
     .leftJoin(users, eq(appointments.staffId, users.id))
-    .$dynamic();
-
-  if (staffScope) {
-    appointmentsQuery = appointmentsQuery.where(staffScope);
-  }
-
-  const appointmentsResult = await appointmentsQuery
     .orderBy(desc(appointments.date))
     .limit(PAGE_SIZE + 1);
 
@@ -68,7 +59,7 @@ export const load: PageServerLoad = async ({ locals }) => {
     .orderBy(services.displayOrder, services.name);
 
   // Haal alle barbers/staff op
-  let staffQuery = db
+  const allStaff = await db
     .select({
       id: users.id,
       displayName: users.displayName,
@@ -76,15 +67,7 @@ export const load: PageServerLoad = async ({ locals }) => {
       role: users.role
     })
     .from(users)
-    .$dynamic();
-
-  staffQuery = staffQuery.where(
-    locals.user?.role === 'staff'
-      ? and(eq(users.isBarber, true), eq(users.id, locals.user.id))
-      : eq(users.isBarber, true)
-  );
-
-  const allStaff = await staffQuery;
+    .where(eq(users.isBarber, true));
 
   return {
     appointments: formattedAppointments,
