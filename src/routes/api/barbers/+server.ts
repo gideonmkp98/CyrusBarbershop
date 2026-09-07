@@ -8,7 +8,8 @@ export const GET: RequestHandler = async () => {
     .select({
       id: users.id,
       displayName: users.displayName,
-      email: users.email
+      email: users.email,
+      imageUrl: users.imageUrl
     })
     .from(users)
     .where(and(eq(users.isBarber, true), eq(users.isActive, true)));

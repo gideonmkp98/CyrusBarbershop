@@ -17,7 +17,7 @@ export const BUSINESS_CONTACT = {
 };
 
 export const SOCIAL_LINKS = {
-  instagram: '', // e.g. 'https://instagram.com/cyrusbarbershop'
+  instagram: 'https://www.instagram.com/cyrusbarbershop/',
   facebook: '' // e.g. 'https://facebook.com/cyrusbarbershop'
 };
 

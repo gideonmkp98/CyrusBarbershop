@@ -49,6 +49,7 @@ export const users = mysqlTable('users', {
   email: varchar('email', { length: 255 }).notNull().unique(),
   passwordHash: varchar('password_hash', { length: 255 }).notNull(),
   displayName: varchar('display_name', { length: 100 }).notNull(),
+  imageUrl: varchar('image_url', { length: 500 }),
   role: mysqlEnum('role', ['owner', 'manager', 'staff']).notNull().default('staff'),
   isBarber: boolean('is_barber').notNull().default(false),
   isActive: boolean('is_active').notNull().default(true),

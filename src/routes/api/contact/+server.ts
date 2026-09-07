@@ -38,9 +38,6 @@ export const POST: RequestHandler = async ({ request }) => {
     });
   }
 
-  // Debug: log the actual body so we can diagnose browser-side state issues.
-  console.log('[contact] received body:', JSON.stringify(body));
-
   // Sanitize: trim string fields and drop empties before Zod so we don't reject
   // browser submissions that contain stray whitespace from autocomplete.
   if (body && typeof body === 'object') {

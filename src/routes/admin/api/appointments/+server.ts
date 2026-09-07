@@ -341,7 +341,9 @@ export const GET: RequestHandler = async ({ url, locals }) => {
     });
 
     const allStaff = await db.query.users.findMany({
-      where: (users, { eq }) => eq(users.isBarber, true),
+      where: (users, { eq, and }) => locals.user?.role === 'staff'
+        ? and(eq(users.isBarber, true), eq(users.id, locals.user.id))
+        : eq(users.isBarber, true),
       columns: { id: true, email: true, displayName: true, role: true }
     });
 

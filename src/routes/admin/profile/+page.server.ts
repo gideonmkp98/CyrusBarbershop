@@ -13,6 +13,7 @@ export const load: PageServerLoad = async ({ locals }) => {
       id: user.id,
       email: user.email,
       displayName: user.displayName,
+      imageUrl: user.imageUrl ?? null,
       role: user.role,
       isActive: user.isActive
     }
