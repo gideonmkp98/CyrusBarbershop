@@ -11,6 +11,11 @@
     isActive: boolean;
   };
 
+  type HoursDisplayGroup = {
+    label: string;
+    text: string;
+  };
+
   let openingHours = $state<OpeningHour[]>([]);
   let loaded = $state(false);
 
@@ -33,49 +38,38 @@
     fetchHours();
   });
 
-  // Helper to format hours display
-  function formatHours(hours: OpeningHour[]): { weekday: string; saturday: string; sunday: string } {
-    const activeHours = hours.filter((h) => h.isActive);
+  function formatHours(hours: OpeningHour[]): HoursDisplayGroup[] {
+    const dayLabels = ['Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za', 'Zo'];
 
-    if (activeHours.length === 0) {
-      return { weekday: 'Gesloten', saturday: 'Gesloten', sunday: 'Gesloten' };
-    }
-
-    // Group by day
-    const weekdayHours = activeHours.filter((h) => h.dayOfWeek >= 1 && h.dayOfWeek <= 5);
-    const saturdayHours = activeHours.filter((h) => h.dayOfWeek === 6);
-    const sundayHours = activeHours.filter((h) => h.dayOfWeek === 7);
-
-    // Helper to format time (remove seconds if present)
     const formatTime = (time: string) => {
       if (!time) return '';
-      // Remove seconds if present (HH:MM:SS -> HH:MM)
       return time.split(':').slice(0, 2).join(':');
     };
 
-    const formatTimeRange = (hours: OpeningHour[]) => {
-      if (hours.length === 0) return 'Gesloten';
-      // Check if all have same hours
-      const allSame = hours.every((h) => h.openTime === hours[0].openTime && h.closeTime === hours[0].closeTime);
-      if (allSame) {
-        return `${formatTime(hours[0].openTime)} – ${formatTime(hours[0].closeTime)} uur`;
-      }
-      // Show range of hours
-      const earliest = Math.min(...hours.map((h) => parseInt(h.openTime.replace(':', ''))));
-      const latest = Math.max(...hours.map((h) => parseInt(h.closeTime.replace(':', ''))));
-      const formatNum = (num: number) => {
-        const h = Math.floor(num / 100);
-        const m = num % 100;
-        return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
-      };
-      return `${formatNum(earliest)} – ${formatNum(latest)} uur`;
+    const formatDay = (dayOfWeek: number) => {
+      const day = hours.find((h) => h.dayOfWeek === dayOfWeek && h.isActive);
+      if (!day) return 'Gesloten';
+      return `${formatTime(day.openTime)} – ${formatTime(day.closeTime)} uur`;
     };
 
-    return {
-      weekday: formatTimeRange(weekdayHours),
-      saturday: formatTimeRange(saturdayHours),
-      sunday: formatTimeRange(sundayHours)
-    };
+    const dayEntries = dayLabels.map((label, index) => ({
+      label,
+      text: formatDay(index + 1)
+    }));
+
+    const groups: HoursDisplayGroup[] = [];
+
+    for (const day of dayEntries) {
+      const last = groups[groups.length - 1];
+      if (last && last.text === day.text) {
+        const startLabel = last.label.split(' – ')[0];
+        last.label = `${startLabel} – ${day.label}`;
+      } else {
+        groups.push({ ...day });
+      }
+    }
+
+    return groups;
   }
 
   let displayHours = $derived(formatHours(openingHours));
@@ -97,23 +91,22 @@
       <div class="grid grid-cols-2 md:grid-cols-3 gap-x-12 gap-y-6">
         <div class="flex flex-col gap-3">
           <span class="font-body text-label text-gold-500">OPENINGSTIJDEN</span>
-          <a href="/contact" class="font-display text-caption text-bone-muted hover:text-bone transition-colors">Ma&ndash;Vr: {displayHours.weekday}</a>
-          <a href="/contact" class="font-display text-caption text-bone-muted hover:text-bone transition-colors">Za: {displayHours.saturday}</a>
-          <a href="/contact" class="font-display text-caption text-bone-muted hover:text-bone transition-colors">Zo: {displayHours.sunday}</a>
+          {#each displayHours as group}
+            <a href="/contact" class="font-display text-caption text-bone-muted hover:text-bone transition-colors">{group.label}: {group.text}</a>
+          {/each}
         </div>
         <div class="flex flex-col gap-3">
           <span class="font-body text-label text-gold-500">CONTACT</span>
           <a href="/contact" class="font-display text-caption text-bone-muted hover:text-bone transition-colors">Locatie</a>
           <a href="/booking" class="font-display text-caption text-bone-muted hover:text-bone transition-colors">Maak een afspraak</a>
+          <a href="/voorwaarden" class="font-display text-caption text-bone-muted hover:text-bone transition-colors">Voorwaarden</a>
+          <a href="/privacy" class="font-display text-caption text-bone-muted hover:text-bone transition-colors">Privacyverklaring</a>
         </div>
         <div class="flex flex-col gap-3">
           <span class="font-body text-label text-gold-500">SOCIALS</span>
           <div class="flex items-center gap-4 mt-1">
-            <a href="/contact" aria-label="Instagram" class="text-bone-muted hover:text-gold-500 transition-colors">
+            <a href="https://www.instagram.com/cyrusbarbershop/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" class="text-bone-muted hover:text-gold-500 transition-colors">
               <SocialIcon name="instagram" size={20} />
-            </a>
-            <a href="/contact" aria-label="Facebook" class="text-bone-muted hover:text-gold-500 transition-colors">
-              <SocialIcon name="facebook" size={20} />
             </a>
           </div>
         </div>
@@ -126,6 +119,15 @@
           <button type="submit" class="text-gold-500 hover:text-gold-300 transition-colors">&rarr;</button>
         </form>
       </div> -->
+    </div>
+
+    <div class="mt-12 border-t border-white/5 pt-6 text-center md:text-left">
+      <p class="font-display text-[0.65rem] uppercase tracking-[0.18em] text-bone-muted/40">
+        Website ontwikkeld door
+        <a href="https://studionz.nl/" target="_blank" rel="noopener noreferrer" class="text-bone-muted/60 hover:text-gold-500 transition-colors">
+          Studio NZ
+        </a>
+      </p>
     </div>
   </div>
 </footer>
