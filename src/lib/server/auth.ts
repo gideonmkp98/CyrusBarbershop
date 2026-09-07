@@ -80,7 +80,6 @@ export async function validateSession(tokenOrSigned: string) {
     id: user.id,
     email: user.email,
     displayName: user.displayName,
-    imageUrl: user.imageUrl,
     role: user.role,
     isActive: user.isActive
   };

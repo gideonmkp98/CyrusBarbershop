@@ -1,5 +1,5 @@
 import { db } from '$lib/server/db/index';
-import { openingHours, appointments, appointmentAddOns, blockedTimes, staffSchedules, users, services } from '$lib/server/db/schema';
+import { openingHours, appointments, blockedTimes, staffSchedules, users, services } from '$lib/server/db/schema';
 import { eq, and, ne, sql, inArray } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 
@@ -12,18 +12,6 @@ function minutesToTime(mins: number): string {
   const h = Math.floor(mins / 60);
   const m = mins % 60;
   return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
-}
-
-function startOfLocalDay(date: Date): Date {
-  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
-}
-
-function isWithinBookingWindow(date: Date): boolean {
-  const today = startOfLocalDay(new Date());
-  const maxDate = new Date(today);
-  maxDate.setDate(maxDate.getDate() + 10 * 7);
-
-  return date >= today && date <= maxDate;
 }
 
 /**
@@ -117,7 +105,6 @@ export const GET: RequestHandler = async ({ url }) => {
   const staffIdParam = url.searchParams.get('staffId');
   const allBarbersParam = url.searchParams.get('allBarbers');
   const serviceIdParam = url.searchParams.get('serviceId');
-  const durationParam = url.searchParams.get('duration');
 
   if (!dateStr || !/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
     return new Response(JSON.stringify({ error: 'Ongeldig datumformaat' }), { status: 400 });
@@ -129,13 +116,6 @@ export const GET: RequestHandler = async ({ url }) => {
 
   const [year, month, day] = dateStr.split('-').map(Number);
   const date = new Date(year, month - 1, day);
-
-  if (!isWithinBookingWindow(date)) {
-    return new Response(JSON.stringify({ date: dateStr, slots: [] }), {
-      headers: { 'Content-Type': 'application/json' }
-    });
-  }
-
   const dayOfWeek = date.getDay() === 0 ? 7 : date.getDay();
 
   // Fetch service duration if serviceId is provided
@@ -148,11 +128,6 @@ export const GET: RequestHandler = async ({ url }) => {
     if (serviceResult.length > 0) {
       serviceDuration = serviceResult[0].duration || 30;
     }
-  }
-
-  const requestedDuration = durationParam ? parseInt(durationParam, 10) : null;
-  if (requestedDuration && requestedDuration > 0 && requestedDuration <= 480) {
-    serviceDuration = requestedDuration;
   }
 
   // Get current date/time to filter out past slots
@@ -195,7 +170,7 @@ export const GET: RequestHandler = async ({ url }) => {
     const allBarbers = await db
       .select({ id: users.id })
       .from(users)
-      .where(and(inArray(users.role, ['owner', 'manager', 'staff']), eq(users.isBarber, true), eq(users.isActive, true)));
+      .where(inArray(users.role, ['owner', 'manager', 'staff']));
 
     if (allBarbers.length === 0) {
       return new Response(JSON.stringify({ date: dateStr, slots: [] }), {
@@ -238,12 +213,11 @@ export const GET: RequestHandler = async ({ url }) => {
         eq(appointments.staffId, barberId)
       ];
 
-    const booked = await db
-      .select({
-        id: appointments.id,
-        timeSlot: appointments.timeSlot,
-        serviceId: appointments.serviceId
-      })
+      const booked = await db
+        .select({
+          timeSlot: appointments.timeSlot,
+          serviceId: appointments.serviceId
+        })
         .from(appointments)
         .where(and(...bookingConditions));
 
@@ -254,13 +228,7 @@ export const GET: RequestHandler = async ({ url }) => {
           .select({ duration: services.duration })
           .from(services)
           .where(eq(services.id, booking.serviceId));
-        const addOns = await db
-          .select({ duration: appointmentAddOns.duration })
-          .from(appointmentAddOns)
-          .where(eq(appointmentAddOns.appointmentId, booking.id));
-        const duration =
-          (serviceResult.length > 0 ? serviceResult[0].duration : 30) +
-          addOns.reduce((sum, addOn) => sum + addOn.duration, 0);
+        const duration = serviceResult.length > 0 ? serviceResult[0].duration : 30;
         appointmentsWithDuration.push({ timeSlot: booking.timeSlot, duration });
       }
 
@@ -342,12 +310,11 @@ export const GET: RequestHandler = async ({ url }) => {
       eq(appointments.staffId, staffId)
     ];
 
-      const booked = await db
-        .select({
-          id: appointments.id,
-          timeSlot: appointments.timeSlot,
-          serviceId: appointments.serviceId
-        })
+    const booked = await db
+      .select({
+        timeSlot: appointments.timeSlot,
+        serviceId: appointments.serviceId
+      })
       .from(appointments)
       .where(and(...bookingConditions));
 
@@ -358,13 +325,7 @@ export const GET: RequestHandler = async ({ url }) => {
         .select({ duration: services.duration })
         .from(services)
         .where(eq(services.id, booking.serviceId));
-      const addOns = await db
-        .select({ duration: appointmentAddOns.duration })
-        .from(appointmentAddOns)
-        .where(eq(appointmentAddOns.appointmentId, booking.id));
-      const duration =
-        (serviceResult.length > 0 ? serviceResult[0].duration : 30) +
-        addOns.reduce((sum, addOn) => sum + addOn.duration, 0);
+      const duration = serviceResult.length > 0 ? serviceResult[0].duration : 30;
       appointmentsWithDuration.push({ timeSlot: booking.timeSlot, duration });
     }
 
