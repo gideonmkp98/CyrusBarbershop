@@ -76,6 +76,26 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     return jsonResponse({ success: true });
   }
 
+  // Handle owner edits for display name.
+  if (body.id !== undefined && body.displayName !== undefined) {
+    if (userRole !== 'owner') {
+      return jsonResponse({ error: "Alleen owner kan namen en foto's wijzigen" }, 403);
+    }
+
+    const targetId = parseInt(String(body.id), 10);
+    if (!targetId) {
+      return jsonResponse({ error: 'Ongeldige gebruiker' }, 400);
+    }
+
+    const displayName = String(body.displayName).trim();
+    if (displayName.length < 2 || displayName.length > 100) {
+      return jsonResponse({ error: 'Naam moet tussen 2 en 100 tekens zijn' }, 400);
+    }
+
+    await db.update(users).set({ displayName }).where(eq(users.id, targetId));
+    return jsonResponse({ success: true });
+  }
+
   // Handle role change
   if (body.id !== undefined && body.role !== undefined) {
     const userToChange = await db.select({ role: users.role }).from(users).where(eq(users.id, body.id)).limit(1);

@@ -28,19 +28,27 @@
 
   // Track which days the selected barber works (1=Mon, 7=Sun)
   let workingDays = $state<Set<number>>(new Set([1, 2, 3, 4, 5, 6])); // Default: Mon-Sat
+  let businessWorkingDays = $state<Set<number>>(new Set([1, 2, 3, 4, 5, 6])); // Default: Mon-Sat
   let loadingWorkingDays = $state(false);
 
   // Track fully booked days when "no preference" is selected
   let fullyBookedDays = $state<Set<string>>(new Set());
+  const maxBookingWeeks = 10;
+
+  $effect(() => {
+    fetchBusinessWorkingDays();
+  });
 
   // Fetch staff schedule when barber selection changes
   $effect(() => {
+    const currentBusinessWorkingDays = businessWorkingDays;
+
     if (selectedStaffId !== null && selectedStaffId !== undefined) {
-      fetchWorkingDays(selectedStaffId);
+      fetchWorkingDays(selectedStaffId, currentBusinessWorkingDays);
       fullyBookedDays = new Set(); // Reset fully booked days when specific barber selected
     } else {
       // No barber selected - fetch combined availability for the visible month
-      workingDays = new Set([1, 2, 3, 4, 5, 6]);
+      workingDays = new Set(currentBusinessWorkingDays);
       fetchFullyBookedDays(calMonth, calYear);
     }
   });
@@ -52,13 +60,34 @@
     }
   });
 
-  async function fetchWorkingDays(staffId: number) {
+  async function fetchBusinessWorkingDays() {
+    try {
+      const res = await fetch('/api/opening-hours');
+      if (res.ok) {
+        const data = await res.json();
+        const openDays = (data.hours || [])
+          .filter((h: any) => h.isActive)
+          .map((h: any) => h.dayOfWeek);
+
+        businessWorkingDays = new Set(openDays.length > 0 ? openDays : []);
+
+        if (selectedStaffId === null) {
+          workingDays = new Set(businessWorkingDays);
+        }
+      }
+    } catch {
+      businessWorkingDays = new Set([1, 2, 3, 4, 5, 6]);
+    }
+  }
+
+  async function fetchWorkingDays(staffId: number, openBusinessDays: Set<number> = businessWorkingDays) {
     loadingWorkingDays = true;
     try {
       const res = await fetch(`/api/staff-schedules/${staffId}`);
       if (res.ok) {
         const data = await res.json();
-        workingDays = new Set(data.workingDays || [1, 2, 3, 4, 5, 6]);
+        const staffDays = data.workingDays || [1, 2, 3, 4, 5, 6];
+        workingDays = new Set(staffDays.filter((day: number) => openBusinessDays.has(day)));
       }
     } catch {
       workingDays = new Set([1, 2, 3, 4, 5, 6]);
@@ -75,12 +104,15 @@
       const date = new Date(year, month, d);
       const dayOfWeek = date.getDay() === 0 ? 7 : date.getDay();
 
-      // Skip Sundays (already disabled) and past dates
       const today = new Date();
-      if (date < new Date(today.getFullYear(), today.getMonth(), today.getDate())) {
+      const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+      const maxBookingDate = new Date(startOfToday);
+      maxBookingDate.setDate(maxBookingDate.getDate() + maxBookingWeeks * 7);
+
+      if (date < startOfToday || date > maxBookingDate) {
         continue;
       }
-      if (dayOfWeek === 7) {
+      if (!businessWorkingDays.has(dayOfWeek)) {
         continue;
       }
 
@@ -120,15 +152,18 @@
     const firstDay = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const today = new Date();
+    const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const maxBookingDate = new Date(startOfToday);
+    maxBookingDate.setDate(maxBookingDate.getDate() + maxBookingWeeks * 7);
     const startDay = firstDay === 0 ? 6 : firstDay - 1;
     const days: CalendarDay[] = [];
     for (let i = 0; i < startDay; i++) days.push({ empty: true });
     for (let d = 1; d <= daysInMonth; d++) {
       const date = new Date(year, month, d);
-      const isPast = date < new Date(today.getFullYear(), today.getMonth(), today.getDate());
+      const isPast = date < startOfToday;
+      const isBeyondBookingWindow = date > maxBookingDate;
       const dayOfWeek = date.getDay() === 0 ? 7 : date.getDay(); // Convert Sun from 0 to 7
-      const isSunday = date.getDay() === 0;
-      const isNotWorkingDay = staffId !== null ? !workingDaysSet.has(dayOfWeek) : false;
+      const isNotWorkingDay = !workingDaysSet.has(dayOfWeek);
 
       // Check if fully booked (only for "no preference" mode)
       const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
@@ -137,7 +172,7 @@
       days.push({
         day: d,
         date,
-        disabled: isPast || isSunday || isNotWorkingDay || isFullyBooked,
+        disabled: isPast || isBeyondBookingWindow || isNotWorkingDay || isFullyBooked,
         selected: selDate !== null && selDate.getDate() === d && selDate.getMonth() === month && selDate.getFullYear() === year,
         fullyBooked: isFullyBooked
       });

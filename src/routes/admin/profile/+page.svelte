@@ -4,6 +4,12 @@
   let { data } = $props();
 
   // Email form state
+  let displayName = $state('');
+  let nameError = $state('');
+  let nameSuccess = $state('');
+  let nameLoading = $state(false);
+  let nameInitialized = $state(false);
+
   let email = $state('');
   let emailError = $state('');
   let emailSuccess = $state('');
@@ -19,11 +25,43 @@
   let passwordLoading = $state(false);
 
   $effect(() => {
+    if (!nameInitialized) {
+      displayName = data.user.displayName;
+      nameInitialized = true;
+    }
+
     if (!emailInitialized) {
       email = data.user.email;
       emailInitialized = true;
     }
   });
+
+  async function updateName(e: Event) {
+    e.preventDefault();
+    nameError = '';
+    nameSuccess = '';
+    nameLoading = true;
+
+    try {
+      const res = await fetch('/admin/api/profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ displayName })
+      });
+
+      const result = await res.json();
+
+      if (res.ok) {
+        nameSuccess = result.message || 'Naam bijgewerkt';
+        setTimeout(() => nameSuccess = '', 3000);
+      } else {
+        nameError = result.error || 'Naam bijwerken mislukt';
+      }
+    } catch {
+      nameError = 'Netwerkfout. Probeer het opnieuw.';
+    }
+    nameLoading = false;
+  }
 
   async function updateEmail(e: Event) {
     e.preventDefault();
@@ -104,6 +142,38 @@
 <h1 class="font-display text-heading text-bone mb-8">Mijn Profiel</h1>
 
 <div class="grid md:grid-cols-2 gap-8">
+  <!-- Name Section -->
+  <div class="bg-surface-base p-6 border border-white/5">
+    <h2 class="font-display text-subheading text-bone mb-6">Naam Wijzigen</h2>
+
+    {#if nameError}
+      <div class="bg-red-900/20 border border-red-500/30 p-3 text-sm text-red-400 mb-4">{nameError}</div>
+    {/if}
+    {#if nameSuccess}
+      <div class="bg-green-900/20 border border-green-500/30 p-3 text-sm text-green-400 mb-4">{nameSuccess}</div>
+    {/if}
+
+    <form onsubmit={updateName}>
+      <div class="field-group mb-6">
+        <input
+          type="text"
+          id="displayName"
+          bind:value={displayName}
+          placeholder=" "
+          required
+        />
+        <label for="displayName">Naam</label>
+      </div>
+      <button
+        type="submit"
+        class="btn-primary"
+        disabled={nameLoading}
+      >
+        {#if nameLoading}Opslaan...{:else}Opslaan{/if}
+      </button>
+    </form>
+  </div>
+
   <!-- Email Section -->
   <div class="bg-surface-base p-6 border border-white/5">
     <h2 class="font-display text-subheading text-bone mb-6">E-mailadres Wijzigen</h2>
@@ -197,7 +267,7 @@
   <div class="grid md:grid-cols-3 gap-6">
     <div>
       <span class="block font-body text-label text-bone-muted mb-1">Naam</span>
-      <span class="font-body text-body text-bone">{data.user.displayName}</span>
+      <span class="font-body text-body text-bone">{displayName}</span>
     </div>
     <div>
       <span class="block font-body text-label text-bone-muted mb-1">Rol</span>

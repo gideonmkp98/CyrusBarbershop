@@ -7,6 +7,7 @@ declare global {
         id: number;
         email: string;
         displayName: string;
+        imageUrl?: string | null;
         role: 'owner' | 'manager' | 'staff';
         isActive: boolean;
       };
