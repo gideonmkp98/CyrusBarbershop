@@ -27,7 +27,6 @@
     id: number;
     displayName: string;
     email: string;
-    imageUrl?: string | null;
   }
 
   let { services, bookingEnabled = true }: { services: ServiceData[] | undefined; bookingEnabled?: boolean } = $props();
@@ -73,7 +72,6 @@
   let loadingSlots = $state(false);
   let barbers = $state<Barber[]>([]);
   let loadingBarbers = $state(false);
-  const maxBookingWeeks = 10;
 
   // Ref to the booking flow wrapper (step indicators + step content).
   // Used to scroll the user back to the top of the current step on step change,
@@ -157,8 +155,7 @@
       const staffIdParam = selectedStaffId !== null ? `&staffId=${selectedStaffId}` : '&allBarbers=true';
       // Include serviceId to get duration-based availability
       const serviceIdParam = selectedServiceId !== null ? `&serviceId=${selectedServiceId}` : '';
-      const durationParam = summaryTotalDuration > 0 ? `&duration=${summaryTotalDuration}` : '';
-      const res = await fetch(`/api/availability?date=${dateStr}${staffIdParam}${serviceIdParam}${durationParam}`);
+      const res = await fetch(`/api/availability?date=${dateStr}${staffIdParam}${serviceIdParam}`);
       if (res.ok) {
         const data = await res.json();
         availableSlots = data.slots || [];
@@ -203,18 +200,9 @@
   }
 
   function changeMonth(dir: number) {
-    const nextMonth = calMonth + dir;
-    const nextDate = new Date(calYear, nextMonth, 1);
-    const today = new Date();
-    const startOfCurrentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-    const maxBookingDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-    maxBookingDate.setDate(maxBookingDate.getDate() + maxBookingWeeks * 7);
-    const startOfMaxMonth = new Date(maxBookingDate.getFullYear(), maxBookingDate.getMonth(), 1);
-
-    if (nextDate < startOfCurrentMonth || nextDate > startOfMaxMonth) return;
-
-    calMonth = nextDate.getMonth();
-    calYear = nextDate.getFullYear();
+    calMonth += dir;
+    if (calMonth > 11) { calMonth = 0; calYear++; }
+    if (calMonth < 0) { calMonth = 11; calYear--; }
   }
 
   function selectCalendarDay(day: { disabled?: boolean; empty?: boolean; day?: number }) {
@@ -288,9 +276,7 @@
       
       for (const barber of barbers) {
         try {
-          const serviceIdParam = selectedServiceId !== null ? `&serviceId=${selectedServiceId}` : '';
-          const durationParam = summaryTotalDuration > 0 ? `&duration=${summaryTotalDuration}` : '';
-          const res = await fetch(`/api/availability?date=${dateStr}&staffId=${barber.id}${serviceIdParam}${durationParam}`);
+          const res = await fetch(`/api/availability?date=${dateStr}&staffId=${barber.id}`);
           if (res.ok) {
             const data = await res.json();
             const hasSlot = data.slots?.some((s: { time: string; available: boolean }) => 

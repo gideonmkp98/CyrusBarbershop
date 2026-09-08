@@ -16,22 +16,6 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
   const body = await request.json();
 
-  // Handle display name change
-  if (body.displayName !== undefined) {
-    const displayName = String(body.displayName).trim();
-    if (displayName.length < 2 || displayName.length > 100) {
-      return new Response(JSON.stringify({ error: 'Naam moet tussen 2 en 100 tekens zijn' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' }
-      });
-    }
-
-    await db.update(users).set({ displayName }).where(eq(users.id, userId));
-    return new Response(JSON.stringify({ success: true, message: 'Naam bijgewerkt' }), {
-      headers: { 'Content-Type': 'application/json' }
-    });
-  }
-
   // Handle email change
   if (body.email !== undefined) {
     const email = body.email?.trim();
