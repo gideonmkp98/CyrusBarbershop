@@ -127,5 +127,14 @@
         </form>
       </div> -->
     </div>
+
+    <div class="mt-12 border-t border-white/5 pt-6 text-center md:text-left">
+      <p class="font-display text-[0.65rem] uppercase tracking-[0.18em] text-bone-muted/40">
+        Website ontwikkeld door
+        <a href="https://studionz.nl/" target="_blank" rel="noopener noreferrer" class="text-bone-muted/60 hover:text-gold-500 transition-colors">
+          Studio NZ
+        </a>
+      </p>
+    </div>
   </div>
 </footer>
