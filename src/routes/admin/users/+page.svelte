@@ -619,7 +619,7 @@
               </span>
             </td>
             <td class="p-4">
-              {#if user.role !== 'owner'}
+              {#if user.role !== 'owner' || data.currentUserRole === 'owner'}
                 <div class="relative inline-block">
                   <button
                     type="button"
@@ -664,34 +664,36 @@
                           {/if}
                         {/if}
 
-                        <button
-                          type="button"
-                          class="flex w-full items-center gap-3 px-4 py-3 text-left font-body text-sm text-gold-400 hover:bg-white/5"
-                          onclick={() => { openActionMenuId = null; openRoleModal(user.id, user.displayName, user.role); }}
-                        >
-                          <UserCog size={16} />
-                          Rol wijzigen
-                        </button>
+                        {#if user.role !== 'owner'}
+                          <button
+                            type="button"
+                            class="flex w-full items-center gap-3 px-4 py-3 text-left font-body text-sm text-gold-400 hover:bg-white/5"
+                            onclick={() => { openActionMenuId = null; openRoleModal(user.id, user.displayName, user.role); }}
+                          >
+                            <UserCog size={16} />
+                            Rol wijzigen
+                          </button>
 
-                        <button
-                          type="button"
-                          class="flex w-full items-center gap-3 px-4 py-3 text-left font-body text-sm {user.isActive ? 'text-red-400' : 'text-green-500'} hover:bg-white/5"
-                          onclick={() => { openActionMenuId = null; toggleActive(user.id, user.isActive); }}
-                        >
-                          <UserX size={16} />
-                          {user.isActive ? 'Deactiveren' : 'Reactiveren'}
-                        </button>
+                          <button
+                            type="button"
+                            class="flex w-full items-center gap-3 px-4 py-3 text-left font-body text-sm {user.isActive ? 'text-red-400' : 'text-green-500'} hover:bg-white/5"
+                            onclick={() => { openActionMenuId = null; toggleActive(user.id, user.isActive); }}
+                          >
+                            <UserX size={16} />
+                            {user.isActive ? 'Deactiveren' : 'Reactiveren'}
+                          </button>
 
-                        <div class="my-2 border-t border-white/10"></div>
+                          <div class="my-2 border-t border-white/10"></div>
 
-                        <button
-                          type="button"
-                          class="flex w-full items-center gap-3 px-4 py-3 text-left font-body text-sm text-red-400 hover:bg-white/5"
-                          onclick={() => { openActionMenuId = null; openDeleteModal(user.id, user.displayName); }}
-                        >
-                          <Trash2 size={16} />
-                          Verwijderen
-                        </button>
+                          <button
+                            type="button"
+                            class="flex w-full items-center gap-3 px-4 py-3 text-left font-body text-sm text-red-400 hover:bg-white/5"
+                            onclick={() => { openActionMenuId = null; openDeleteModal(user.id, user.displayName); }}
+                          >
+                            <Trash2 size={16} />
+                            Verwijderen
+                          </button>
+                        {/if}
                       </div>
                     </div>
                   {/if}
