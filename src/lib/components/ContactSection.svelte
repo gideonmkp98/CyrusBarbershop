@@ -165,7 +165,7 @@
             </div>
             <div>
               <span class="block font-body text-label text-bone-muted mb-1">Telefoon</span>
-              <p class="font-display text-subheading text-bone" style="font-size: clamp(1.25rem, 2vw, 1.5rem); line-height: 1.3; font-weight: 500;">0629231030</p>
+              <a href="tel:+31629231030" class="font-display text-subheading text-gold-500 hover:text-bone transition-colors" style="font-size: clamp(1.25rem, 2vw, 1.5rem); line-height: 1.3; font-weight: 500;">06 29 23 10 30</a>
             </div>
           </div>
           <div class="flex gap-5 items-start">
