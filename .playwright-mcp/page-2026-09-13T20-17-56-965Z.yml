@@ -1,0 +1,93 @@
+- main [ref=f6e16]:
+  - generic [ref=f6e17]:
+    - complementary [ref=f6e18]:
+      - link "Cyrus CYRUS BEHEER" [ref=f6e20] [cursor=pointer]:
+        - /url: /
+        - img "Cyrus" [ref=f6e21]
+        - generic [ref=f6e22]: CYRUS BEHEER
+      - navigation [ref=f6e23]:
+        - link "Dashboard" [ref=f6e24] [cursor=pointer]:
+          - /url: /admin
+        - link "Afspraken" [ref=f6e25] [cursor=pointer]:
+          - /url: /admin/appointments
+        - link "Behandelingen" [ref=f6e26] [cursor=pointer]:
+          - /url: /admin/services
+        - link "Gebruikers" [ref=f6e27] [cursor=pointer]:
+          - /url: /admin/users
+        - link "Openingstijden" [ref=f6e28] [cursor=pointer]:
+          - /url: /admin/opening-hours
+      - generic [ref=f6e29]:
+        - generic [ref=f6e30]:
+          - generic [ref=f6e31]: Account
+          - generic [ref=f6e32]: Admin
+        - link "Mijn Profiel" [ref=f6e33] [cursor=pointer]:
+          - /url: /admin/profile
+      - button "Afmelden" [ref=f6e35]
+    - main [ref=f6e36]:
+      - generic [ref=f6e37]:
+        - generic [ref=f6e38]:
+          - heading "Afspraken" [level=1] [ref=f6e39]
+          - paragraph [ref=f6e40]: 5 totaal · 4 vandaag · 4 bevestigd
+        - generic [ref=f6e41]:
+          - generic [ref=f6e42]:
+            - button "Kalender" [ref=f6e43]
+            - button "Per persoon" [ref=f6e44]
+            - button "Lijst" [ref=f6e45]
+          - button "+ Nieuwe Afspraak" [ref=f6e46]
+      - generic [ref=f6e47]:
+        - generic [ref=f6e48]:
+          - button "Alle" [active] [ref=f6e49]
+          - button "Bevestigd" [ref=f6e50]
+          - button "Afgerond" [ref=f6e51]
+          - button "Geannuleerd" [ref=f6e52]
+          - button "Niet Verschenen" [ref=f6e53]
+        - generic [ref=f6e54]:
+          - combobox [ref=f6e55]:
+            - option "Alle barbers" [selected]
+            - option "Admin"
+            - option "hnkie"
+          - textbox "Zoek..." [ref=f6e56]
+      - generic [ref=f6e137]:
+        - generic [ref=f6e138]:
+          - generic [ref=f6e139]:
+            - generic [ref=f6e140]: Admin
+            - generic [ref=f6e141]: "3"
+          - generic [ref=f6e226]:
+            - button "09:00 Afgerond Klant A Haarknippen · 13-09-2026" [ref=f6e227]:
+              - generic [ref=f6e228]:
+                - generic [ref=f6e229]: 09:00
+                - generic [ref=f6e230]: Afgerond
+              - generic [ref=f6e231]: Klant A
+              - generic [ref=f6e232]: Haarknippen · 13-09-2026
+            - button "10:30 Bevestigd Klant C Haarknippen · 13-09-2026" [ref=f6e233]:
+              - generic [ref=f6e234]:
+                - generic [ref=f6e235]: 10:30
+                - generic [ref=f6e236]: Bevestigd
+              - generic [ref=f6e237]: Klant C
+              - generic [ref=f6e238]: Haarknippen · 13-09-2026
+            - button "14:00 Bevestigd Klant D Haarknippen · 14-09-2026" [ref=f6e239]:
+              - generic [ref=f6e240]:
+                - generic [ref=f6e241]: 14:00
+                - generic [ref=f6e242]: Bevestigd
+              - generic [ref=f6e243]: Klant D
+              - generic [ref=f6e244]: Haarknippen · 14-09-2026
+        - generic [ref=f6e161]:
+          - generic [ref=f6e162]:
+            - generic [ref=f6e163]: hnkie
+            - generic [ref=f6e164]: "1"
+          - button "09:30 Bevestigd Klant B Haarknippen · 13-09-2026" [ref=f6e220]:
+            - generic [ref=f6e221]:
+              - generic [ref=f6e222]: 09:30
+              - generic [ref=f6e223]: Bevestigd
+            - generic [ref=f6e224]: Klant B
+            - generic [ref=f6e225]: Haarknippen · 13-09-2026
+        - generic [ref=f6e245]:
+          - generic [ref=f6e246]:
+            - generic [ref=f6e247]: Geen voorkeur
+            - generic [ref=f6e248]: "1"
+          - button "11:00 Bevestigd GeenVoorkeur Klant Haarknippen · 13-09-2026" [ref=f6e250]:
+            - generic [ref=f6e251]:
+              - generic [ref=f6e252]: 11:00
+              - generic [ref=f6e253]: Bevestigd
+            - generic [ref=f6e254]: GeenVoorkeur Klant
+            - generic [ref=f6e255]: Haarknippen · 13-09-2026

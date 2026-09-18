@@ -1,0 +1,168 @@
+- main [ref=f4e14]:
+  - generic [ref=f4e15]:
+    - generic [ref=f4e16]:
+      - link "Cyrus CYRUS BEHEER" [ref=f4e17] [cursor=pointer]:
+        - /url: /admin
+        - img "Cyrus" [ref=f4e18]
+        - generic [ref=f4e19]: CYRUS BEHEER
+      - button "Menu openen" [ref=f4e20]
+    - complementary [ref=f4e24]:
+      - link "Cyrus CYRUS BEHEER" [ref=f4e26] [cursor=pointer]:
+        - /url: /
+        - img "Cyrus" [ref=f4e27]
+        - generic [ref=f4e28]: CYRUS BEHEER
+      - navigation [ref=f4e29]:
+        - link "Dashboard" [ref=f4e30] [cursor=pointer]:
+          - /url: /admin
+        - link "Afspraken" [ref=f4e31] [cursor=pointer]:
+          - /url: /admin/appointments
+        - link "Behandelingen" [ref=f4e32] [cursor=pointer]:
+          - /url: /admin/services
+        - link "Gebruikers" [ref=f4e33] [cursor=pointer]:
+          - /url: /admin/users
+        - link "Openingstijden" [ref=f4e34] [cursor=pointer]:
+          - /url: /admin/opening-hours
+      - generic [ref=f4e35]:
+        - generic [ref=f4e36]:
+          - generic [ref=f4e37]: Account
+          - generic [ref=f4e38]: Admin
+        - link "Mijn Profiel" [ref=f4e39] [cursor=pointer]:
+          - /url: /admin/profile
+      - button "Afmelden" [ref=f4e41]
+    - main [ref=f4e42]:
+      - generic [ref=f4e43]:
+        - generic [ref=f4e44]:
+          - heading "Behandelingen" [level=1] [ref=f4e45]
+          - paragraph [ref=f4e46]: 7 totaal · 7 actief · 1 signature
+        - button "Nieuwe Behandeling" [ref=f4e47] [cursor=pointer]
+      - generic [ref=f4e49]:
+        - combobox [ref=f4e51]:
+          - option "Alle categorieën" [selected]
+          - option "Haar"
+          - option "Baard"
+          - option "Signature"
+          - option "Extra"
+        - combobox [ref=f4e53]:
+          - option "Alle statussen" [selected]
+          - option "Actief"
+          - option "Inactief"
+        - textbox "Zoek behandelingen..." [ref=f4e54]
+        - generic [ref=f4e55]:
+          - button "Grid" [ref=f4e56]
+          - button "Lijst" [active] [ref=f4e57]
+      - table [ref=f4e217]:
+        - rowgroup [ref=f4e218]:
+          - row [ref=f4e219]:
+            - columnheader "Naam" [ref=f4e220]
+            - columnheader "Categorie" [ref=f4e221]
+            - columnheader "Prijs" [ref=f4e222]
+            - columnheader "Duur" [ref=f4e223]
+            - columnheader "Signature" [ref=f4e224]
+            - columnheader "Status" [ref=f4e225]
+            - columnheader "Acties" [ref=f4e226]
+        - rowgroup [ref=f4e227]:
+          - row [ref=f4e228]:
+            - cell "Haarknippen Een vakkundige snit op maat. Schaarwerk, tondeuse en styling. Inclusief wassen en föhnen." [ref=f4e229]:
+              - generic [ref=f4e230]:
+                - generic [ref=f4e231]: Haarknippen
+                - generic [ref=f4e232]: Een vakkundige snit op maat. Schaarwerk, tondeuse en styling. Inclusief wassen en föhnen.
+            - cell "Haar" [ref=f4e233]
+            - cell "€35.00" [ref=f4e236]
+            - cell "45 min" [ref=f4e237]
+            - cell "—" [ref=f4e238]
+            - cell [ref=f4e239]:
+              - button "Actief" [ref=f4e240]
+            - cell [ref=f4e242]:
+              - generic [ref=f4e243]:
+                - button [ref=f4e244]
+                - button [ref=f4e246]
+          - row [ref=f4e248]:
+            - cell "Fade Vloeiende overgang van huid naar haar. Verschillende fademogelijkheden met scheermesafwerking." [ref=f4e249]:
+              - generic [ref=f4e250]:
+                - generic [ref=f4e251]: Fade
+                - generic [ref=f4e252]: Vloeiende overgang van huid naar haar. Verschillende fademogelijkheden met scheermesafwerking.
+            - cell "Haar" [ref=f4e253]
+            - cell "€45.00" [ref=f4e256]
+            - cell "45 min" [ref=f4e257]
+            - cell "—" [ref=f4e258]
+            - cell [ref=f4e259]:
+              - button "Actief" [ref=f4e260]
+            - cell [ref=f4e262]:
+              - generic [ref=f4e263]:
+                - button [ref=f4e264]
+                - button [ref=f4e266]
+          - row [ref=f4e268]:
+            - cell "De Klassieke Gerespecteerd klassiek werk. Hals netjes afgewerkt met warme handdoek. De standaard." [ref=f4e269]:
+              - generic [ref=f4e270]:
+                - generic [ref=f4e271]: De Klassieke
+                - generic [ref=f4e272]: Gerespecteerd klassiek werk. Hals netjes afgewerkt met warme handdoek. De standaard.
+            - cell "Haar" [ref=f4e273]
+            - cell "€45.00" [ref=f4e276]
+            - cell "50 min" [ref=f4e277]
+            - cell "—" [ref=f4e278]
+            - cell [ref=f4e279]:
+              - button "Actief" [ref=f4e280]
+            - cell [ref=f4e282]:
+              - generic [ref=f4e283]:
+                - button [ref=f4e284]
+                - button [ref=f4e286]
+          - row [ref=f4e288]:
+            - cell "Baardtrim & Vorm Vakkundig trimmen en vormen naar je gezichtsstructuur. Afgewerkt met premium baardolie." [ref=f4e289]:
+              - generic [ref=f4e290]:
+                - generic [ref=f4e291]: Baardtrim & Vorm
+                - generic [ref=f4e292]: Vakkundig trimmen en vormen naar je gezichtsstructuur. Afgewerkt met premium baardolie.
+            - cell "Baard" [ref=f4e293]
+            - cell "€25.00" [ref=f4e296]
+            - cell "30 min" [ref=f4e297]
+            - cell "—" [ref=f4e298]
+            - cell [ref=f4e299]:
+              - button "Actief" [ref=f4e300]
+            - cell [ref=f4e302]:
+              - generic [ref=f4e303]:
+                - button [ref=f4e304]
+                - button [ref=f4e306]
+          - row [ref=f4e308]:
+            - cell "Warme Scheerbeurt Klassieke scheerervaring. Stoom, zeep en scheermeswerk met de nodige finesse." [ref=f4e309]:
+              - generic [ref=f4e310]:
+                - generic [ref=f4e311]: Warme Scheerbeurt
+                - generic [ref=f4e312]: Klassieke scheerervaring. Stoom, zeep en scheermeswerk met de nodige finesse.
+            - cell "Baard" [ref=f4e313]
+            - cell "€40.00" [ref=f4e316]
+            - cell "45 min" [ref=f4e317]
+            - cell "—" [ref=f4e318]
+            - cell [ref=f4e319]:
+              - button "Actief" [ref=f4e320]
+            - cell [ref=f4e322]:
+              - generic [ref=f4e323]:
+                - button [ref=f4e324]
+                - button [ref=f4e326]
+          - row [ref=f4e328]:
+            - cell "Baard Design Fijne vorming en linenwerk. Voor wie waarde hecht aan perfecte details en vakwerk." [ref=f4e329]:
+              - generic [ref=f4e330]:
+                - generic [ref=f4e331]: Baard Design
+                - generic [ref=f4e332]: Fijne vorming en linenwerk. Voor wie waarde hecht aan perfecte details en vakwerk.
+            - cell "Baard" [ref=f4e333]
+            - cell "€30.00" [ref=f4e336]
+            - cell "35 min" [ref=f4e337]
+            - cell "—" [ref=f4e338]
+            - cell [ref=f4e339]:
+              - button "Actief" [ref=f4e340]
+            - cell [ref=f4e342]:
+              - generic [ref=f4e343]:
+                - button [ref=f4e344]
+                - button [ref=f4e346]
+          - row [ref=f4e348]:
+            - cell "The Works Het volledige Cyrus-programma. Premium haarknippen of fade, baardwerk en gezichtsmassage." [ref=f4e349]:
+              - generic [ref=f4e350]:
+                - generic [ref=f4e351]: The Works
+                - generic [ref=f4e352]: Het volledige Cyrus-programma. Premium haarknippen of fade, baardwerk en gezichtsmassage.
+            - cell "Signature" [ref=f4e353]
+            - cell "€75.00" [ref=f4e356]
+            - cell "90 min" [ref=f4e357]
+            - cell [ref=f4e358]
+            - cell [ref=f4e361]:
+              - button "Actief" [ref=f4e362]
+            - cell [ref=f4e364]:
+              - generic [ref=f4e365]:
+                - button [ref=f4e366]
+                - button [ref=f4e368]

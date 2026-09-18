@@ -73,6 +73,27 @@ export const staffSchedules = mysqlTable('staff_schedules', {
   isActive: boolean('is_active').notNull().default(true)
 });
 
+// A single model covers employee requests and approved/direct absences.
+// Null start/end times represent a full-day or multi-day absence; this leaves
+// room for partial-day support without changing the model later.
+export const staffTimeOff = mysqlTable('staff_time_off', {
+  id: int('id').primaryKey().autoincrement(),
+  staffId: int('staff_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  startDate: date('start_date').notNull(),
+  endDate: date('end_date').notNull(),
+  startTime: time('start_time'),
+  endTime: time('end_time'),
+  reason: varchar('reason', { length: 500 }),
+  status: mysqlEnum('status', ['pending', 'approved', 'rejected']).notNull().default('pending'),
+  entryType: mysqlEnum('entry_type', ['request', 'direct']).notNull().default('request'),
+  requestedBy: int('requested_by').references(() => users.id, { onDelete: 'set null' }),
+  reviewedBy: int('reviewed_by').references(() => users.id, { onDelete: 'set null' }),
+  reviewedAt: timestamp('reviewed_at'),
+  reviewerNote: varchar('reviewer_note', { length: 500 }),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow()
+});
+
 export const appointmentAddOns = mysqlTable('appointment_add_ons', {
   id: int('id').primaryKey().autoincrement(),
   appointmentId: int('appointment_id').notNull().references(() => appointments.id, { onDelete: 'cascade' }),

@@ -1,0 +1,150 @@
+- main [ref=f6e16]:
+  - generic [ref=f6e17]:
+    - complementary [ref=f6e18]:
+      - link "Cyrus CYRUS BEHEER" [ref=f6e20] [cursor=pointer]:
+        - /url: /
+        - img "Cyrus" [ref=f6e21]
+        - generic [ref=f6e22]: CYRUS BEHEER
+      - navigation [ref=f6e23]:
+        - link "Dashboard" [ref=f6e24] [cursor=pointer]:
+          - /url: /admin
+        - link "Afspraken" [ref=f6e25] [cursor=pointer]:
+          - /url: /admin/appointments
+        - link "Behandelingen" [ref=f6e26] [cursor=pointer]:
+          - /url: /admin/services
+        - link "Gebruikers" [ref=f6e27] [cursor=pointer]:
+          - /url: /admin/users
+        - link "Openingstijden" [ref=f6e28] [cursor=pointer]:
+          - /url: /admin/opening-hours
+      - generic [ref=f6e29]:
+        - generic [ref=f6e30]:
+          - generic [ref=f6e31]: Account
+          - generic [ref=f6e32]: Admin
+        - link "Mijn Profiel" [ref=f6e33] [cursor=pointer]:
+          - /url: /admin/profile
+      - button "Afmelden" [ref=f6e35]
+    - main [ref=f6e36]:
+      - generic [ref=f6e37]:
+        - generic [ref=f6e38]:
+          - heading "Afspraken" [level=1] [ref=f6e39]
+          - paragraph [ref=f6e40]: 5 totaal · 4 vandaag · 4 bevestigd
+        - generic [ref=f6e41]:
+          - generic [ref=f6e42]:
+            - button "Kalender" [ref=f6e43]
+            - button "Per persoon" [ref=f6e44]
+            - button "Lijst" [ref=f6e45]
+          - button "Annuleren" [ref=f6e331]
+      - generic [ref=f6e332]:
+        - heading "Nieuwe Afspraak Inplannen" [level=2] [ref=f6e333]
+        - generic [ref=f6e334]:
+          - generic [ref=f6e335]:
+            - generic [ref=f6e336]: Behandeling *
+            - combobox "Behandeling *" [ref=f6e337]:
+              - option "Selecteer behandeling"
+              - option "Haarknippen – €35.00 (45 min)"
+              - option "Fade – €45.00 (45 min)" [selected]
+              - option "De Klassieke – €45.00 (50 min)"
+              - option "Baardtrim & Vorm – €25.00 (30 min)"
+              - option "Warme Scheerbeurt – €40.00 (45 min)"
+              - option "Baard Design – €30.00 (35 min)"
+              - option "The Works – €75.00 (90 min)"
+          - generic [ref=f6e338]:
+            - generic [ref=f6e339]: Barber (optioneel)
+            - combobox "Barber (optioneel)" [ref=f6e340]:
+              - option "Geen voorkeur"
+              - option "Admin (owner)"
+              - option "hnkie (staff)" [selected]
+          - generic [ref=f6e341]:
+            - generic [ref=f6e342]: Datum *
+            - textbox "Datum *" [ref=f6e343]: 2026-09-14
+          - generic [ref=f6e344]:
+            - generic [ref=f6e345]: Tijdstip *
+            - combobox "Tijdstip *" [ref=f6e361]:
+              - option "Selecteer tijdstip"
+              - option "11:00"
+              - option "11:45"
+              - option "12:30"
+              - option "13:15"
+              - option "14:00"
+              - option "14:45"
+              - option "15:30" [selected]
+              - option "16:15"
+              - option "17:00"
+          - generic [ref=f6e347]:
+            - generic [ref=f6e348]: Naam Klant *
+            - textbox "Naam Klant *" [active] [ref=f6e349]:
+              - /placeholder: Voornaam Achternaam
+              - text: UI Test Klant
+          - generic [ref=f6e350]:
+            - generic [ref=f6e351]: Telefoonnummer
+            - textbox "Telefoonnummer" [ref=f6e352]:
+              - /placeholder: 06 12345678
+          - generic [ref=f6e353]:
+            - generic [ref=f6e354]: E-mail (optioneel)
+            - textbox "E-mail (optioneel)" [ref=f6e355]:
+              - /placeholder: klant@voorbeeld.nl
+          - generic [ref=f6e356]:
+            - generic [ref=f6e357]: Notities
+            - textbox "Notities" [ref=f6e358]:
+              - /placeholder: Optionele notities...
+          - button "Afspraak Inplannen" [ref=f6e360]
+      - generic [ref=f6e47]:
+        - generic [ref=f6e48]:
+          - button "Alle" [ref=f6e49]
+          - button "Bevestigd" [ref=f6e50]
+          - button "Afgerond" [ref=f6e51]
+          - button "Geannuleerd" [ref=f6e52]
+          - button "Niet Verschenen" [ref=f6e53]
+        - generic [ref=f6e54]:
+          - combobox [ref=f6e55]:
+            - option "Alle barbers" [selected]
+            - option "Admin"
+            - option "hnkie"
+          - textbox "Zoek..." [ref=f6e56]
+      - generic [ref=f6e256]:
+        - generic [ref=f6e257]:
+          - generic [ref=f6e258]:
+            - button "←" [ref=f6e259]
+            - button "Vandaag" [ref=f6e260]
+            - button "→" [ref=f6e261]
+          - generic [ref=f6e262]: 14 sep – 20 sep
+        - generic [ref=f6e264]:
+          - generic [ref=f6e265]:
+            - generic [ref=f6e266]:
+              - generic [ref=f6e267]: Ma
+              - generic [ref=f6e268]: "14"
+            - button "14:00 Klant D Haarknippen Admin" [ref=f6e325]:
+              - generic [ref=f6e326]: 14:00
+              - generic [ref=f6e327]: Klant D
+              - generic [ref=f6e328]: Haarknippen
+              - generic [ref=f6e329]: Admin
+          - generic [ref=f6e271]:
+            - generic [ref=f6e272]:
+              - generic [ref=f6e273]: Di
+              - generic [ref=f6e274]: "15"
+            - generic [ref=f6e275]: Geen afspraken
+          - generic [ref=f6e277]:
+            - generic [ref=f6e278]:
+              - generic [ref=f6e279]: Wo
+              - generic [ref=f6e280]: "16"
+            - generic [ref=f6e281]: Geen afspraken
+          - generic [ref=f6e283]:
+            - generic [ref=f6e284]:
+              - generic [ref=f6e285]: Do
+              - generic [ref=f6e286]: "17"
+            - generic [ref=f6e287]: Geen afspraken
+          - generic [ref=f6e289]:
+            - generic [ref=f6e290]:
+              - generic [ref=f6e291]: Vr
+              - generic [ref=f6e292]: "18"
+            - generic [ref=f6e293]: Geen afspraken
+          - generic [ref=f6e295]:
+            - generic [ref=f6e296]:
+              - generic [ref=f6e297]: Za
+              - generic [ref=f6e298]: "19"
+            - generic [ref=f6e299]: Geen afspraken
+          - generic [ref=f6e301]:
+            - generic [ref=f6e302]:
+              - generic [ref=f6e303]: Zo
+              - generic [ref=f6e304]: "20"
+            - generic [ref=f6e305]: Geen afspraken

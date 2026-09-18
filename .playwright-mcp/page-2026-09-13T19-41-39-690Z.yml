@@ -1,0 +1,101 @@
+- generic [ref=f11e2]:
+  - banner [ref=f11e5]:
+    - navigation [ref=f11e6]:
+      - link [ref=f11e7] [cursor=pointer]:
+        - /url: /
+        - img "Cyrus Barbershop" [ref=f11e8]
+      - button "Toggle menu" [ref=f11e10]
+  - main [ref=f11e14]:
+    - generic [ref=f11e15]:
+      - generic [ref=f11e16]:
+        - link "Cyrus CYRUS BEHEER" [ref=f11e17] [cursor=pointer]:
+          - /url: /admin
+          - img "Cyrus" [ref=f11e18]
+          - generic [ref=f11e19]: CYRUS BEHEER
+        - button "Menu openen" [ref=f11e20]
+      - complementary [ref=f11e24]:
+        - link "Cyrus CYRUS BEHEER" [ref=f11e26] [cursor=pointer]:
+          - /url: /
+          - img "Cyrus" [ref=f11e27]
+          - generic [ref=f11e28]: CYRUS BEHEER
+        - navigation [ref=f11e29]:
+          - link "Dashboard" [ref=f11e30] [cursor=pointer]:
+            - /url: /admin
+          - link "Afspraken" [ref=f11e31] [cursor=pointer]:
+            - /url: /admin/appointments
+          - link "Behandelingen" [ref=f11e32] [cursor=pointer]:
+            - /url: /admin/services
+          - link "Gebruikers" [ref=f11e33] [cursor=pointer]:
+            - /url: /admin/users
+          - link "Openingstijden" [ref=f11e34] [cursor=pointer]:
+            - /url: /admin/opening-hours
+        - generic [ref=f11e35]:
+          - generic [ref=f11e36]:
+            - generic [ref=f11e37]: Account
+            - generic [ref=f11e38]: Admin
+          - link "Mijn Profiel" [ref=f11e39] [cursor=pointer]:
+            - /url: /admin/profile
+        - button "Afmelden" [ref=f11e41]
+      - main [ref=f11e42]:
+        - heading "Gebruikersbeheer" [level=1] [ref=f11e43]
+        - generic [ref=f11e44]:
+          - heading "Maak Personeelsgebruiker" [level=2] [ref=f11e45]
+          - generic [ref=f11e46]:
+            - generic [ref=f11e47]:
+              - textbox "Weergavenaam" [ref=f11e48]:
+                - /placeholder: " "
+              - generic: Weergavenaam
+            - generic [ref=f11e49]:
+              - textbox "E-mail" [ref=f11e50]:
+                - /placeholder: " "
+              - generic: E-mail
+            - generic [ref=f11e51]:
+              - textbox "Wachtwoord" [ref=f11e52]:
+                - /placeholder: " "
+              - generic: Wachtwoord
+            - generic [ref=f11e53]:
+              - checkbox "Dit personeelslid is een barber" [ref=f11e54]
+              - generic [ref=f11e55]: Dit personeelslid is een barber
+            - button "Gebruiker Aanmaken" [ref=f11e57] [cursor=pointer]
+        - table [ref=f11e59]:
+          - rowgroup [ref=f11e60]:
+            - row [ref=f11e61]:
+              - columnheader "Naam" [ref=f11e62]
+              - columnheader "E-mail" [ref=f11e63]
+              - columnheader "Rol" [ref=f11e64]
+              - columnheader "Barber" [ref=f11e65]
+              - columnheader "Foto" [ref=f11e66]
+              - columnheader "Status" [ref=f11e67]
+              - columnheader "Acties" [ref=f11e68]
+          - rowgroup
+  - contentinfo [ref=f11e69]:
+    - generic [ref=f11e70]:
+      - generic [ref=f11e71]:
+        - generic [ref=f11e72]:
+          - generic [ref=f11e73]:
+            - img "Cyrus Barbershop" [ref=f11e74]
+            - generic [ref=f11e75]: CYRUS BARBERSHOP
+          - paragraph [ref=f11e76]: © 2025 CYRUS BARBERSHOP.
+        - generic [ref=f11e77]:
+          - generic [ref=f11e78]:
+            - generic [ref=f11e79]: OPENINGSTIJDEN
+            - 'link "Ma – Zo: Gesloten" [ref=f11e80] [cursor=pointer]':
+              - /url: /contact
+          - generic [ref=f11e81]:
+            - generic [ref=f11e82]: CONTACT
+            - link "Locatie" [ref=f11e83] [cursor=pointer]:
+              - /url: /contact
+            - link "Maak een afspraak" [ref=f11e84] [cursor=pointer]:
+              - /url: /booking
+            - link "Voorwaarden" [ref=f11e85] [cursor=pointer]:
+              - /url: /voorwaarden
+            - link "Privacyverklaring" [ref=f11e86] [cursor=pointer]:
+              - /url: /privacy
+          - generic [ref=f11e87]:
+            - generic [ref=f11e88]: SOCIALS
+            - link "Instagram" [ref=f11e90] [cursor=pointer]:
+              - /url: https://www.instagram.com/cyrusbarbershop/
+      - paragraph [ref=f11e94]:
+        - text: Website ontwikkeld door
+        - link "Studio NZ" [ref=f11e95] [cursor=pointer]:
+          - /url: https://studionz.nl/

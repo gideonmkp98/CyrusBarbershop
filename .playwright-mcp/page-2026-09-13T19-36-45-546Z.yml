@@ -1,0 +1,53 @@
+- generic [ref=e2]:
+  - banner [ref=e5]:
+    - navigation [ref=e6]:
+      - link [ref=e7] [cursor=pointer]:
+        - /url: /
+        - img "Cyrus Barbershop" [ref=e8]
+      - button "Toggle menu" [ref=e10]
+  - main [ref=e14]:
+    - generic [ref=e16]:
+      - generic [ref=e17]:
+        - img "Cyrus" [ref=e18]
+        - heading "CYRUS BEHEER" [level=1] [ref=e19]
+      - generic [ref=e20]:
+        - generic [ref=e21]:
+          - textbox "E-mail" [ref=e22]:
+            - /placeholder: " "
+          - generic: E-mail
+        - generic [ref=e23]:
+          - textbox "Wachtwoord" [ref=e24]:
+            - /placeholder: " "
+          - generic: Wachtwoord
+        - button "Aanmelden" [ref=e25] [cursor=pointer]
+  - contentinfo [ref=e26]:
+    - generic [ref=e27]:
+      - generic [ref=e28]:
+        - generic [ref=e29]:
+          - generic [ref=e30]:
+            - img "Cyrus Barbershop" [ref=e31]
+            - generic [ref=e32]: CYRUS BARBERSHOP
+          - paragraph [ref=e33]: © 2025 CYRUS BARBERSHOP.
+        - generic [ref=e34]:
+          - generic [ref=e35]:
+            - generic [ref=e36]: OPENINGSTIJDEN
+            - 'link "Ma – Zo: Gesloten" [ref=e37] [cursor=pointer]':
+              - /url: /contact
+          - generic [ref=e38]:
+            - generic [ref=e39]: CONTACT
+            - link "Locatie" [ref=e40] [cursor=pointer]:
+              - /url: /contact
+            - link "Maak een afspraak" [ref=e41] [cursor=pointer]:
+              - /url: /booking
+            - link "Voorwaarden" [ref=e42] [cursor=pointer]:
+              - /url: /voorwaarden
+            - link "Privacyverklaring" [ref=e43] [cursor=pointer]:
+              - /url: /privacy
+          - generic [ref=e44]:
+            - generic [ref=e45]: SOCIALS
+            - link "Instagram" [ref=e47] [cursor=pointer]:
+              - /url: https://www.instagram.com/cyrusbarbershop/
+      - paragraph [ref=e51]:
+        - text: Website ontwikkeld door
+        - link "Studio NZ" [ref=e52] [cursor=pointer]:
+          - /url: https://studionz.nl/

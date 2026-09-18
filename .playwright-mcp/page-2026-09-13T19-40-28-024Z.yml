@@ -1,0 +1,76 @@
+- generic [ref=f5e2]:
+  - banner [ref=f5e5]:
+    - navigation [ref=f5e6]:
+      - link [ref=f5e7] [cursor=pointer]:
+        - /url: /
+        - img "Cyrus Barbershop" [ref=f5e8]
+      - button "Toggle menu" [ref=f5e10]
+  - main [ref=f5e14]:
+    - generic [ref=f5e15]:
+      - generic [ref=f5e16]:
+        - link "Cyrus CYRUS BEHEER" [ref=f5e17] [cursor=pointer]:
+          - /url: /admin
+          - img "Cyrus" [ref=f5e18]
+          - generic [ref=f5e19]: CYRUS BEHEER
+        - button "Menu openen" [ref=f5e20]
+      - complementary [ref=f5e24]:
+        - link "Cyrus CYRUS BEHEER" [ref=f5e26] [cursor=pointer]:
+          - /url: /
+          - img "Cyrus" [ref=f5e27]
+          - generic [ref=f5e28]: CYRUS BEHEER
+        - navigation [ref=f5e29]:
+          - link "Dashboard" [ref=f5e30] [cursor=pointer]:
+            - /url: /admin
+          - link "Afspraken" [ref=f5e31] [cursor=pointer]:
+            - /url: /admin/appointments
+          - link "Behandelingen" [ref=f5e32] [cursor=pointer]:
+            - /url: /admin/services
+          - link "Gebruikers" [ref=f5e33] [cursor=pointer]:
+            - /url: /admin/users
+          - link "Openingstijden" [ref=f5e34] [cursor=pointer]:
+            - /url: /admin/opening-hours
+        - generic [ref=f5e35]:
+          - generic [ref=f5e36]:
+            - generic [ref=f5e37]: Account
+            - generic [ref=f5e38]: Admin
+          - link "Mijn Profiel" [ref=f5e39] [cursor=pointer]:
+            - /url: /admin/profile
+        - button "Afmelden" [ref=f5e41]
+      - main [ref=f5e42]:
+        - generic [ref=f5e43]:
+          - generic [ref=f5e44]:
+            - text: BESCHIKBAARHEID
+            - heading "Openingstijden" [level=1] [ref=f5e45]
+            - paragraph [ref=f5e46]: Stel per dag in wanneer klanten afspraken kunnen boeken.
+          - paragraph [ref=f5e48]: "Opslaan: wijzigingen worden automatisch opgeslagen wanneer je een tijd wijzigt of een dag opent/sluit."
+  - contentinfo [ref=f5e49]:
+    - generic [ref=f5e50]:
+      - generic [ref=f5e51]:
+        - generic [ref=f5e52]:
+          - generic [ref=f5e53]:
+            - img "Cyrus Barbershop" [ref=f5e54]
+            - generic [ref=f5e55]: CYRUS BARBERSHOP
+          - paragraph [ref=f5e56]: © 2025 CYRUS BARBERSHOP.
+        - generic [ref=f5e57]:
+          - generic [ref=f5e58]:
+            - generic [ref=f5e59]: OPENINGSTIJDEN
+            - 'link "Ma – Zo: Gesloten" [ref=f5e60] [cursor=pointer]':
+              - /url: /contact
+          - generic [ref=f5e61]:
+            - generic [ref=f5e62]: CONTACT
+            - link "Locatie" [ref=f5e63] [cursor=pointer]:
+              - /url: /contact
+            - link "Maak een afspraak" [ref=f5e64] [cursor=pointer]:
+              - /url: /booking
+            - link "Voorwaarden" [ref=f5e65] [cursor=pointer]:
+              - /url: /voorwaarden
+            - link "Privacyverklaring" [ref=f5e66] [cursor=pointer]:
+              - /url: /privacy
+          - generic [ref=f5e67]:
+            - generic [ref=f5e68]: SOCIALS
+            - link "Instagram" [ref=f5e70] [cursor=pointer]:
+              - /url: https://www.instagram.com/cyrusbarbershop/
+      - paragraph [ref=f5e74]:
+        - text: Website ontwikkeld door
+        - link "Studio NZ" [ref=f5e75] [cursor=pointer]:
+          - /url: https://studionz.nl/

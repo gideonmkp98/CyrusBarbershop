@@ -1,0 +1,93 @@
+- main [ref=f3e14]:
+  - generic [ref=f3e15]:
+    - generic [ref=f3e16]:
+      - link "Cyrus CYRUS BEHEER" [ref=f3e17] [cursor=pointer]:
+        - /url: /admin
+        - img "Cyrus" [ref=f3e18]
+        - generic [ref=f3e19]: CYRUS BEHEER
+      - button "Menu openen" [ref=f3e20]
+    - complementary [ref=f3e24]:
+      - link "Cyrus CYRUS BEHEER" [ref=f3e26] [cursor=pointer]:
+        - /url: /
+        - img "Cyrus" [ref=f3e27]
+        - generic [ref=f3e28]: CYRUS BEHEER
+      - navigation [ref=f3e29]:
+        - link "Dashboard" [ref=f3e30] [cursor=pointer]:
+          - /url: /admin
+        - link "Afspraken" [ref=f3e31] [cursor=pointer]:
+          - /url: /admin/appointments
+        - link "Behandelingen" [ref=f3e32] [cursor=pointer]:
+          - /url: /admin/services
+        - link "Gebruikers" [ref=f3e33] [cursor=pointer]:
+          - /url: /admin/users
+        - link "Openingstijden" [ref=f3e34] [cursor=pointer]:
+          - /url: /admin/opening-hours
+      - generic [ref=f3e35]:
+        - generic [ref=f3e36]:
+          - generic [ref=f3e37]: Account
+          - generic [ref=f3e38]: Admin
+        - link "Mijn Profiel" [ref=f3e39] [cursor=pointer]:
+          - /url: /admin/profile
+      - button "Afmelden" [ref=f3e41]
+    - main [ref=f3e42]:
+      - heading "Gebruikersbeheer" [level=1] [ref=f3e43]
+      - generic [ref=f3e44]:
+        - heading "Maak Personeelsgebruiker" [level=2] [ref=f3e45]
+        - generic [ref=f3e46]:
+          - generic [ref=f3e47]:
+            - textbox "Weergavenaam" [ref=f3e48]:
+              - /placeholder: " "
+            - generic: Weergavenaam
+          - generic [ref=f3e49]:
+            - textbox "E-mail" [ref=f3e50]:
+              - /placeholder: " "
+            - generic: E-mail
+          - generic [ref=f3e51]:
+            - textbox "Wachtwoord" [ref=f3e52]:
+              - /placeholder: " "
+            - generic: Wachtwoord
+          - generic [ref=f3e53]:
+            - checkbox "Dit personeelslid is een barber" [ref=f3e54]
+            - generic [ref=f3e55]: Dit personeelslid is een barber
+          - button "Gebruiker Aanmaken" [ref=f3e57] [cursor=pointer]
+      - table [ref=f3e59]:
+        - rowgroup [ref=f3e60]:
+          - row [ref=f3e61]:
+            - columnheader "Naam" [ref=f3e62]
+            - columnheader "E-mail" [ref=f3e63]
+            - columnheader "Rol" [ref=f3e64]
+            - columnheader "Barber" [ref=f3e65]
+            - columnheader "Foto" [ref=f3e66]
+            - columnheader "Status" [ref=f3e67]
+            - columnheader "Acties" [ref=f3e68]
+        - rowgroup [ref=f3e96]:
+          - row [ref=f3e97]:
+            - cell [ref=f3e98]:
+              - textbox "Naam van Admin" [ref=f3e99]: Admin
+            - cell "gideonmkp98@gmail.com" [ref=f3e100]
+            - cell "owner" [ref=f3e101]
+            - cell "✓ Barber" [ref=f3e103]
+            - cell [ref=f3e105]:
+              - img "Admin" [ref=f3e106]
+            - cell "Actief" [ref=f3e107]
+            - cell [ref=f3e109]:
+              - button "Acties voor Admin" [ref=f3e111]
+          - row [ref=f3e130]:
+            - cell [ref=f3e114]:
+              - textbox "Naam van hnkie" [ref=f3e115]: hnkie
+            - cell "jwj@live.nl" [ref=f3e116]
+            - cell "Medewerker" [ref=f3e117]
+            - cell "✓ Barber" [ref=f3e119]
+            - cell [ref=f3e121]:
+              - img "hnkie" [ref=f3e122]
+            - cell "Actief" [ref=f3e123]
+            - cell [ref=f3e131]:
+              - generic [ref=f3e126]:
+                - button "Acties voor hnkie" [expanded] [active] [ref=f3e127]
+                - generic [ref=f3e133]:
+                  - button "Geen barber" [ref=f3e134]
+                  - button "Werktijden" [ref=f3e136]
+                  - button "Upload foto" [ref=f3e138]
+                  - button "Rol wijzigen" [ref=f3e140]
+                  - button "Deactiveren" [ref=f3e142]
+                  - button "Verwijderen" [ref=f3e145]
