@@ -15,6 +15,7 @@
     "db:seed": "tsx src/lib/server/db/seed.ts",
     "db:reset-admin-password": "tsx src/lib/server/db/reset-admin-password.ts",
     "test:email": "tsx scripts/test-email.ts",
+    "test:scheduling": "tsx --test src/lib/server/availability-slots.test.ts",
     "vercel-build": "node scripts/vercel-deploy.js && npm run build"
   },
   "type": "module",

@@ -356,38 +356,42 @@
   }
 
   // ── Availability ──
-  // Refetch when datum, behandeling of barber wijzigt zodat het tijdslot-grid
-  // de duration van de gekozen behandeling meeneemt. Zonder dit: 45 min
-  // service toont nog steeds 30 min grid → slot past niet → error bij submit.
+  // Recheck the complete treatment duration whenever the selection changes.
   let lastFetchKey = $state('');
   $effect(() => {
-    if (!appointmentDate) {
-      availableSlots = [];
-      return;
-    }
-    const key = `${appointmentDate}|${selectedServiceId ?? ''}|${selectedStaffId ?? ''}`;
+    const key = `${appointmentDate}|${selectedServiceId ?? ''}|${selectedStaffId ?? ''}|${selectedAddOnTotalDuration}`;
     if (key === lastFetchKey) return;
     lastFetchKey = key;
     fetchAvailability();
   });
 
+  let availabilityRequestId = 0;
   async function fetchAvailability() {
+    const requestId = ++availabilityRequestId;
+    appointmentTime = "";
+    availableSlots = [];
     if (!appointmentDate) {
       availableSlots = [];
+      loadingSlots = false;
       return;
     }
     loadingSlots = true;
     try {
       const staffIdParam = selectedStaffId !== null ? `&staffId=${selectedStaffId}` : '&allBarbers=true';
       const serviceIdParam = selectedServiceId !== null ? `&serviceId=${selectedServiceId}` : '';
-      const res = await fetch(`/api/availability?date=${appointmentDate}${staffIdParam}${serviceIdParam}`);
+      const service = treatmentServices.find((s) => s.id === selectedServiceId);
+      const duration = (service?.duration ?? 30) + selectedAddOnTotalDuration;
+      const res = await fetch(`/api/availability?date=${appointmentDate}${staffIdParam}${serviceIdParam}&duration=${duration}`);
+      if (requestId !== availabilityRequestId) return;
       if (res.ok) {
         const slotData = await res.json();
+        if (requestId !== availabilityRequestId) return;
         availableSlots = slotData.slots || [];
       } else {
         availableSlots = [];
       }
     } catch {
+      if (requestId !== availabilityRequestId) return;
       availableSlots = [];
     }
     loadingSlots = false;
