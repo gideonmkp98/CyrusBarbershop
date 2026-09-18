@@ -1,0 +1,80 @@
+- main [ref=f11e16]:
+  - generic [ref=f11e17]:
+    - complementary [ref=f11e18]:
+      - link "Cyrus CYRUS BEHEER" [ref=f11e20] [cursor=pointer]:
+        - /url: /
+        - img "Cyrus" [ref=f11e21]
+        - generic [ref=f11e22]: CYRUS BEHEER
+      - navigation [ref=f11e23]:
+        - link "Dashboard" [ref=f11e24] [cursor=pointer]:
+          - /url: /admin
+        - link "Afspraken" [ref=f11e25] [cursor=pointer]:
+          - /url: /admin/appointments
+        - link "Behandelingen" [ref=f11e26] [cursor=pointer]:
+          - /url: /admin/services
+        - link "Gebruikers" [ref=f11e27] [cursor=pointer]:
+          - /url: /admin/users
+        - link "Openingstijden" [ref=f11e28] [cursor=pointer]:
+          - /url: /admin/opening-hours
+      - generic [ref=f11e29]:
+        - generic [ref=f11e30]:
+          - generic [ref=f11e31]: Account
+          - generic [ref=f11e32]: Admin
+        - link "Mijn Profiel" [ref=f11e33] [cursor=pointer]:
+          - /url: /admin/profile
+      - button "Afmelden" [ref=f11e35]
+    - main [ref=f11e36]:
+      - generic [ref=f11e37]:
+        - generic [ref=f11e38]:
+          - heading "Afspraken" [level=1] [ref=f11e39]
+          - paragraph [ref=f11e40]: 5 totaal · 2 vandaag · 5 bevestigd
+        - generic [ref=f11e41]:
+          - generic [ref=f11e42]:
+            - button "Kalender" [ref=f11e43]
+            - button "Per persoon" [active] [ref=f11e44]
+            - button "Lijst" [ref=f11e45]
+          - button "+ Nieuwe Afspraak" [ref=f11e46]
+      - generic [ref=f11e47]:
+        - generic [ref=f11e48]:
+          - button "Alle" [ref=f11e49]
+          - button "Bevestigd" [ref=f11e50]
+          - button "Afgerond" [ref=f11e51]
+          - button "Geannuleerd" [ref=f11e52]
+          - button "Niet Verschenen" [ref=f11e53]
+        - generic [ref=f11e54]:
+          - combobox [ref=f11e55]:
+            - option "Alle barbers" [selected]
+            - option "Admin"
+            - option "hnkie"
+          - textbox "Zoek..." [ref=f11e56]
+      - generic [ref=f11e135]:
+        - generic [ref=f11e136]:
+          - button "Vorige" [ref=f11e137]: ←
+          - button "Vandaag" [ref=f11e138]
+          - button "Volgende" [ref=f11e139]: →
+        - generic [ref=f11e140]:
+          - generic [ref=f11e141]: 7 sep – 13 sep
+          - generic [ref=f11e142]:
+            - button "Week" [pressed] [ref=f11e143]
+            - button "Dag" [ref=f11e144]
+      - generic [ref=f11e147]:
+        - generic [ref=f11e148]:
+          - generic [ref=f11e149]:
+            - generic [ref=f11e150]: Admin
+            - generic [ref=f11e151]: "1"
+          - button "09:00 Bevestigd Test Klant A Haarknippen · 13-09-2026" [ref=f11e153]:
+            - generic [ref=f11e154]:
+              - generic [ref=f11e155]: 09:00
+              - generic [ref=f11e156]: Bevestigd
+            - generic [ref=f11e157]: Test Klant A
+            - generic [ref=f11e158]: Haarknippen · 13-09-2026
+        - generic [ref=f11e159]:
+          - generic [ref=f11e160]:
+            - generic [ref=f11e161]: hnkie
+            - generic [ref=f11e162]: "1"
+          - button "10:30 Bevestigd Test Klant B Haarknippen · 13-09-2026" [ref=f11e164]:
+            - generic [ref=f11e165]:
+              - generic [ref=f11e166]: 10:30
+              - generic [ref=f11e167]: Bevestigd
+            - generic [ref=f11e168]: Test Klant B
+            - generic [ref=f11e169]: Haarknippen · 13-09-2026

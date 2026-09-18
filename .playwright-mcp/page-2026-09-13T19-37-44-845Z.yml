@@ -1,0 +1,99 @@
+- generic [ref=f1e2]:
+  - main [ref=f1e14]:
+    - generic [ref=f1e15]:
+      - generic [ref=f1e16]:
+        - link "Cyrus CYRUS BEHEER" [ref=f1e17] [cursor=pointer]:
+          - /url: /admin
+          - img "Cyrus" [ref=f1e18]
+          - generic [ref=f1e19]: CYRUS BEHEER
+        - button "Menu openen" [ref=f1e20]
+      - complementary [ref=f1e24]:
+        - link "Cyrus CYRUS BEHEER" [ref=f1e26] [cursor=pointer]:
+          - /url: /
+          - img "Cyrus" [ref=f1e27]
+          - generic [ref=f1e28]: CYRUS BEHEER
+        - navigation [ref=f1e29]:
+          - link "Dashboard" [ref=f1e30] [cursor=pointer]:
+            - /url: /admin
+          - link "Afspraken" [ref=f1e31] [cursor=pointer]:
+            - /url: /admin/appointments
+          - link "Behandelingen" [ref=f1e32] [cursor=pointer]:
+            - /url: /admin/services
+          - link "Gebruikers" [ref=f1e33] [cursor=pointer]:
+            - /url: /admin/users
+          - link "Openingstijden" [ref=f1e34] [cursor=pointer]:
+            - /url: /admin/opening-hours
+        - generic [ref=f1e35]:
+          - generic [ref=f1e36]:
+            - generic [ref=f1e37]: Account
+            - generic [ref=f1e38]: Admin
+          - link "Mijn Profiel" [ref=f1e39] [cursor=pointer]:
+            - /url: /admin/profile
+        - button "Afmelden" [ref=f1e41]
+      - main [ref=f1e42]:
+        - generic [ref=f1e174]:
+          - generic [ref=f1e175]:
+            - heading "Afspraken" [level=1] [ref=f1e176]
+            - paragraph [ref=f1e177]: 0 totaal · 0 vandaag · 0 bevestigd
+          - generic [ref=f1e178]:
+            - generic [ref=f1e179]:
+              - button "Kalender" [ref=f1e180]
+              - button "Lijst" [ref=f1e181]
+            - button "+ Nieuwe Afspraak" [ref=f1e182]
+        - generic [ref=f1e183]:
+          - generic [ref=f1e184]:
+            - button "Alle" [ref=f1e185]
+            - button "Bevestigd" [ref=f1e186]
+            - button "Afgerond" [ref=f1e187]
+            - button "Geannuleerd" [ref=f1e188]
+            - button "Niet Verschenen" [ref=f1e189]
+          - generic [ref=f1e190]:
+            - combobox [ref=f1e191]:
+              - option "Alle barbers" [selected]
+              - option "Admin"
+              - option "hnkie"
+            - textbox "Zoek..." [ref=f1e192]
+        - generic [ref=f1e193]:
+          - generic [ref=f1e194]:
+            - generic [ref=f1e195]:
+              - button "←" [ref=f1e196]
+              - button "Vandaag" [ref=f1e197]
+              - button "→" [ref=f1e198]
+            - generic [ref=f1e199]: 7 sep – 13 sep
+          - generic [ref=f1e201]:
+            - generic [ref=f1e202]:
+              - generic [ref=f1e203]:
+                - generic [ref=f1e204]: Ma
+                - generic [ref=f1e205]: "7"
+              - generic [ref=f1e206]: Geen afspraken
+            - generic [ref=f1e208]:
+              - generic [ref=f1e209]:
+                - generic [ref=f1e210]: Di
+                - generic [ref=f1e211]: "8"
+              - generic [ref=f1e212]: Geen afspraken
+            - generic [ref=f1e214]:
+              - generic [ref=f1e215]:
+                - generic [ref=f1e216]: Wo
+                - generic [ref=f1e217]: "9"
+              - generic [ref=f1e218]: Geen afspraken
+            - generic [ref=f1e220]:
+              - generic [ref=f1e221]:
+                - generic [ref=f1e222]: Do
+                - generic [ref=f1e223]: "10"
+              - generic [ref=f1e224]: Geen afspraken
+            - generic [ref=f1e226]:
+              - generic [ref=f1e227]:
+                - generic [ref=f1e228]: Vr
+                - generic [ref=f1e229]: "11"
+              - generic [ref=f1e230]: Geen afspraken
+            - generic [ref=f1e232]:
+              - generic [ref=f1e233]:
+                - generic [ref=f1e234]: Za
+                - generic [ref=f1e235]: "12"
+              - generic [ref=f1e236]: Geen afspraken
+            - generic [ref=f1e238]:
+              - generic [ref=f1e239]:
+                - generic [ref=f1e240]: Zo
+                - generic [ref=f1e241]: "13"
+              - generic [ref=f1e242]: Geen afspraken
+  - generic [ref=f1e172]: Afspraken — Cyrus Beheer

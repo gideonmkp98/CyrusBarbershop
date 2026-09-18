@@ -1,19 +1,36 @@
 import { json } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
-import { appointments, appointmentAddOns, services, users } from '$lib/server/db/schema';
-import { appointmentSchema } from '$lib/utils/validation';
-import { eq, and, sql, desc, ne, isNull, inArray } from 'drizzle-orm';
+import { appointments, appointmentAddOns, services, staffTimeOff, users } from '$lib/server/db/schema';
+import { appointmentRescheduleSchema, appointmentSchema } from '$lib/utils/validation';
+import { eq, and, sql, desc } from 'drizzle-orm';
+import { appointmentStaffScope } from '$lib/server/appointment-scope';
+import { SchedulingError, formatDateKey, validateAppointmentConfiguration } from '$lib/server/scheduling';
 import type { RequestHandler } from './$types';
 
-/** Minuten vanaf een HH:MM tijdslot */
-function timeToMinutes(time: string): number {
-  const [h, m] = time.split(':').map(Number);
-  return h * 60 + m;
-}
+async function loadApprovedTimeOff(user: NonNullable<App.Locals['user']>, startDate?: string | null, endDate?: string | null) {
+  const conditions: any[] = [eq(staffTimeOff.status, 'approved')];
+  if (user.role === 'staff') conditions.push(eq(staffTimeOff.staffId, user.id));
+  if (startDate) conditions.push(sql`${staffTimeOff.endDate} >= ${startDate}`);
+  if (endDate) conditions.push(sql`${staffTimeOff.startDate} <= ${endDate}`);
 
-/** Twee tijdranges overlappen? */
-function hasOverlap(start1: number, end1: number, start2: number, end2: number): boolean {
-  return start1 < end2 && start2 < end1;
+  const rows = await db
+    .select({
+      id: staffTimeOff.id,
+      staffId: staffTimeOff.staffId,
+      startDate: staffTimeOff.startDate,
+      endDate: staffTimeOff.endDate,
+      reason: staffTimeOff.reason,
+      employeeName: users.displayName
+    })
+    .from(staffTimeOff)
+    .innerJoin(users, eq(staffTimeOff.staffId, users.id))
+    .where(and(...conditions));
+
+  return rows.map((entry) => ({
+    ...entry,
+    startDate: formatDateKey(entry.startDate),
+    endDate: formatDateKey(entry.endDate)
+  }));
 }
 
 export const POST: RequestHandler = async ({ request, locals }) => {
@@ -30,100 +47,21 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     }
 
     const { serviceId, staffId, date, timeSlot, clientName, clientEmail, clientPhone, notes, addOnIds } = parsed.data;
-    const appointmentDate = new Date(date + 'T00:00:00');
-
     // Staff may only create appointments assigned to themselves.
-    const assignedStaffId = locals.user.role === 'staff' ? locals.user.id : staffId;
+    const assignedStaffId = locals.user.role === 'staff' ? locals.user.id : staffId ?? null;
 
-    // Hoofdbehandeling ophalen
-    const serviceResult = await db
-      .select({ id: services.id, name: services.name, duration: services.duration, category: services.category, isActive: services.isActive })
-      .from(services)
-      .where(eq(services.id, serviceId))
-      .limit(1);
-
-    if (serviceResult.length === 0) {
-      return json({ error: 'Service niet gevonden' }, { status: 404 });
-    }
-
-    const bookedService = serviceResult[0];
-
-    // Barber-displaynaam ophalen voor client-side weergave
-    let barberName: string | null = null;
-    if (assignedStaffId) {
-      const staffResult = await db
-        .select({ displayName: users.displayName })
-        .from(users)
-        .where(eq(users.id, assignedStaffId))
-        .limit(1);
-      if (staffResult.length > 0) barberName = staffResult[0].displayName;
-    }
-
-    // Extras valideren (moeten category 'extra' en actief zijn)
-    let resolvedAddOns: { id: number; price: string; duration: number }[] = [];
-    if (addOnIds && addOnIds.length > 0) {
-      const uniqueIds = Array.from(new Set(addOnIds));
-      const addOnResults = await db
-        .select({ id: services.id, price: services.price, duration: services.duration, category: services.category, isActive: services.isActive })
-        .from(services)
-        .where(inArray(services.id, uniqueIds));
-
-      if (addOnResults.length !== uniqueIds.length) {
-        return json({ error: 'Eén of meer extra behandelingen bestaan niet' }, { status: 400 });
-      }
-
-      const invalid = addOnResults.filter(a => a.category !== 'extra' || !a.isActive);
-      if (invalid.length > 0) {
-        return json({ error: 'Geselecteerde extra\'s zijn niet beschikbaar' }, { status: 400 });
-      }
-
-      resolvedAddOns = addOnResults.map(a => ({ id: a.id, price: a.price, duration: a.duration }));
-    }
-
-    const addOnTotalDuration = resolvedAddOns.reduce((sum, a) => sum + a.duration, 0);
-    const totalDuration = bookedService.duration + addOnTotalDuration;
-    const newStart = timeToMinutes(timeSlot);
-    const newEnd = newStart + totalDuration;
-
-    // Overlap-check + insert in één transactie (voorkomt dubbele boekingen bij gelijktijdigheid)
-    let appointmentId: number;
-    try {
-      appointmentId = await db.transaction(async (tx) => {
-        const txConditions: any[] = [
-          sql`${appointments.date} = ${appointmentDate}`,
-          ne(appointments.status, 'cancelled')
-        ];
-
-        if (assignedStaffId) {
-          txConditions.push(eq(appointments.staffId, assignedStaffId));
-        } else {
-          txConditions.push(isNull(appointments.staffId));
-        }
-
-        const existing = await tx
-          .select({ id: appointments.id, timeSlot: appointments.timeSlot, serviceId: appointments.serviceId })
-          .from(appointments)
-          .where(and(...txConditions));
-
-        for (const appt of existing) {
-          const durResult = await tx
-            .select({ duration: services.duration })
-            .from(services)
-            .where(eq(services.id, appt.serviceId))
-            .limit(1);
-          const existingDuration = durResult.length > 0 ? durResult[0].duration : 30;
-          const existingStart = timeToMinutes(appt.timeSlot);
-          const existingEnd = existingStart + existingDuration;
-
-          if (hasOverlap(newStart, newEnd, existingStart, existingEnd)) {
-            throw new Error('OVERLAP');
-          }
-        }
-
-        const insertResult = await tx.insert(appointments).values({
+    const created = await db.transaction(async (tx) => {
+      const configuration = await validateAppointmentConfiguration(tx, {
+        serviceId,
+        staffId: assignedStaffId,
+        date,
+        timeSlot,
+        addOnIds
+      });
+      const insertResult = await tx.insert(appointments).values({
           serviceId,
-          staffId: assignedStaffId || null,
-          date: appointmentDate,
+          staffId: configuration.resolvedStaffId,
+          date: configuration.appointmentDate,
           timeSlot,
           clientName,
           clientEmail: clientEmail || '',
@@ -132,48 +70,41 @@ export const POST: RequestHandler = async ({ request, locals }) => {
           status: 'confirmed'
         });
 
-        const newAppointmentId = insertResult[0].insertId;
-
-        if (resolvedAddOns.length > 0) {
+      const appointmentId = insertResult[0].insertId;
+      if (configuration.addOns.length > 0) {
           await tx.insert(appointmentAddOns).values(
-            resolvedAddOns.map(a => ({
-              appointmentId: newAppointmentId,
-              serviceId: a.id,
-              price: a.price,
-              duration: a.duration
+          configuration.addOns.map((addOn: any) => ({
+              appointmentId,
+              serviceId: addOn.id,
+              price: addOn.price,
+              duration: addOn.duration
             }))
           );
-        }
-
-        return newAppointmentId;
-      });
-    } catch (txError: any) {
-      if (txError?.message === 'OVERLAP') {
-        return json({ error: 'Dit moment overlapt met een bestaande afspraak' }, { status: 409 });
       }
-      throw txError;
-    }
-
-    const dateStr = `${appointmentDate.getFullYear()}-${String(appointmentDate.getMonth() + 1).padStart(2, '0')}-${String(appointmentDate.getDate()).padStart(2, '0')}`;
+      return { appointmentId, configuration };
+    });
 
     return json({
       success: true,
-      id: appointmentId,
+      id: created.appointmentId,
       appointment: {
-        id: appointmentId,
-        date: dateStr,
+        id: created.appointmentId,
+        date,
         timeSlot,
         clientName,
         clientEmail: clientEmail || '',
         clientPhone: clientPhone || null,
-        serviceName: bookedService.name,
+        serviceName: created.configuration.service.name,
         status: 'confirmed',
-        barberName,
-        staffId: assignedStaffId || null,
+        barberName: created.configuration.barberName,
+        staffId: created.configuration.resolvedStaffId,
         serviceId
       }
     }, { status: 201 });
   } catch (error: any) {
+    if (error instanceof SchedulingError) {
+      return json({ error: error.message, code: error.code }, { status: error.status });
+    }
     console.error('Fout bij aanmaken afspraak:', error);
     return json({ error: 'Er is iets misgegaan bij het aanmaken van de afspraak' }, { status: 500 });
   }
@@ -186,6 +117,62 @@ export const PATCH: RequestHandler = async ({ request, locals }) => {
 
   try {
     const body = await request.json();
+
+    if (body.serviceId !== undefined || body.staffId !== undefined || body.date !== undefined || body.timeSlot !== undefined) {
+      if (locals.user.role === 'staff') {
+        return json({ error: 'Alleen owner en manager kunnen afspraken verplaatsen' }, { status: 403 });
+      }
+
+      const parsed = appointmentRescheduleSchema.safeParse({
+        ...body,
+        id: Number(body.id),
+        serviceId: Number(body.serviceId),
+        staffId: Number(body.staffId)
+      });
+      if (!parsed.success) {
+        return json({ error: parsed.error.issues[0]?.message || 'Ongeldige afspraakgegevens' }, { status: 400 });
+      }
+
+      const input = parsed.data;
+      const existing = await db.select({ id: appointments.id }).from(appointments).where(eq(appointments.id, input.id)).limit(1);
+      if (!existing[0]) return json({ error: 'Afspraak niet gevonden' }, { status: 404 });
+      const existingAddOns = await db
+        .select({ serviceId: appointmentAddOns.serviceId })
+        .from(appointmentAddOns)
+        .where(eq(appointmentAddOns.appointmentId, input.id));
+
+      const configuration = await db.transaction(async (tx) => {
+        const checked = await validateAppointmentConfiguration(tx, {
+          serviceId: input.serviceId,
+          staffId: input.staffId,
+          date: input.date,
+          timeSlot: input.timeSlot,
+          addOnIds: existingAddOns.map((row) => row.serviceId)
+        }, { excludeAppointmentId: input.id });
+
+        await tx.update(appointments).set({
+          serviceId: input.serviceId,
+          staffId: input.staffId,
+          date: checked.appointmentDate,
+          timeSlot: input.timeSlot
+        }).where(eq(appointments.id, input.id));
+        return checked;
+      });
+
+      return json({
+        success: true,
+        appointment: {
+          id: input.id,
+          serviceId: input.serviceId,
+          serviceName: configuration.service.name,
+          staffId: input.staffId,
+          barberName: configuration.barberName,
+          date: input.date,
+          timeSlot: input.timeSlot
+        }
+      });
+    }
+
     const { id, status } = body as { id?: unknown; status?: 'completed' | 'cancelled' | 'no_show' };
 
     if (
@@ -219,6 +206,9 @@ export const PATCH: RequestHandler = async ({ request, locals }) => {
     await db.update(appointments).set({ status }).where(eq(appointments.id, appointmentId));
     return json({ success: true });
   } catch (error: any) {
+    if (error instanceof SchedulingError) {
+      return json({ error: error.message, code: error.code }, { status: error.status });
+    }
     console.error('Fout bij bijwerken status:', error);
     return json({ error: 'Er is iets misgegaan bij het bijwerken van de status' }, { status: 500 });
   }
@@ -230,10 +220,30 @@ export const GET: RequestHandler = async ({ url, locals }) => {
   }
 
   try {
+    const appointmentIdParam = url.searchParams.get('id');
     const startDate = url.searchParams.get('startDate');
     const endDate = url.searchParams.get('endDate');
     const cursor = url.searchParams.get('cursor');
     const limit = parseInt(url.searchParams.get('limit') || '50', 10);
+
+    if (appointmentIdParam) {
+      const appointmentId = parseInt(appointmentIdParam, 10);
+      if (!appointmentId) return json({ error: 'Ongeldig ID' }, { status: 400 });
+      const rows = await db
+        .select({ staffId: appointments.staffId })
+        .from(appointments)
+        .where(eq(appointments.id, appointmentId))
+        .limit(1);
+      if (!rows[0]) return json({ error: 'Afspraak niet gevonden' }, { status: 404 });
+      if (locals.user.role === 'staff' && rows[0].staffId !== locals.user.id) {
+        return json({ error: 'Geen toegang tot deze afspraak' }, { status: 403 });
+      }
+      const addOns = await db
+        .select({ serviceId: appointmentAddOns.serviceId, duration: appointmentAddOns.duration })
+        .from(appointmentAddOns)
+        .where(eq(appointmentAddOns.appointmentId, appointmentId));
+      return json({ addOns, addOnDuration: addOns.reduce((sum, addOn) => sum + addOn.duration, 0) });
+    }
 
     // If date range provided, return appointments in that range
     if (startDate || endDate) {
@@ -241,7 +251,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
       const endCond = endDate ? sql`${appointments.date} <= ${endDate}` : undefined;
       const dateWhere = startCond && endCond ? and(startCond, endCond) : startCond || endCond;
       // Staff are scoped to their own appointments only.
-      const staffScope = locals.user.role === 'staff' ? eq(appointments.staffId, locals.user.id) : undefined;
+      const staffScope = appointmentStaffScope(locals.user);
       const whereClause = dateWhere && staffScope
         ? and(dateWhere, staffScope)
         : dateWhere || staffScope;
@@ -283,14 +293,15 @@ export const GET: RequestHandler = async ({ url, locals }) => {
         nextCursor = lastItem ? String(lastItem.id) : null;
       }
 
-      return json({ appointments: formatted, hasMore, nextCursor });
+      const timeOff = await loadApprovedTimeOff(locals.user, startDate, endDate);
+      return json({ appointments: formatted, timeOff, hasMore, nextCursor });
     }
 
     // Cursor-based pagination for infinite scroll
     if (cursor) {
       const cursorId = parseInt(cursor, 10);
       const cursorCond = cursorId ? sql`${appointments.id} < ${cursorId}` : undefined;
-      const staffScope = locals.user.role === 'staff' ? eq(appointments.staffId, locals.user.id) : undefined;
+      const staffScope = appointmentStaffScope(locals.user);
       const whereClause = cursorCond && staffScope
         ? and(cursorCond, staffScope)
         : cursorCond || staffScope;

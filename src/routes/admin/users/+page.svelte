@@ -40,6 +40,21 @@
   let success = $state('');
   let userSaveStatus = $state<Record<number, 'success' | 'error' | null>>({});
   let openActionMenuId = $state<number | null>(null);
+  // Fixed positioning keeps the actions menu visible even when the table
+  // sits inside a horizontally scrollable container on small screens.
+  let actionMenuPos = $state({ top: 0, right: 0 });
+
+  function toggleActionMenu(id: number, e: MouseEvent) {
+    if (openActionMenuId === id) {
+      openActionMenuId = null;
+      return;
+    }
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    const right = Math.max(8, window.innerWidth - rect.right);
+    const top = Math.max(8, Math.min(rect.bottom + 4, window.innerHeight - 340));
+    actionMenuPos = { top, right };
+    openActionMenuId = id;
+  }
 
   // Delete confirmation modal state
   let showDeleteModal = $state(false);
@@ -560,8 +575,8 @@
   </div>
 
   <!-- User list -->
-  <div class="bg-surface-base border border-white/5 overflow-visible">
-    <table class="w-full text-sm">
+  <div class="bg-surface-base border border-white/5 overflow-x-auto" onscroll={() => openActionMenuId = null}>
+    <table class="w-full text-sm min-w-[860px]">
       <thead>
         <tr class="border-b border-white/5">
           <th class="text-left p-4 font-body text-label text-bone-muted">Naam</th>
@@ -626,13 +641,16 @@
                     class="p-1.5 rounded hover:bg-white/5 transition-colors text-bone-muted hover:text-bone"
                     aria-label="Acties voor {user.displayName}"
                     aria-expanded={openActionMenuId === user.id}
-                    onclick={() => openActionMenuId = openActionMenuId === user.id ? null : user.id}
+                    onclick={(e) => toggleActionMenu(user.id, e)}
                   >
                     <MoreVertical size={18} />
                   </button>
 
                   {#if openActionMenuId === user.id}
-                    <div class="absolute right-0 top-9 z-30 w-56 border border-white/10 bg-surface-base shadow-2xl">
+                    <div
+                      class="fixed z-50 w-56 max-h-[70vh] overflow-y-auto border border-white/10 bg-surface-base shadow-2xl"
+                      style="top: {actionMenuPos.top}px; right: {actionMenuPos.right}px;"
+                    >
                       <div class="py-2">
                         <button
                           type="button"
@@ -710,8 +728,8 @@
 
   <!-- Avatar Upload Modal -->
   {#if showAvatarModal}
-    <div class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 w-full" role="button" tabindex="0" aria-label="Modal sluiten" onclick={closeAvatarModal} onkeydown={(e) => e.key === 'Enter' && closeAvatarModal()}>
-      <div class="bg-surface-base p-8 rounded-lg border border-white/10 max-w-lg w-full mx-6 shadow-2xl" onclick={e => e.stopPropagation()} onkeydown={(e) => e.key === 'Escape' && closeAvatarModal()} role="dialog" aria-modal="true" tabindex="-1">
+    <div class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 w-full p-4" role="button" tabindex="0" aria-label="Modal sluiten" onclick={closeAvatarModal} onkeydown={(e) => e.key === 'Enter' && closeAvatarModal()}>
+      <div class="bg-surface-base p-5 sm:p-8 rounded-lg border border-white/10 max-w-lg w-full shadow-2xl max-h-[90vh] overflow-y-auto" onclick={e => e.stopPropagation()} onkeydown={(e) => e.key === 'Escape' && closeAvatarModal()} role="dialog" aria-modal="true" tabindex="-1">
         <div class="text-center mb-6">
           <div class="w-16 h-16 rounded-full bg-gold-500/10 flex items-center justify-center mx-auto mb-4 overflow-hidden border border-white/10">
             {#if userToUploadAvatar?.imageUrl}
@@ -777,8 +795,8 @@
 
   <!-- Role Change Modal -->
   {#if showRoleModal}
-    <div class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 w-full" role="button" tabindex="0" aria-label="Modal sluiten" onclick={closeRoleModal} onkeydown={(e) => e.key === 'Enter' && closeRoleModal()}>
-      <div class="bg-surface-base p-8 rounded-lg border border-white/10 max-w-md w-full mx-6 shadow-2xl" onclick={e => e.stopPropagation()} onkeydown={(e) => e.key === 'Escape' && closeRoleModal()} role="dialog" aria-modal="true" tabindex="-1">
+    <div class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 w-full p-4" role="button" tabindex="0" aria-label="Modal sluiten" onclick={closeRoleModal} onkeydown={(e) => e.key === 'Enter' && closeRoleModal()}>
+      <div class="bg-surface-base p-5 sm:p-8 rounded-lg border border-white/10 max-w-md w-full shadow-2xl max-h-[90vh] overflow-y-auto" onclick={e => e.stopPropagation()} onkeydown={(e) => e.key === 'Escape' && closeRoleModal()} role="dialog" aria-modal="true" tabindex="-1">
         <div class="text-center mb-6">
           <div class="w-16 h-16 rounded-full bg-gold-500/10 flex items-center justify-center mx-auto mb-4">
             <UserCog class="text-gold-500" size={32} />
@@ -824,8 +842,8 @@
 
   <!-- Delete Confirmation Modal -->
   {#if showDeleteModal}
-    <div class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 w-full" role="button" tabindex="0" aria-label="Modal sluiten" onclick={closeDeleteModal} onkeydown={(e) => e.key === 'Enter' && closeDeleteModal()}>
-      <div class="bg-surface-base p-8 rounded-lg border border-white/10 max-w-md w-full mx-6 shadow-2xl" onclick={e => e.stopPropagation()} onkeydown={(e) => e.key === 'Escape' && closeDeleteModal()} role="dialog" aria-modal="true" tabindex="-1">
+    <div class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 w-full p-4" role="button" tabindex="0" aria-label="Modal sluiten" onclick={closeDeleteModal} onkeydown={(e) => e.key === 'Enter' && closeDeleteModal()}>
+      <div class="bg-surface-base p-5 sm:p-8 rounded-lg border border-white/10 max-w-md w-full shadow-2xl max-h-[90vh] overflow-y-auto" onclick={e => e.stopPropagation()} onkeydown={(e) => e.key === 'Escape' && closeDeleteModal()} role="dialog" aria-modal="true" tabindex="-1">
         <div class="text-center mb-6">
           <div class="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-4">
             <span class="text-red-400 text-3xl">!</span>
@@ -855,8 +873,8 @@
 
   <!-- Schedule Modal -->
   {#if showScheduleModal}
-    <div class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 w-full" role="button" tabindex="0" aria-label="Modal sluiten" onclick={closeScheduleModal} onkeydown={(e) => e.key === 'Enter' && closeScheduleModal()}>
-      <div class="bg-surface-base p-8 rounded-lg border border-white/10 max-w-2xl w-full mx-6 shadow-2xl max-h-[90vh] overflow-y-auto" onclick={e => e.stopPropagation()} onkeydown={(e) => e.key === 'Escape' && closeScheduleModal()} role="dialog" aria-modal="true" tabindex="-1">
+    <div class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 w-full p-4" role="button" tabindex="0" aria-label="Modal sluiten" onclick={closeScheduleModal} onkeydown={(e) => e.key === 'Enter' && closeScheduleModal()}>
+      <div class="bg-surface-base p-5 sm:p-8 rounded-lg border border-white/10 max-w-2xl w-full shadow-2xl max-h-[90vh] overflow-y-auto" onclick={e => e.stopPropagation()} onkeydown={(e) => e.key === 'Escape' && closeScheduleModal()} role="dialog" aria-modal="true" tabindex="-1">
         <div class="text-center mb-6">
           <h3 class="font-display text-subheading text-bone mb-2">Werktijden: {userToEditSchedule?.displayName}</h3>
           <p class="font-body text-sm text-bone-muted">Wijzigingen worden automatisch opgeslagen. Deze tijden moeten binnen de openingstijden van de zaak vallen.</p>
@@ -873,7 +891,7 @@
               {@const dayOfWeek = i + 1}
               {@const sched = getSchedule(dayOfWeek)}
               {@const hours = businessHours[dayOfWeek]}
-              <div class="flex items-center gap-3 p-3 bg-surface-low border border-white/5 rounded">
+              <div class="flex flex-wrap items-center gap-3 p-3 bg-surface-low border border-white/5 rounded">
                 <span class="w-8 font-body text-sm text-bone">{day}</span>
                 <button
                   onclick={() => toggleUserSchedule(dayOfWeek)}
@@ -882,7 +900,7 @@
                 >
                   <span class="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-surface transition-transform {sched.isActive ? 'translate-x-6' : 'translate-x-0'}"></span>
                 </button>
-                <div class="flex items-center gap-2 flex-1">
+                <div class="flex items-center gap-2 flex-1 min-w-[220px]">
                   <input
                     type="time"
                     id="open_{dayOfWeek}"

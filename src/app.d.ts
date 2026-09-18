@@ -10,6 +10,7 @@ declare global {
         imageUrl?: string | null;
         role: 'owner' | 'manager' | 'staff';
         isActive: boolean;
+        isBarber: boolean;
       };
     }
   }

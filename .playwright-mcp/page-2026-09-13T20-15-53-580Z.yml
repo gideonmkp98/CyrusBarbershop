@@ -1,0 +1,221 @@
+- generic [ref=f4e2]:
+  - banner [ref=f4e5]:
+    - navigation [ref=f4e6]:
+      - link [ref=f4e7] [cursor=pointer]:
+        - /url: /
+        - img "Cyrus Barbershop" [ref=f4e8]
+      - generic [ref=f4e9]:
+        - link "Home" [ref=f4e10] [cursor=pointer]:
+          - /url: /
+        - link "Behandelingen" [ref=f4e11] [cursor=pointer]:
+          - /url: /services
+        - link "Over" [ref=f4e12] [cursor=pointer]:
+          - /url: /about
+        - link "Contact" [ref=f4e13] [cursor=pointer]:
+          - /url: /contact
+      - link "Maak een Afspraak" [ref=f4e15] [cursor=pointer]:
+        - /url: /booking
+  - main [ref=f4e16]:
+    - generic [ref=f4e17]:
+      - complementary [ref=f4e18]:
+        - link "Cyrus CYRUS BEHEER" [ref=f4e20] [cursor=pointer]:
+          - /url: /
+          - img "Cyrus" [ref=f4e21]
+          - generic [ref=f4e22]: CYRUS BEHEER
+        - navigation [ref=f4e23]:
+          - link "Dashboard" [ref=f4e24] [cursor=pointer]:
+            - /url: /admin
+          - link "Afspraken" [ref=f4e25] [cursor=pointer]:
+            - /url: /admin/appointments
+          - link "Behandelingen" [ref=f4e26] [cursor=pointer]:
+            - /url: /admin/services
+          - link "Gebruikers" [ref=f4e27] [cursor=pointer]:
+            - /url: /admin/users
+          - link "Openingstijden" [ref=f4e28] [cursor=pointer]:
+            - /url: /admin/opening-hours
+        - generic [ref=f4e29]:
+          - generic [ref=f4e30]:
+            - generic [ref=f4e31]: Account
+            - generic [ref=f4e32]: Admin
+          - link "Mijn Profiel" [ref=f4e33] [cursor=pointer]:
+            - /url: /admin/profile
+        - button "Afmelden" [ref=f4e35]
+      - main [ref=f4e36]:
+        - generic [ref=f4e37]:
+          - generic [ref=f4e38]:
+            - generic [ref=f4e40]:
+              - generic [ref=f4e41]:
+                - text: DASHBOARD
+                - heading "Planning" [level=1] [ref=f4e42]
+                - paragraph [ref=f4e43]: Een rustig overzicht van de komende afspraken.
+              - generic [ref=f4e44]:
+                - generic [ref=f4e45]:
+                  - text: Vandaag
+                  - strong [ref=f4e46]: "4"
+                - generic [ref=f4e47]:
+                  - text: Komende 7 dagen
+                  - strong [ref=f4e48]: "5"
+                - generic [ref=f4e49]:
+                  - text: Geselecteerde dag
+                  - strong [ref=f4e50]: "4"
+            - complementary [ref=f4e51]:
+              - generic [ref=f4e52]:
+                - generic [ref=f4e54]:
+                  - text: VOLGENDE AFSPRAAK
+                  - heading "09:00" [level=2] [ref=f4e56]
+                  - paragraph [ref=f4e57]: Klant A
+                  - paragraph [ref=f4e58]: Haarknippen - 45 min
+                  - paragraph [ref=f4e59]: "Barber: Admin"
+                - generic [ref=f4e63]:
+                  - button "Afronden" [ref=f4e64]
+                  - button "No-show" [ref=f4e67]
+              - generic [ref=f4e73]:
+                - text: DAGSTATUS
+                - generic [ref=f4e74]:
+                  - generic [ref=f4e75]:
+                    - text: Bevestigd
+                    - strong [ref=f4e76]: "4"
+                  - generic [ref=f4e77]:
+                    - text: Afgerond
+                    - strong [ref=f4e78]: "0"
+          - generic [ref=f4e79]:
+            - generic [ref=f4e80]:
+              - generic [ref=f4e81]:
+                - text: 7-DAAGSE RADAR
+                - heading "Afspraken per dag" [level=2] [ref=f4e82]
+              - generic [ref=f4e83]:
+                - button "Vandaag 13-09 4" [ref=f4e84]:
+                  - generic [ref=f4e85]:
+                    - generic [ref=f4e86]: Vandaag
+                    - generic [ref=f4e87]: 13-09
+                  - generic [ref=f4e88]: "4"
+                - button "Maandag 14-09 1" [ref=f4e92]:
+                  - generic [ref=f4e93]:
+                    - generic [ref=f4e94]: Maandag
+                    - generic [ref=f4e95]: 14-09
+                  - generic [ref=f4e96]: "1"
+                - button "Dinsdag 15-09 0" [ref=f4e100]:
+                  - generic [ref=f4e101]:
+                    - generic [ref=f4e102]: Dinsdag
+                    - generic [ref=f4e103]: 15-09
+                  - generic [ref=f4e104]: "0"
+                - button "Woensdag 16-09 0" [ref=f4e107]:
+                  - generic [ref=f4e108]:
+                    - generic [ref=f4e109]: Woensdag
+                    - generic [ref=f4e110]: 16-09
+                  - generic [ref=f4e111]: "0"
+                - button "Donderdag 17-09 0" [ref=f4e114]:
+                  - generic [ref=f4e115]:
+                    - generic [ref=f4e116]: Donderdag
+                    - generic [ref=f4e117]: 17-09
+                  - generic [ref=f4e118]: "0"
+                - button "Vrijdag 18-09 0" [ref=f4e121]:
+                  - generic [ref=f4e122]:
+                    - generic [ref=f4e123]: Vrijdag
+                    - generic [ref=f4e124]: 18-09
+                  - generic [ref=f4e125]: "0"
+                - button "Zaterdag 19-09 0" [ref=f4e128]:
+                  - generic [ref=f4e129]:
+                    - generic [ref=f4e130]: Zaterdag
+                    - generic [ref=f4e131]: 19-09
+                  - generic [ref=f4e132]: "0"
+            - generic [ref=f4e135]:
+              - generic [ref=f4e137]:
+                - generic [ref=f4e138]:
+                  - text: DAGPLANNING
+                  - heading "Planning van vandaag" [level=2] [ref=f4e139]
+                - generic [ref=f4e140]:
+                  - generic [ref=f4e141]:
+                    - button "Alles" [pressed] [ref=f4e142]
+                    - button "Mijn afspraken" [ref=f4e143]
+                  - textbox "Zoek klant, service..." [ref=f4e148]
+                  - combobox [ref=f4e149]:
+                    - option "Alles" [selected]
+                    - option "Bevestigd"
+                    - option "Afgerond"
+                    - option "Geannuleerd"
+                    - option "Niet verschenen"
+              - generic [ref=f4e150]:
+                - article [ref=f4e151]:
+                  - generic [ref=f4e152]:
+                    - text: 09:00
+                    - generic [ref=f4e153]: 45 min
+                  - generic [ref=f4e154]:
+                    - generic [ref=f4e155]:
+                      - heading "Klant A" [level=3] [ref=f4e156]
+                      - generic [ref=f4e157]: Bevestigd
+                    - paragraph [ref=f4e158]: Haarknippen - Admin
+                  - generic [ref=f4e159]:
+                    - button "Klaar" [ref=f4e160]
+                    - button "No-show" [ref=f4e163]
+                    - button "Annuleer" [ref=f4e169]
+                - article [ref=f4e173]:
+                  - generic [ref=f4e174]:
+                    - text: 09:30
+                    - generic [ref=f4e175]: 45 min
+                  - generic [ref=f4e176]:
+                    - generic [ref=f4e177]:
+                      - heading "Klant B" [level=3] [ref=f4e178]
+                      - generic [ref=f4e179]: Bevestigd
+                    - paragraph [ref=f4e180]: Haarknippen - hnkie
+                  - generic [ref=f4e181]:
+                    - button "Klaar" [ref=f4e182]
+                    - button "No-show" [ref=f4e185]
+                    - button "Annuleer" [ref=f4e191]
+                - article [ref=f4e195]:
+                  - generic [ref=f4e196]:
+                    - text: 10:30
+                    - generic [ref=f4e197]: 45 min
+                  - generic [ref=f4e198]:
+                    - generic [ref=f4e199]:
+                      - heading "Klant C" [level=3] [ref=f4e200]
+                      - generic [ref=f4e201]: Bevestigd
+                    - paragraph [ref=f4e202]: Haarknippen - Admin
+                  - generic [ref=f4e203]:
+                    - button "Klaar" [ref=f4e204]
+                    - button "No-show" [ref=f4e207]
+                    - button "Annuleer" [ref=f4e213]
+                - article [ref=f4e217]:
+                  - generic [ref=f4e218]:
+                    - text: 11:00
+                    - generic [ref=f4e219]: 45 min
+                  - generic [ref=f4e220]:
+                    - generic [ref=f4e221]:
+                      - heading "GeenVoorkeur Klant" [level=3] [ref=f4e222]
+                      - generic [ref=f4e223]: Bevestigd
+                    - paragraph [ref=f4e224]: Haarknippen
+                  - generic [ref=f4e225]:
+                    - button "Klaar" [ref=f4e226]
+                    - button "No-show" [ref=f4e229]
+                    - button "Annuleer" [ref=f4e235]
+  - contentinfo [ref=f4e239]:
+    - generic [ref=f4e240]:
+      - generic [ref=f4e241]:
+        - generic [ref=f4e242]:
+          - generic [ref=f4e243]:
+            - img "Cyrus Barbershop" [ref=f4e244]
+            - generic [ref=f4e245]: CYRUS BARBERSHOP
+          - paragraph [ref=f4e246]: © 2025 CYRUS BARBERSHOP.
+        - generic [ref=f4e247]:
+          - generic [ref=f4e248]:
+            - generic [ref=f4e249]: OPENINGSTIJDEN
+            - 'link "Ma – Zo: Gesloten" [ref=f4e250] [cursor=pointer]':
+              - /url: /contact
+          - generic [ref=f4e251]:
+            - generic [ref=f4e252]: CONTACT
+            - link "Locatie" [ref=f4e253] [cursor=pointer]:
+              - /url: /contact
+            - link "Maak een afspraak" [ref=f4e254] [cursor=pointer]:
+              - /url: /booking
+            - link "Voorwaarden" [ref=f4e255] [cursor=pointer]:
+              - /url: /voorwaarden
+            - link "Privacyverklaring" [ref=f4e256] [cursor=pointer]:
+              - /url: /privacy
+          - generic [ref=f4e257]:
+            - generic [ref=f4e258]: SOCIALS
+            - link "Instagram" [ref=f4e260] [cursor=pointer]:
+              - /url: https://www.instagram.com/cyrusbarbershop/
+      - paragraph [ref=f4e264]:
+        - text: Website ontwikkeld door
+        - link "Studio NZ" [ref=f4e265] [cursor=pointer]:
+          - /url: https://studionz.nl/

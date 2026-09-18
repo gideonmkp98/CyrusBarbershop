@@ -1,0 +1,139 @@
+- generic [ref=f17e2]:
+  - banner [ref=f17e5]:
+    - navigation [ref=f17e6]:
+      - link [ref=f17e7] [cursor=pointer]:
+        - /url: /
+        - img "Cyrus Barbershop" [ref=f17e8]
+      - generic [ref=f17e9]:
+        - link "Maak een Afspraak" [ref=f17e10] [cursor=pointer]:
+          - /url: /booking
+        - button "Toggle menu" [ref=f17e11]
+  - main [ref=f17e15]:
+    - generic [ref=f17e16]:
+      - generic [ref=f17e17]:
+        - link "Cyrus CYRUS BEHEER" [ref=f17e18] [cursor=pointer]:
+          - /url: /admin
+          - img "Cyrus" [ref=f17e19]
+          - generic [ref=f17e20]: CYRUS BEHEER
+        - button "Menu openen" [ref=f17e21]
+      - complementary [ref=f17e25]:
+        - link "Cyrus CYRUS BEHEER" [ref=f17e27] [cursor=pointer]:
+          - /url: /
+          - img "Cyrus" [ref=f17e28]
+          - generic [ref=f17e29]: CYRUS BEHEER
+        - navigation [ref=f17e30]:
+          - link "Dashboard" [ref=f17e31] [cursor=pointer]:
+            - /url: /admin
+          - link "Afspraken" [ref=f17e32] [cursor=pointer]:
+            - /url: /admin/appointments
+          - link "Behandelingen" [ref=f17e33] [cursor=pointer]:
+            - /url: /admin/services
+          - link "Gebruikers" [ref=f17e34] [cursor=pointer]:
+            - /url: /admin/users
+          - link "Openingstijden" [ref=f17e35] [cursor=pointer]:
+            - /url: /admin/opening-hours
+        - generic [ref=f17e36]:
+          - generic [ref=f17e37]:
+            - generic [ref=f17e38]: Account
+            - generic [ref=f17e39]: Admin
+          - link "Mijn Profiel" [ref=f17e40] [cursor=pointer]:
+            - /url: /admin/profile
+        - button "Afmelden" [ref=f17e42]
+      - main [ref=f17e43]:
+        - generic [ref=f17e44]:
+          - generic [ref=f17e45]:
+            - heading "Afspraken" [level=1] [ref=f17e46]
+            - paragraph [ref=f17e47]: 0 totaal · 0 vandaag · 0 bevestigd
+          - generic [ref=f17e48]:
+            - generic [ref=f17e49]:
+              - button "Kalender" [ref=f17e50]
+              - button "Per persoon" [ref=f17e51]
+              - button "Lijst" [ref=f17e52]
+            - button "+ Nieuwe Afspraak" [ref=f17e53]
+        - generic [ref=f17e54]:
+          - generic [ref=f17e55]:
+            - button "Alle" [ref=f17e56]
+            - button "Bevestigd" [ref=f17e57]
+            - button "Afgerond" [ref=f17e58]
+            - button "Geannuleerd" [ref=f17e59]
+            - button "Niet Verschenen" [ref=f17e60]
+          - generic [ref=f17e61]:
+            - combobox [ref=f17e62]:
+              - option "Alle barbers" [selected]
+              - option "Admin"
+              - option "hnkie"
+            - textbox "Zoek..." [ref=f17e63]
+        - generic [ref=f17e64]:
+          - generic [ref=f17e65]:
+            - generic [ref=f17e66]:
+              - button "←" [ref=f17e67]
+              - button "Vandaag" [ref=f17e68]
+              - button "→" [ref=f17e69]
+            - generic [ref=f17e70]: 7 sep – 13 sep
+          - generic [ref=f17e72]:
+            - generic [ref=f17e73]:
+              - generic [ref=f17e74]:
+                - generic [ref=f17e75]: Ma
+                - generic [ref=f17e76]: "7"
+              - generic [ref=f17e77]: Geen afspraken
+            - generic [ref=f17e79]:
+              - generic [ref=f17e80]:
+                - generic [ref=f17e81]: Di
+                - generic [ref=f17e82]: "8"
+              - generic [ref=f17e83]: Geen afspraken
+            - generic [ref=f17e85]:
+              - generic [ref=f17e86]:
+                - generic [ref=f17e87]: Wo
+                - generic [ref=f17e88]: "9"
+              - generic [ref=f17e89]: Geen afspraken
+            - generic [ref=f17e91]:
+              - generic [ref=f17e92]:
+                - generic [ref=f17e93]: Do
+                - generic [ref=f17e94]: "10"
+              - generic [ref=f17e95]: Geen afspraken
+            - generic [ref=f17e97]:
+              - generic [ref=f17e98]:
+                - generic [ref=f17e99]: Vr
+                - generic [ref=f17e100]: "11"
+              - generic [ref=f17e101]: Geen afspraken
+            - generic [ref=f17e103]:
+              - generic [ref=f17e104]:
+                - generic [ref=f17e105]: Za
+                - generic [ref=f17e106]: "12"
+              - generic [ref=f17e107]: Geen afspraken
+            - generic [ref=f17e109]:
+              - generic [ref=f17e110]:
+                - generic [ref=f17e111]: Zo
+                - generic [ref=f17e112]: "13"
+              - generic [ref=f17e113]: Geen afspraken
+  - contentinfo [ref=f17e115]:
+    - generic [ref=f17e116]:
+      - generic [ref=f17e117]:
+        - generic [ref=f17e118]:
+          - generic [ref=f17e119]:
+            - img "Cyrus Barbershop" [ref=f17e120]
+            - generic [ref=f17e121]: CYRUS BARBERSHOP
+          - paragraph [ref=f17e122]: © 2025 CYRUS BARBERSHOP.
+        - generic [ref=f17e123]:
+          - generic [ref=f17e124]:
+            - generic [ref=f17e125]: OPENINGSTIJDEN
+            - 'link "Ma – Zo: Gesloten" [ref=f17e126] [cursor=pointer]':
+              - /url: /contact
+          - generic [ref=f17e127]:
+            - generic [ref=f17e128]: CONTACT
+            - link "Locatie" [ref=f17e129] [cursor=pointer]:
+              - /url: /contact
+            - link "Maak een afspraak" [ref=f17e130] [cursor=pointer]:
+              - /url: /booking
+            - link "Voorwaarden" [ref=f17e131] [cursor=pointer]:
+              - /url: /voorwaarden
+            - link "Privacyverklaring" [ref=f17e132] [cursor=pointer]:
+              - /url: /privacy
+          - generic [ref=f17e133]:
+            - generic [ref=f17e134]: SOCIALS
+            - link "Instagram" [ref=f17e136] [cursor=pointer]:
+              - /url: https://www.instagram.com/cyrusbarbershop/
+      - paragraph [ref=f17e140]:
+        - text: Website ontwikkeld door
+        - link "Studio NZ" [ref=f17e141] [cursor=pointer]:
+          - /url: https://studionz.nl/

@@ -1,0 +1,165 @@
+- generic [ref=e2]:
+  - banner [ref=e5]:
+    - navigation [ref=e6]:
+      - link [ref=e7] [cursor=pointer]:
+        - /url: /
+        - img "Cyrus Barbershop" [ref=e8]
+      - generic [ref=e9]:
+        - link "Home" [ref=e10] [cursor=pointer]:
+          - /url: /
+        - link "Behandelingen" [ref=e11] [cursor=pointer]:
+          - /url: /services
+        - link "Over" [ref=e12] [cursor=pointer]:
+          - /url: /about
+        - link "Contact" [ref=e13] [cursor=pointer]:
+          - /url: /contact
+      - link "Maak een Afspraak" [ref=e15] [cursor=pointer]:
+        - /url: /booking
+  - main [ref=e16]:
+    - generic [ref=e17]:
+      - complementary [ref=e18]:
+        - link "Cyrus CYRUS BEHEER" [ref=e20] [cursor=pointer]:
+          - /url: /
+          - img "Cyrus" [ref=e21]
+          - generic [ref=e22]: CYRUS BEHEER
+        - navigation [ref=e23]:
+          - link "Dashboard" [ref=e24] [cursor=pointer]:
+            - /url: /admin
+          - link "Afspraken" [ref=e25] [cursor=pointer]:
+            - /url: /admin/appointments
+          - link "Behandelingen" [ref=e26] [cursor=pointer]:
+            - /url: /admin/services
+          - link "Gebruikers" [ref=e27] [cursor=pointer]:
+            - /url: /admin/users
+          - link "Openingstijden" [ref=e28] [cursor=pointer]:
+            - /url: /admin/opening-hours
+        - generic [ref=e29]:
+          - generic [ref=e30]:
+            - generic [ref=e31]: Account
+            - generic [ref=e32]: Admin
+          - link "Mijn Profiel" [ref=e33] [cursor=pointer]:
+            - /url: /admin/profile
+        - button "Afmelden" [ref=e35]
+      - main [ref=e36]:
+        - generic [ref=e37]:
+          - generic [ref=e38]:
+            - generic [ref=e40]:
+              - generic [ref=e41]:
+                - text: DASHBOARD
+                - heading "Planning" [level=1] [ref=e42]
+                - paragraph [ref=e43]: Een rustig overzicht van de komende afspraken.
+              - generic [ref=e44]:
+                - generic [ref=e45]:
+                  - text: Vandaag
+                  - strong [ref=e46]: "0"
+                - generic [ref=e47]:
+                  - text: Komende 7 dagen
+                  - strong [ref=e48]: "0"
+                - generic [ref=e49]:
+                  - text: Geselecteerde dag
+                  - strong [ref=e50]: "0"
+            - complementary [ref=e51]:
+              - generic [ref=e54]:
+                - text: VOLGENDE AFSPRAAK
+                - heading "Planning rustig" [level=2] [ref=e55]
+                - paragraph [ref=e56]: Geen bevestigde afspraak meer in deze 7-daagse planning.
+              - generic [ref=e60]:
+                - text: DAGSTATUS
+                - generic [ref=e61]:
+                  - generic [ref=e62]:
+                    - text: Bevestigd
+                    - strong [ref=e63]: "0"
+                  - generic [ref=e64]:
+                    - text: Afgerond
+                    - strong [ref=e65]: "0"
+          - generic [ref=e66]:
+            - generic [ref=e67]:
+              - generic [ref=e68]:
+                - text: 7-DAAGSE RADAR
+                - heading "Afspraken per dag" [level=2] [ref=e69]
+              - generic [ref=e70]:
+                - button "Vandaag 13-09 0" [ref=e71]:
+                  - generic [ref=e72]:
+                    - generic [ref=e73]: Vandaag
+                    - generic [ref=e74]: 13-09
+                  - generic [ref=e75]: "0"
+                - button "Maandag 14-09 0" [ref=e78]:
+                  - generic [ref=e79]:
+                    - generic [ref=e80]: Maandag
+                    - generic [ref=e81]: 14-09
+                  - generic [ref=e82]: "0"
+                - button "Dinsdag 15-09 0" [ref=e85]:
+                  - generic [ref=e86]:
+                    - generic [ref=e87]: Dinsdag
+                    - generic [ref=e88]: 15-09
+                  - generic [ref=e89]: "0"
+                - button "Woensdag 16-09 0" [ref=e92]:
+                  - generic [ref=e93]:
+                    - generic [ref=e94]: Woensdag
+                    - generic [ref=e95]: 16-09
+                  - generic [ref=e96]: "0"
+                - button "Donderdag 17-09 0" [ref=e99]:
+                  - generic [ref=e100]:
+                    - generic [ref=e101]: Donderdag
+                    - generic [ref=e102]: 17-09
+                  - generic [ref=e103]: "0"
+                - button "Vrijdag 18-09 0" [ref=e106]:
+                  - generic [ref=e107]:
+                    - generic [ref=e108]: Vrijdag
+                    - generic [ref=e109]: 18-09
+                  - generic [ref=e110]: "0"
+                - button "Zaterdag 19-09 0" [ref=e113]:
+                  - generic [ref=e114]:
+                    - generic [ref=e115]: Zaterdag
+                    - generic [ref=e116]: 19-09
+                  - generic [ref=e117]: "0"
+            - generic [ref=e120]:
+              - generic [ref=e122]:
+                - generic [ref=e123]:
+                  - text: DAGPLANNING
+                  - heading "Planning voor deze dag" [level=2] [ref=e124]
+                - generic [ref=e125]:
+                  - generic [ref=e126]:
+                    - button "Alles" [pressed] [ref=e127]
+                    - button "Mijn afspraken" [ref=e128]
+                  - textbox "Zoek klant, service..." [ref=e133]
+                  - combobox [ref=e134]:
+                    - option "Alles" [selected]
+                    - option "Bevestigd"
+                    - option "Afgerond"
+                    - option "Geannuleerd"
+                    - option "Niet verschenen"
+              - generic [ref=e135]:
+                - paragraph [ref=e139]: Geen afspraken in deze selectie
+                - paragraph [ref=e140]: Pas je filter aan of kies een andere dag.
+  - contentinfo [ref=e141]:
+    - generic [ref=e142]:
+      - generic [ref=e143]:
+        - generic [ref=e144]:
+          - generic [ref=e145]:
+            - img "Cyrus Barbershop" [ref=e146]
+            - generic [ref=e147]: CYRUS BARBERSHOP
+          - paragraph [ref=e148]: © 2025 CYRUS BARBERSHOP.
+        - generic [ref=e149]:
+          - generic [ref=e150]:
+            - generic [ref=e151]: OPENINGSTIJDEN
+            - 'link "Ma – Zo: Gesloten" [ref=e152] [cursor=pointer]':
+              - /url: /contact
+          - generic [ref=e153]:
+            - generic [ref=e154]: CONTACT
+            - link "Locatie" [ref=e155] [cursor=pointer]:
+              - /url: /contact
+            - link "Maak een afspraak" [ref=e156] [cursor=pointer]:
+              - /url: /booking
+            - link "Voorwaarden" [ref=e157] [cursor=pointer]:
+              - /url: /voorwaarden
+            - link "Privacyverklaring" [ref=e158] [cursor=pointer]:
+              - /url: /privacy
+          - generic [ref=e159]:
+            - generic [ref=e160]: SOCIALS
+            - link "Instagram" [ref=e162] [cursor=pointer]:
+              - /url: https://www.instagram.com/cyrusbarbershop/
+      - paragraph [ref=e166]:
+        - text: Website ontwikkeld door
+        - link "Studio NZ" [ref=e167] [cursor=pointer]:
+          - /url: https://studionz.nl/

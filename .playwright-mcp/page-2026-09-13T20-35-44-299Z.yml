@@ -1,0 +1,77 @@
+- main [ref=f13e14]:
+  - generic [ref=f13e15]:
+    - generic [ref=f13e16]:
+      - link "Cyrus CYRUS BEHEER" [ref=f13e17] [cursor=pointer]:
+        - /url: /admin
+        - img "Cyrus" [ref=f13e18]
+        - generic [ref=f13e19]: CYRUS BEHEER
+      - button "Menu openen" [ref=f13e20]
+    - complementary [ref=f13e24]:
+      - link "Cyrus CYRUS BEHEER" [ref=f13e26] [cursor=pointer]:
+        - /url: /
+        - img "Cyrus" [ref=f13e27]
+        - generic [ref=f13e28]: CYRUS BEHEER
+      - navigation [ref=f13e29]:
+        - link "Dashboard" [ref=f13e30] [cursor=pointer]:
+          - /url: /admin
+        - link "Afspraken" [ref=f13e31] [cursor=pointer]:
+          - /url: /admin/appointments
+        - link "Behandelingen" [ref=f13e32] [cursor=pointer]:
+          - /url: /admin/services
+        - link "Gebruikers" [ref=f13e33] [cursor=pointer]:
+          - /url: /admin/users
+        - link "Openingstijden" [ref=f13e34] [cursor=pointer]:
+          - /url: /admin/opening-hours
+      - generic [ref=f13e35]:
+        - generic [ref=f13e36]:
+          - generic [ref=f13e37]: Account
+          - generic [ref=f13e38]: Admin
+        - link "Mijn Profiel" [ref=f13e39] [cursor=pointer]:
+          - /url: /admin/profile
+      - button "Afmelden" [ref=f13e41]
+    - main [ref=f13e42]:
+      - generic [ref=f13e43]:
+        - generic [ref=f13e44]:
+          - heading "Afspraken" [level=1] [ref=f13e45]
+          - paragraph [ref=f13e46]: 5 totaal · 2 vandaag · 5 bevestigd
+        - generic [ref=f13e47]:
+          - generic [ref=f13e48]:
+            - button "Kalender" [ref=f13e49]
+            - button "Per persoon" [ref=f13e50]
+            - button "Lijst" [ref=f13e51]
+          - button "+ Nieuwe Afspraak" [ref=f13e52]
+      - generic [ref=f13e53]:
+        - generic [ref=f13e54]:
+          - button "Alle" [ref=f13e55]
+          - button "Bevestigd" [ref=f13e56]
+          - button "Afgerond" [active] [ref=f13e57]
+          - button "Geannuleerd" [ref=f13e58]
+          - button "Niet Verschenen" [ref=f13e59]
+        - generic [ref=f13e60]:
+          - combobox [ref=f13e61]:
+            - option "Alle barbers" [selected]
+            - option "Admin"
+            - option "hnkie"
+          - textbox "Zoek..." [ref=f13e62]
+      - generic [ref=f13e141]:
+        - generic [ref=f13e142]:
+          - button "Vorige" [ref=f13e143]: ←
+          - button "Vandaag" [ref=f13e144]
+          - button "Volgende" [ref=f13e145]: →
+        - generic [ref=f13e146]:
+          - generic [ref=f13e147]: 7 sep – 13 sep
+          - generic [ref=f13e148]:
+            - button "Week" [pressed] [ref=f13e149]
+            - button "Dag" [ref=f13e150]
+      - generic [ref=f13e173]:
+        - generic [ref=f13e174]:
+          - generic [ref=f13e175]:
+            - generic [ref=f13e176]: Admin
+            - generic [ref=f13e177]: "0"
+          - paragraph [ref=f13e225]: Geen afspraken
+        - generic [ref=f13e185]:
+          - generic [ref=f13e186]:
+            - generic [ref=f13e187]: hnkie
+            - generic [ref=f13e188]: "0"
+          - paragraph [ref=f13e227]: Geen afspraken
+      - generic: Sluiten

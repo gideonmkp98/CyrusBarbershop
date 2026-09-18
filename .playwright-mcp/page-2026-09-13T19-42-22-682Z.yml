@@ -1,0 +1,148 @@
+- main [ref=f11e14]:
+  - generic [ref=f11e15]:
+    - generic [ref=f11e16]:
+      - link "Cyrus CYRUS BEHEER" [ref=f11e17] [cursor=pointer]:
+        - /url: /admin
+        - img "Cyrus" [ref=f11e18]
+        - generic [ref=f11e19]: CYRUS BEHEER
+      - button "Menu openen" [ref=f11e20]
+    - complementary [ref=f11e24]:
+      - link "Cyrus CYRUS BEHEER" [ref=f11e26] [cursor=pointer]:
+        - /url: /
+        - img "Cyrus" [ref=f11e27]
+        - generic [ref=f11e28]: CYRUS BEHEER
+      - navigation [ref=f11e29]:
+        - link "Dashboard" [ref=f11e30] [cursor=pointer]:
+          - /url: /admin
+        - link "Afspraken" [ref=f11e31] [cursor=pointer]:
+          - /url: /admin/appointments
+        - link "Behandelingen" [ref=f11e32] [cursor=pointer]:
+          - /url: /admin/services
+        - link "Gebruikers" [ref=f11e33] [cursor=pointer]:
+          - /url: /admin/users
+        - link "Openingstijden" [ref=f11e34] [cursor=pointer]:
+          - /url: /admin/opening-hours
+      - generic [ref=f11e35]:
+        - generic [ref=f11e36]:
+          - generic [ref=f11e37]: Account
+          - generic [ref=f11e38]: Admin
+        - link "Mijn Profiel" [ref=f11e39] [cursor=pointer]:
+          - /url: /admin/profile
+      - button "Afmelden" [ref=f11e41]
+    - main [ref=f11e42]:
+      - heading "Gebruikersbeheer" [level=1] [ref=f11e43]
+      - generic [ref=f11e44]:
+        - heading "Maak Personeelsgebruiker" [level=2] [ref=f11e45]
+        - generic [ref=f11e46]:
+          - generic [ref=f11e47]:
+            - textbox "Weergavenaam" [ref=f11e48]:
+              - /placeholder: " "
+            - generic: Weergavenaam
+          - generic [ref=f11e49]:
+            - textbox "E-mail" [ref=f11e50]:
+              - /placeholder: " "
+            - generic: E-mail
+          - generic [ref=f11e51]:
+            - textbox "Wachtwoord" [ref=f11e52]:
+              - /placeholder: " "
+            - generic: Wachtwoord
+          - generic [ref=f11e53]:
+            - checkbox "Dit personeelslid is een barber" [ref=f11e54]
+            - generic [ref=f11e55]: Dit personeelslid is een barber
+          - button "Gebruiker Aanmaken" [ref=f11e57] [cursor=pointer]
+      - table [ref=f11e59]:
+        - rowgroup [ref=f11e60]:
+          - row [ref=f11e61]:
+            - columnheader "Naam" [ref=f11e62]
+            - columnheader "E-mail" [ref=f11e63]
+            - columnheader "Rol" [ref=f11e64]
+            - columnheader "Barber" [ref=f11e65]
+            - columnheader "Foto" [ref=f11e66]
+            - columnheader "Status" [ref=f11e67]
+            - columnheader "Acties" [ref=f11e68]
+        - rowgroup [ref=f11e96]:
+          - row [ref=f11e97]:
+            - cell [ref=f11e98]:
+              - textbox "Naam van Admin" [ref=f11e99]: Admin
+            - cell "gideonmkp98@gmail.com" [ref=f11e100]
+            - cell "owner" [ref=f11e101]
+            - cell "✓ Barber" [ref=f11e103]
+            - cell [ref=f11e105]:
+              - img "Admin" [ref=f11e106]
+            - cell "Actief" [ref=f11e107]
+            - cell [ref=f11e109]:
+              - button "Acties voor Admin" [ref=f11e111]
+          - row [ref=f11e147]:
+            - cell [ref=f11e114]:
+              - textbox "Naam van hnkie" [ref=f11e115]: hnkie
+            - cell "jwj@live.nl" [ref=f11e116]
+            - cell "Medewerker" [ref=f11e117]
+            - cell "✓ Barber" [ref=f11e119]
+            - cell [ref=f11e121]:
+              - img "hnkie" [ref=f11e122]
+            - cell "Actief" [ref=f11e123]
+            - cell [ref=f11e148]:
+              - button "Acties voor hnkie" [ref=f11e127]
+      - button "Modal sluiten" [ref=f11e149]:
+        - dialog [ref=f11e150]:
+          - generic [ref=f11e151]:
+            - 'heading "Werktijden: hnkie" [level=3] [ref=f11e152]'
+            - paragraph [ref=f11e153]: Wijzigingen worden automatisch opgeslagen. Deze tijden moeten binnen de openingstijden van de zaak vallen.
+          - generic [ref=f11e154]:
+            - generic [ref=f11e155]:
+              - generic [ref=f11e156]: Ma
+              - button "Vrij zetten voor Ma" [ref=f11e157]
+              - generic [ref=f11e159]:
+                - textbox [ref=f11e160]: 11:00
+                - generic [ref=f11e161]: "-"
+                - textbox [ref=f11e162]: 18:00
+                - generic [ref=f11e163]: Werkt
+            - generic [ref=f11e164]:
+              - generic [ref=f11e165]: Di
+              - button "Vrij zetten voor Di" [ref=f11e166]
+              - generic [ref=f11e168]:
+                - textbox [ref=f11e169]: 11:00
+                - generic [ref=f11e170]: "-"
+                - textbox [ref=f11e171]: 20:00
+                - generic [ref=f11e172]: Werkt
+            - generic [ref=f11e173]:
+              - generic [ref=f11e174]: Wo
+              - button "Vrij zetten voor Wo" [ref=f11e175]
+              - generic [ref=f11e177]:
+                - textbox [ref=f11e178]: 11:00
+                - generic [ref=f11e179]: "-"
+                - textbox [ref=f11e180]: 20:00
+                - generic [ref=f11e181]: Werkt
+            - generic [ref=f11e182]:
+              - generic [ref=f11e183]: Do
+              - button "Vrij zetten voor Do" [ref=f11e184]
+              - generic [ref=f11e186]:
+                - textbox [ref=f11e187]: 11:00
+                - generic [ref=f11e188]: "-"
+                - textbox [ref=f11e189]: 20:00
+                - generic [ref=f11e190]: Werkt
+            - generic [ref=f11e191]:
+              - generic [ref=f11e192]: Vr
+              - button "Vrij zetten voor Vr" [ref=f11e193]
+              - generic [ref=f11e195]:
+                - textbox [ref=f11e196]: 11:00
+                - generic [ref=f11e197]: "-"
+                - textbox [ref=f11e198]: 20:00
+                - generic [ref=f11e199]: Werkt
+            - generic [ref=f11e200]:
+              - generic [ref=f11e201]: Za
+              - button "Vrij zetten voor Za" [ref=f11e202]
+              - generic [ref=f11e204]:
+                - textbox [ref=f11e205]: 10:00
+                - generic [ref=f11e206]: "-"
+                - textbox [ref=f11e207]: 17:00
+                - generic [ref=f11e208]: Werkt
+            - generic [ref=f11e209]:
+              - generic [ref=f11e210]: Zo
+              - button "Werkdag aanzetten voor Zo" [ref=f11e211]
+              - generic [ref=f11e213]:
+                - textbox [disabled] [ref=f11e214]
+                - generic [ref=f11e215]: "-"
+                - textbox [disabled] [ref=f11e216]
+                - generic [ref=f11e217]: Vrij
+          - button "Sluiten" [ref=f11e219] [cursor=pointer]

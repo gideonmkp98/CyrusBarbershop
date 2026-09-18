@@ -283,12 +283,12 @@
   </div>
 
   <!-- Filters bar -->
-  <div class="flex flex-col md:flex-row gap-3 mb-6">
+  <div class="flex flex-wrap items-center gap-3 mb-6">
     <!-- Category filter -->
     <div class="relative">
       <select
         bind:value={filterCategory}
-        class="bg-surface-base border border-white/10 pl-9 pr-3 py-1.5 text-sm font-body text-bone focus:outline-none focus:border-gold-500 appearance-none"
+        class="bg-surface-base border border-white/10 pl-9 pr-3 py-1.5 text-sm font-body text-bone focus:outline-none focus:border-gold-500 appearance-none max-w-full"
       >
         <option value="all">Alle categorieën</option>
         <option value="hair">Haar</option>
@@ -305,7 +305,7 @@
     <div class="relative">
       <select
         bind:value={filterStatus}
-        class="bg-surface-base border border-white/10 pl-9 pr-3 py-1.5 text-sm font-body text-bone focus:outline-none focus:border-gold-500 appearance-none"
+        class="bg-surface-base border border-white/10 pl-9 pr-3 py-1.5 text-sm font-body text-bone focus:outline-none focus:border-gold-500 appearance-none max-w-full"
       >
         <option value="all">Alle statussen</option>
         <option value="active">Actief</option>
@@ -321,7 +321,7 @@
       type="text"
       bind:value={searchQuery}
       placeholder="Zoek behandelingen..."
-      class="bg-surface-base border border-white/10 px-3 py-1.5 text-sm font-body text-bone focus:outline-none focus:border-gold-500 w-full md:w-64 placeholder:text-bone-muted/50"
+      class="bg-surface-base border border-white/10 px-3 py-1.5 text-sm font-body text-bone focus:outline-none focus:border-gold-500 w-full sm:flex-1 sm:min-w-0 md:w-64 placeholder:text-bone-muted/50"
     />
 
     <!-- View toggle -->
@@ -390,7 +390,7 @@
               {/if}
             </button>
 
-            <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div class="flex gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
               <button
                 onclick={() => openEditModal(service)}
                 onmouseenter={(e) => showTooltip(e, 'Bewerken')}
@@ -426,8 +426,8 @@
 
   {:else}
     <!-- List View -->
-    <div class="bg-surface-base border border-white/5 overflow-hidden">
-      <table class="w-full text-sm">
+    <div class="bg-surface-base border border-white/5 overflow-x-auto">
+      <table class="w-full text-sm min-w-[720px]">
         <thead>
           <tr class="border-b border-white/5">
             <th class="text-left p-4 font-body text-label text-bone-muted">Naam</th>
@@ -520,8 +520,8 @@
 
   <!-- Create/Edit Modal -->
   {#if showFormModal}
-    <div class="fixed inset-0 bg-black/70 flex items-center justify-center z-50" role="button" tabindex="0" aria-label="Modal sluiten" onclick={closeFormModal} onkeydown={(e) => e.key === 'Enter' && closeFormModal()}>
-      <div class="bg-surface-base p-8 border border-white/10 max-w-2xl w-full mx-6 shadow-2xl max-h-[90vh] overflow-y-auto" role="dialog" aria-modal="true" tabindex="-1" onclick={e => e.stopPropagation()} onkeydown={(e) => e.key === 'Escape' && closeFormModal()}>
+    <div class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4" role="button" tabindex="0" aria-label="Modal sluiten" onclick={closeFormModal} onkeydown={(e) => e.key === 'Enter' && closeFormModal()}>
+      <div class="bg-surface-base p-5 sm:p-8 border border-white/10 max-w-2xl w-full shadow-2xl max-h-[90vh] overflow-y-auto" role="dialog" aria-modal="true" tabindex="-1" onclick={e => e.stopPropagation()} onkeydown={(e) => e.key === 'Escape' && closeFormModal()}>
         <div class="flex items-center gap-4 mb-6 pb-4 border-b border-white/5">
           <div class="w-12 h-12 rounded-full bg-gold-500/10 flex items-center justify-center">
             <Scissors class="text-gold-500" size={24} />
@@ -640,8 +640,8 @@
 
   <!-- Delete Confirmation Modal -->
   {#if showDeleteModal}
-    <div class="fixed inset-0 bg-black/70 flex items-center justify-center z-50" role="button" tabindex="0" aria-label="Modal sluiten" onclick={closeDeleteModal} onkeydown={(e) => e.key === 'Enter' && closeDeleteModal()}>
-      <div class="bg-surface-base p-8 border border-white/10 max-w-md w-full mx-6 shadow-2xl" role="dialog" aria-modal="true" tabindex="-1" onclick={e => e.stopPropagation()} onkeydown={(e) => e.key === 'Escape' && closeDeleteModal()}>
+    <div class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4" role="button" tabindex="0" aria-label="Modal sluiten" onclick={closeDeleteModal} onkeydown={(e) => e.key === 'Enter' && closeDeleteModal()}>
+      <div class="bg-surface-base p-5 sm:p-8 border border-white/10 max-w-md w-full shadow-2xl" role="dialog" aria-modal="true" tabindex="-1" onclick={e => e.stopPropagation()} onkeydown={(e) => e.key === 'Escape' && closeDeleteModal()}>
         <div class="text-center mb-6">
           <div class="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-4">
             <AlertTriangle size={32} class="text-red-400" />

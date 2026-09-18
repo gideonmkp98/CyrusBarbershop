@@ -1,0 +1,65 @@
+- main [ref=f6e16]:
+  - generic [ref=f6e17]:
+    - complementary [ref=f6e18]:
+      - link "Cyrus CYRUS BEHEER" [ref=f6e20] [cursor=pointer]:
+        - /url: /
+        - img "Cyrus" [ref=f6e21]
+        - generic [ref=f6e22]: CYRUS BEHEER
+      - navigation [ref=f6e23]:
+        - link "Dashboard" [ref=f6e24] [cursor=pointer]:
+          - /url: /admin
+        - link "Afspraken" [ref=f6e25] [cursor=pointer]:
+          - /url: /admin/appointments
+        - link "Behandelingen" [ref=f6e26] [cursor=pointer]:
+          - /url: /admin/services
+        - link "Gebruikers" [ref=f6e27] [cursor=pointer]:
+          - /url: /admin/users
+        - link "Openingstijden" [ref=f6e28] [cursor=pointer]:
+          - /url: /admin/opening-hours
+      - generic [ref=f6e29]:
+        - generic [ref=f6e30]:
+          - generic [ref=f6e31]: Account
+          - generic [ref=f6e32]: Admin
+        - link "Mijn Profiel" [ref=f6e33] [cursor=pointer]:
+          - /url: /admin/profile
+      - button "Afmelden" [ref=f6e35]
+    - main [ref=f6e36]:
+      - generic [ref=f6e37]:
+        - generic [ref=f6e38]:
+          - heading "Afspraken" [level=1] [ref=f6e39]
+          - paragraph [ref=f6e40]: 5 totaal · 4 vandaag · 4 bevestigd
+        - generic [ref=f6e41]:
+          - generic [ref=f6e42]:
+            - button "Kalender" [ref=f6e43]
+            - button "Per persoon" [ref=f6e44]
+            - button "Lijst" [ref=f6e45]
+          - button "+ Nieuwe Afspraak" [ref=f6e46]
+      - generic [ref=f6e47]:
+        - generic [ref=f6e48]:
+          - button "Alle" [active] [ref=f6e49]
+          - button "Bevestigd" [ref=f6e50]
+          - button "Afgerond" [ref=f6e51]
+          - button "Geannuleerd" [ref=f6e52]
+          - button "Niet Verschenen" [ref=f6e53]
+        - generic [ref=f6e54]:
+          - combobox [ref=f6e55]:
+            - option "Alle barbers"
+            - option "Admin"
+            - option "hnkie" [selected]
+          - textbox "Zoek..." [ref=f6e56]
+      - generic [ref=f6e137]:
+        - generic [ref=f6e138]:
+          - generic [ref=f6e139]:
+            - generic [ref=f6e140]: Admin
+            - generic [ref=f6e141]: "0"
+          - paragraph [ref=f6e218]: Geen afspraken
+        - generic [ref=f6e161]:
+          - generic [ref=f6e162]:
+            - generic [ref=f6e163]: hnkie
+            - generic [ref=f6e164]: "1"
+          - button "09:30 Bevestigd Klant B Haarknippen · 13-09-2026" [ref=f6e220]:
+            - generic [ref=f6e221]:
+              - generic [ref=f6e222]: 09:30
+              - generic [ref=f6e223]: Bevestigd
+            - generic [ref=f6e224]: Klant B
+            - generic [ref=f6e225]: Haarknippen · 13-09-2026
