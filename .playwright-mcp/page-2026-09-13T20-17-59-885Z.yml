@@ -1,0 +1,111 @@
+- main [ref=f6e16]:
+  - generic [ref=f6e17]:
+    - complementary [ref=f6e18]:
+      - link "Cyrus CYRUS BEHEER" [ref=f6e20] [cursor=pointer]:
+        - /url: /
+        - img "Cyrus" [ref=f6e21]
+        - generic [ref=f6e22]: CYRUS BEHEER
+      - navigation [ref=f6e23]:
+        - link "Dashboard" [ref=f6e24] [cursor=pointer]:
+          - /url: /admin
+        - link "Afspraken" [ref=f6e25] [cursor=pointer]:
+          - /url: /admin/appointments
+        - link "Behandelingen" [ref=f6e26] [cursor=pointer]:
+          - /url: /admin/services
+        - link "Gebruikers" [ref=f6e27] [cursor=pointer]:
+          - /url: /admin/users
+        - link "Openingstijden" [ref=f6e28] [cursor=pointer]:
+          - /url: /admin/opening-hours
+      - generic [ref=f6e29]:
+        - generic [ref=f6e30]:
+          - generic [ref=f6e31]: Account
+          - generic [ref=f6e32]: Admin
+        - link "Mijn Profiel" [ref=f6e33] [cursor=pointer]:
+          - /url: /admin/profile
+      - button "Afmelden" [ref=f6e35]
+    - main [ref=f6e36]:
+      - generic [ref=f6e37]:
+        - generic [ref=f6e38]:
+          - heading "Afspraken" [level=1] [ref=f6e39]
+          - paragraph [ref=f6e40]: 5 totaal · 4 vandaag · 4 bevestigd
+        - generic [ref=f6e41]:
+          - generic [ref=f6e42]:
+            - button "Kalender" [active] [ref=f6e43]
+            - button "Per persoon" [ref=f6e44]
+            - button "Lijst" [ref=f6e45]
+          - button "+ Nieuwe Afspraak" [ref=f6e46]
+      - generic [ref=f6e47]:
+        - generic [ref=f6e48]:
+          - button "Alle" [ref=f6e49]
+          - button "Bevestigd" [ref=f6e50]
+          - button "Afgerond" [ref=f6e51]
+          - button "Geannuleerd" [ref=f6e52]
+          - button "Niet Verschenen" [ref=f6e53]
+        - generic [ref=f6e54]:
+          - combobox [ref=f6e55]:
+            - option "Alle barbers" [selected]
+            - option "Admin"
+            - option "hnkie"
+          - textbox "Zoek..." [ref=f6e56]
+      - generic [ref=f6e256]:
+        - generic [ref=f6e257]:
+          - generic [ref=f6e258]:
+            - button "←" [ref=f6e259]
+            - button "Vandaag" [ref=f6e260]
+            - button "→" [ref=f6e261]
+          - generic [ref=f6e262]: 7 sep – 13 sep
+        - generic [ref=f6e264]:
+          - generic [ref=f6e265]:
+            - generic [ref=f6e266]:
+              - generic [ref=f6e267]: Ma
+              - generic [ref=f6e268]: "7"
+            - generic [ref=f6e269]: Geen afspraken
+          - generic [ref=f6e271]:
+            - generic [ref=f6e272]:
+              - generic [ref=f6e273]: Di
+              - generic [ref=f6e274]: "8"
+            - generic [ref=f6e275]: Geen afspraken
+          - generic [ref=f6e277]:
+            - generic [ref=f6e278]:
+              - generic [ref=f6e279]: Wo
+              - generic [ref=f6e280]: "9"
+            - generic [ref=f6e281]: Geen afspraken
+          - generic [ref=f6e283]:
+            - generic [ref=f6e284]:
+              - generic [ref=f6e285]: Do
+              - generic [ref=f6e286]: "10"
+            - generic [ref=f6e287]: Geen afspraken
+          - generic [ref=f6e289]:
+            - generic [ref=f6e290]:
+              - generic [ref=f6e291]: Vr
+              - generic [ref=f6e292]: "11"
+            - generic [ref=f6e293]: Geen afspraken
+          - generic [ref=f6e295]:
+            - generic [ref=f6e296]:
+              - generic [ref=f6e297]: Za
+              - generic [ref=f6e298]: "12"
+            - generic [ref=f6e299]: Geen afspraken
+          - generic [ref=f6e301]:
+            - generic [ref=f6e302]:
+              - generic [ref=f6e303]: Zo
+              - generic [ref=f6e304]: "13"
+            - generic [ref=f6e305]:
+              - button "09:00 Klant A Haarknippen Admin" [ref=f6e306]:
+                - generic [ref=f6e307]: 09:00
+                - generic [ref=f6e308]: Klant A
+                - generic [ref=f6e309]: Haarknippen
+                - generic [ref=f6e310]: Admin
+              - button "09:30 Klant B Haarknippen hnkie" [ref=f6e311]:
+                - generic [ref=f6e312]: 09:30
+                - generic [ref=f6e313]: Klant B
+                - generic [ref=f6e314]: Haarknippen
+                - generic [ref=f6e315]: hnkie
+              - button "10:30 Klant C Haarknippen Admin" [ref=f6e316]:
+                - generic [ref=f6e317]: 10:30
+                - generic [ref=f6e318]: Klant C
+                - generic [ref=f6e319]: Haarknippen
+                - generic [ref=f6e320]: Admin
+              - button "11:00 GeenVoorkeur Klant Haarknippen" [ref=f6e321]:
+                - generic [ref=f6e322]: 11:00
+                - generic [ref=f6e323]: GeenVoorkeur Klant
+                - generic [ref=f6e324]: Haarknippen

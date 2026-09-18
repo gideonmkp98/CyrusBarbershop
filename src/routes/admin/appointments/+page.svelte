@@ -1,12 +1,15 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { browser } from '$app/environment';
   import WeekCalendar from '$lib/components/admin/WeekCalendar.svelte';
   import { toast } from '$lib/stores/toast';
+  import { AlertTriangle, CalendarOff, Pencil, X } from 'lucide-svelte';
 
   let { data } = $props();
 
   // ── Accumulated appointment data ──
   let allAppointments = $state<any[]>([]);
+  let allTimeOff = $state<any[]>([]);
   let loadedRanges = $state<{ start: string; end: string }[]>([]);
   let isLoadingCalendar = $state(false);
   let isLoadingMore = $state(false);
@@ -35,6 +38,7 @@
   $effect(() => {
     if (!initialDataLoaded) {
       allAppointments = data.appointments;
+      allTimeOff = data.timeOff ?? [];
       appointmentIds = new Set<number>(data.appointments.map((a: any) => a.id));
       nextCursor = data.nextCursor || null;
       hasMore = data.hasMore || false;
@@ -64,7 +68,23 @@
   });
 
   // ── View state ──
-  let viewMode = $state<'list' | 'calendar'>('calendar');
+  // Ingelogde gebruiker komt uit de admin-layout data ("Mijn afspraken" = staffId === user.id).
+  const currentUserId: number | null = data.user?.id ?? null;
+  const canEditAppointments = data.user?.role === 'owner' || data.user?.role === 'manager';
+  const currentUserIsBarber = Boolean(data.user?.isBarber);
+  const barberSelectHasMe = (data.staff as any[]).some((s) => s.id === currentUserId);
+  let viewMode = $state<'list' | 'calendar' | 'person'>('calendar');
+
+  // View-voorkeur bewaren binnen de sessie
+  if (browser) {
+    const savedView = sessionStorage.getItem('admin-appointments-view');
+    if (savedView === 'list' || savedView === 'calendar' || savedView === 'person') {
+      viewMode = savedView;
+    }
+  }
+  $effect(() => {
+    if (browser) sessionStorage.setItem('admin-appointments-view', viewMode);
+  });
   let showNewAppointmentForm = $state(false);
 
   // ── Filters ──
@@ -181,6 +201,67 @@
     })
   );
 
+  // ── Per-persoon kolommen (week/dag) ──
+  // Eén kolom per barber (uit data.staff), chronologisch gesorteerd, binnen de
+  // gekozen periode: week (ma–zo) of één dag, navigeerbaar zoals de weekkalender.
+  // Afspraken zonder barber krijgen alleen een kolom als ze bestaan.
+  let selectedPersonIndex = $state(0);
+  let personMode = $state<'week' | 'day'>('week');
+  let personAnchor = $state(formatDateKey(new Date()));
+
+  function personAddDays(dateKey: string, days: number): string {
+    const d = new Date(dateKey + 'T00:00:00');
+    d.setDate(d.getDate() + days);
+    return formatDateKey(d);
+  }
+
+  function personMonday(dateKey: string): string {
+    const d = new Date(dateKey + 'T00:00:00');
+    const day = d.getDay();
+    return personAddDays(dateKey, day === 0 ? -6 : 1 - day);
+  }
+
+  let personRange = $derived.by(() => {
+    if (personMode === 'day') return { start: personAnchor, end: personAnchor };
+    const start = personMonday(personAnchor);
+    return { start, end: personAddDays(start, 6) };
+  });
+
+  let personRangeLabel = $derived.by(() => {
+    if (personMode === 'day') {
+      return new Date(personAnchor + 'T00:00:00').toLocaleDateString('nl-NL', {
+        weekday: 'long', day: 'numeric', month: 'long'
+      });
+    }
+    const fmt = (key: string) =>
+      new Date(key + 'T00:00:00').toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' });
+    return `${fmt(personRange.start)} – ${fmt(personRange.end)}`;
+  });
+
+  let personColumns = $derived((() => {
+    const byTime = (a: any, b: any) => `${a.date}T${a.timeSlot}`.localeCompare(`${b.date}T${b.timeSlot}`);
+    const inRange = (a: any) => a.date >= personRange.start && a.date <= personRange.end;
+    const columns: { id: number | null; name: string; role: string; appointments: any[]; timeOff: any[] }[] = (data.staff as any[]).map((s: any) => ({
+      id: s.id,
+      name: s.displayName,
+      role: s.role,
+      appointments: filteredAppointments.filter((a: any) => a.staffId === s.id && inRange(a)).sort(byTime),
+      timeOff: allTimeOff.filter((entry: any) => entry.staffId === s.id && entry.startDate <= personRange.end && entry.endDate >= personRange.start)
+    }));
+
+    const unassigned = filteredAppointments
+      .filter((a: any) => (a.staffId === null || a.staffId === undefined) && inRange(a))
+      .sort(byTime);
+    if (unassigned.length > 0) {
+      columns.push({ id: null, name: 'Geen voorkeur', role: 'overig', appointments: unassigned, timeOff: [] });
+    }
+
+    return columns;
+  })());
+  let mobileColumn = $derived(
+    personColumns.length > 0 ? personColumns[Math.min(selectedPersonIndex, personColumns.length - 1)] : null
+  );
+
   // ── Stats ──
   // ── Grouped list for card view ──
   let groupedAppointments = $derived((() => {
@@ -260,6 +341,11 @@
           nextCursor = payload.nextCursor || null;
           hasMore = payload.hasMore || false;
         }
+        if (payload.timeOff) {
+          const mergedTimeOff = new Map(allTimeOff.map((entry: any) => [entry.id, entry]));
+          payload.timeOff.forEach((entry: any) => mergedTimeOff.set(entry.id, entry));
+          allTimeOff = Array.from(mergedTimeOff.values());
+        }
       }
     } catch (e) {
       console.error('Fout bij laden afspraken:', e);
@@ -303,6 +389,37 @@
         pendingWeekLoad = null;
       }
     }, 150);
+  }
+
+  // ── Per-persoon periode-navigatie (week/dag) ──
+  function personShift(direction: number) {
+    personAnchor = personAddDays(personAnchor, personMode === 'week' ? direction * 7 : direction);
+    handleWeekChange(personRange.start, personRange.end);
+  }
+
+  function personGoToday() {
+    personAnchor = formatDateKey(new Date());
+    handleWeekChange(personRange.start, personRange.end);
+  }
+
+  function setPersonMode(mode: 'week' | 'day') {
+    if (personMode === mode) return;
+    // Week → dag: start op de maandag van de getoonde week, niet op de navigatie-anchor.
+    if (mode === 'day' && personMode === 'week') {
+      personAnchor = personRange.start;
+    }
+    personMode = mode;
+    handleWeekChange(personRange.start, personRange.end);
+  }
+
+  function openPersonView() {
+    viewMode = 'person';
+    handleWeekChange(personRange.start, personRange.end);
+  }
+
+  // Opgeslagen persoon-view: huidige periode direct laden bij herstel
+  if (browser && viewMode === 'person') {
+    void loadRange(personRange.start, personRange.end);
   }
 
   // ── Actions ──
@@ -353,6 +470,99 @@
   function closeDetail() {
     showDetailModal = false;
     selectedAppointment = null;
+    editingAppointment = false;
+  }
+
+  // ── Appointment editing ──
+  let editingAppointment = $state(false);
+  let editServiceId = $state<number | null>(null);
+  let editStaffId = $state<number | null>(null);
+  let editDate = $state('');
+  let editTime = $state('');
+  let editAddOnDuration = $state(0);
+  let editSlots = $state<{ time: string; available: boolean }[]>([]);
+  let loadingEditSlots = $state(false);
+  let savingEdit = $state(false);
+  let editError = $state('');
+
+  async function fetchEditAvailability() {
+    if (!selectedAppointment || !editDate || !editServiceId || !editStaffId) {
+      editSlots = [];
+      return;
+    }
+    loadingEditSlots = true;
+    editError = '';
+    try {
+      const service = treatmentServices.find((item: any) => item.id === editServiceId);
+      const duration = (service?.duration ?? 30) + editAddOnDuration;
+      const response = await fetch(`/api/availability?date=${editDate}&staffId=${editStaffId}&serviceId=${editServiceId}&duration=${duration}&excludeAppointmentId=${selectedAppointment.id}`);
+      const result = await response.json();
+      editSlots = response.ok ? (result.slots ?? []) : [];
+      if (result.unavailable) editError = 'Deze medewerker is afwezig op deze datum.';
+      if (!editSlots.some((slot) => slot.time === editTime && slot.available)) editTime = '';
+    } catch {
+      editSlots = [];
+      editError = 'Beschikbare tijden konden niet worden geladen.';
+    } finally {
+      loadingEditSlots = false;
+    }
+  }
+
+  async function startEditingAppointment() {
+    if (!selectedAppointment || !canEditAppointments) return;
+    editServiceId = selectedAppointment.serviceId;
+    editStaffId = selectedAppointment.staffId;
+    editDate = selectedAppointment.date;
+    editTime = selectedAppointment.timeSlot.slice(0, 5);
+    editAddOnDuration = 0;
+    editError = '';
+    editingAppointment = true;
+    try {
+      const response = await fetch(`/admin/api/appointments?id=${selectedAppointment.id}`);
+      if (response.ok) {
+        const details = await response.json();
+        editAddOnDuration = details.addOnDuration ?? 0;
+      }
+    } catch {
+      // The server remains authoritative if detail loading fails.
+    }
+    await fetchEditAvailability();
+  }
+
+  async function saveAppointmentEdit() {
+    if (!selectedAppointment || !editServiceId || !editStaffId || !editDate || !editTime) {
+      editError = 'Vul behandeling, barber, datum en tijdstip in.';
+      return;
+    }
+    savingEdit = true;
+    editError = '';
+    try {
+      const response = await fetch('/admin/api/appointments', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: selectedAppointment.id,
+          serviceId: editServiceId,
+          staffId: editStaffId,
+          date: editDate,
+          timeSlot: editTime
+        })
+      });
+      const result = await response.json();
+      if (!response.ok) {
+        editError = result.error || 'Afspraak kon niet worden gewijzigd.';
+        return;
+      }
+      const updated = { ...selectedAppointment, ...result.appointment };
+      allAppointments = allAppointments.map((appointment: any) => appointment.id === updated.id ? updated : appointment);
+      selectedAppointment = updated;
+      editingAppointment = false;
+      toast.success('Afspraak bijgewerkt');
+    } catch {
+      editError = 'Afspraak kon niet worden gewijzigd.';
+    } finally {
+      savingEdit = false;
+    }
   }
 
   // ── Availability ──
@@ -494,6 +704,12 @@
     }
     return String(dateValue);
   }
+
+  function formatTimeOffPeriod(entry: any): string {
+    return entry.startDate === entry.endDate
+      ? formatDate(entry.startDate)
+      : `${formatDate(entry.startDate)} - ${formatDate(entry.endDate)}`;
+  }
 </script>
 
 <svelte:head>
@@ -509,13 +725,17 @@
     </p>
   </div>
 
-  <div class="flex items-center gap-3">
+  <div class="flex flex-wrap items-center gap-3">
     <!-- View toggle -->
     <div class="flex bg-surface-base border border-white/10 overflow-hidden">
       <button
         onclick={() => viewMode = 'calendar'}
         class="px-4 py-2 text-sm font-body transition-colors {viewMode === 'calendar' ? 'bg-gold-500 text-surface' : 'text-bone hover:text-bone'}"
       >Kalender</button>
+      <button
+        onclick={openPersonView}
+        class="px-4 py-2 text-sm font-body transition-colors {viewMode === 'person' ? 'bg-gold-500 text-surface' : 'text-bone hover:text-bone'}"
+      >Per persoon</button>
       <button
         onclick={() => viewMode = 'list'}
         class="px-4 py-2 text-sm font-body transition-colors {viewMode === 'list' ? 'bg-gold-500 text-surface' : 'text-bone hover:text-bone'}"
@@ -681,22 +901,28 @@
     {/each}
   </div>
 
-  <div class="flex gap-3 ml-auto">
-    <select
-      bind:value={filterBarber}
-      class="bg-surface-base border border-white/10 px-3 py-1.5 text-xs font-body text-bone focus:outline-none focus:border-gold-500"
-    >
-      <option value="all">Alle barbers</option>
-      {#each data.staff as staffMember}
-        <option value={String(staffMember.id)}>{staffMember.displayName}</option>
-      {/each}
-    </select>
+  <div class="flex flex-wrap gap-3 md:ml-auto">
+    <!-- Barber-filter is overbodig in "Per persoon": kolommen zijn al per persoon gesplitst -->
+    {#if viewMode !== 'person'}
+      <select
+        bind:value={filterBarber}
+        class="bg-surface-base border border-white/10 px-3 py-1.5 text-xs font-body text-bone focus:outline-none focus:border-gold-500 max-w-full"
+      >
+        <option value="all">Alle barbers</option>
+        {#each data.staff as staffMember}
+          <option value={String(staffMember.id)}>{staffMember.displayName}</option>
+        {/each}
+        {#if currentUserIsBarber && !barberSelectHasMe}
+          <option value={String(currentUserId)}>Mijn afspraken</option>
+        {/if}
+      </select>
+    {/if}
 
     <input
       type="text"
       bind:value={searchQuery}
       placeholder="Zoek..."
-      class="bg-surface-base border border-white/10 px-3 py-1.5 text-xs font-body text-bone focus:outline-none focus:border-gold-500 w-48 placeholder:text-bone-muted/50"
+      class="bg-surface-base border border-white/10 px-3 py-1.5 text-xs font-body text-bone focus:outline-none focus:border-gold-500 w-full sm:w-48 placeholder:text-bone-muted/50"
     />
   </div>
 </div>
@@ -706,11 +932,162 @@
   <WeekCalendar
     appointments={filteredAppointments}
     staff={data.staff}
+    timeOff={allTimeOff}
     onSelect={openDetail}
     onStatusChange={updateStatus}
     onWeekChange={handleWeekChange}
     isLoading={isLoadingCalendar}
   />
+{:else if viewMode === 'person'}
+  <!-- Per persoon -->
+  {#if personColumns.length === 0}
+    <div class="bg-surface-base border border-white/5 p-16 text-center">
+      <p class="text-bone-muted font-body">Geen medewerkers gevonden</p>
+      <p class="text-bone-muted/60 text-sm font-body mt-1">Voeg eerst medewerkers toe</p>
+    </div>
+  {:else}
+    <!-- Periode-navigatie (week/dag), zelfde stijl als de weekkalender -->
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+      <div class="flex items-center gap-2">
+        <button
+          type="button"
+          onclick={() => personShift(-1)}
+          aria-label="Vorige"
+          class="px-3 py-1.5 bg-surface-base border border-white/10 text-bone hover:border-gold-500 transition-colors text-sm font-body"
+        >←</button>
+        <button
+          type="button"
+          onclick={personGoToday}
+          class="px-3 py-1.5 bg-surface-base border border-white/10 text-bone hover:border-gold-500 transition-colors text-sm font-body"
+        >Vandaag</button>
+        <button
+          type="button"
+          onclick={() => personShift(1)}
+          aria-label="Volgende"
+          class="px-3 py-1.5 bg-surface-base border border-white/10 text-bone hover:border-gold-500 transition-colors text-sm font-body"
+        >→</button>
+        {#if isLoadingCalendar}
+          <span class="text-xs text-bone-muted font-body animate-pulse">Laden...</span>
+        {/if}
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="font-display text-subheading text-bone capitalize">{personRangeLabel}</span>
+        <div class="flex bg-surface-base border border-white/10 overflow-hidden">
+          <button
+            type="button"
+            onclick={() => setPersonMode('week')}
+            aria-pressed={personMode === 'week'}
+            class="px-3 py-1.5 text-xs font-body transition-colors {personMode === 'week' ? 'bg-gold-500 text-surface' : 'text-bone-muted hover:text-bone'}"
+          >Week</button>
+          <button
+            type="button"
+            onclick={() => setPersonMode('day')}
+            aria-pressed={personMode === 'day'}
+            class="px-3 py-1.5 text-xs font-body transition-colors {personMode === 'day' ? 'bg-gold-500 text-surface' : 'text-bone-muted hover:text-bone'}"
+          >Dag</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile: medewerker-selector + één kolom -->
+    <div class="md:hidden">
+      {#if personColumns.length > 1}
+        <select
+          bind:value={selectedPersonIndex}
+          class="w-full bg-surface-base border border-white/10 px-3 py-2 text-sm font-body text-bone focus:outline-none focus:border-gold-500 mb-4"
+        >
+          {#each personColumns as col, i}
+            <option value={i}>{col.name} ({col.appointments.length})</option>
+          {/each}
+        </select>
+      {/if}
+
+      {#if mobileColumn}
+        <div class="bg-surface-low border border-white/5 p-4">
+          <div class="flex items-center justify-between gap-3 mb-4">
+            <span class="font-display text-subheading text-bone truncate">{mobileColumn.name}</span>
+            <span class="px-2 py-0.5 bg-surface-base border border-white/10 text-xs font-body text-bone-muted shrink-0">{mobileColumn.appointments.length}</span>
+          </div>
+          {#each mobileColumn.timeOff as entry (entry.id)}
+            <div class="mb-2 border border-amber-400/20 bg-amber-400/10 p-3">
+              <div class="flex items-center gap-2 font-body text-xs text-amber-300"><CalendarOff size={14} /> Afwezig</div>
+              <div class="mt-1 font-body text-xs text-bone">{formatTimeOffPeriod(entry)}</div>
+              {#if entry.reason}<div class="mt-0.5 truncate font-body text-xs text-bone-muted">{entry.reason}</div>{/if}
+            </div>
+          {/each}
+          {#if mobileColumn.appointments.length === 0}
+            <div class="border border-dashed border-white/10 p-8 text-center">
+              <p class="text-bone-muted/60 text-sm font-body">Geen afspraken</p>
+            </div>
+          {:else}
+            <div class="space-y-2">
+              {#each mobileColumn.appointments as appt (appt.id)}
+                <button
+                  type="button"
+                  onclick={() => openDetail(appt)}
+                  class="w-full text-left bg-surface-base border border-white/5 hover:border-gold-500/20 p-3 transition-colors"
+                >
+                  <div class="flex items-center justify-between gap-2">
+                    <span class="font-display text-sm text-gold-500 tabular-nums">{appt.timeSlot.slice(0, 5)}</span>
+                    <span class="px-1.5 py-0.5 text-[10px] font-body border shrink-0 {statusBadgeBg[appt.status] || 'bg-surface-low border-white/10'} {statusColors[appt.status] || 'text-bone-muted'}">{statusLabels[appt.status] || appt.status}</span>
+                  </div>
+                  <span class="block mt-1 font-body text-sm text-bone truncate">{appt.clientName}</span>
+                  <span class="block font-body text-xs text-bone-muted truncate">{appt.serviceName} · {formatDate(appt.date)}</span>
+                </button>
+              {/each}
+            </div>
+          {/if}
+        </div>
+      {/if}
+    </div>
+
+    <!-- Tablet/desktop: alle kolommen naast elkaar, scroll binnen de view -->
+    <div class="hidden md:block">
+      <div class="overflow-x-auto pb-2">
+        <div class="flex gap-4 min-w-max">
+          {#each personColumns as col (col.id ?? 'unassigned')}
+            <div class="w-64 shrink-0">
+              <div class="flex items-center justify-between gap-2 mb-3 pb-2 border-b border-white/5">
+                <span class="font-display text-sm text-bone truncate">{col.name}</span>
+                <span class="px-2 py-0.5 bg-surface-base border border-white/10 text-xs font-body text-bone-muted shrink-0">{col.appointments.length}</span>
+              </div>
+
+              {#each col.timeOff as entry (entry.id)}
+                <div class="mb-2 border border-amber-400/20 bg-amber-400/10 p-3">
+                  <div class="flex items-center gap-2 font-body text-xs text-amber-300"><CalendarOff size={14} /> Afwezig</div>
+                  <div class="mt-1 font-body text-xs text-bone">{formatTimeOffPeriod(entry)}</div>
+                  {#if entry.reason}<div class="mt-0.5 truncate font-body text-xs text-bone-muted">{entry.reason}</div>{/if}
+                </div>
+              {/each}
+
+              {#if col.appointments.length === 0}
+                <div class="border border-dashed border-white/10 p-8 text-center">
+                  <p class="text-bone-muted/60 text-sm font-body">Geen afspraken</p>
+                </div>
+              {:else}
+                <div class="space-y-2">
+                  {#each col.appointments as appt (appt.id)}
+                    <button
+                      type="button"
+                      onclick={() => openDetail(appt)}
+                      class="w-full text-left bg-surface-base border border-white/5 hover:border-gold-500/20 p-3 transition-colors"
+                    >
+                      <div class="flex items-center justify-between gap-2">
+                        <span class="font-display text-sm text-gold-500 tabular-nums">{appt.timeSlot.slice(0, 5)}</span>
+                        <span class="px-1.5 py-0.5 text-[10px] font-body border shrink-0 {statusBadgeBg[appt.status] || 'bg-surface-low border-white/10'} {statusColors[appt.status] || 'text-bone-muted'}">{statusLabels[appt.status] || appt.status}</span>
+                      </div>
+                      <span class="block mt-1 font-body text-sm text-bone truncate">{appt.clientName}</span>
+                      <span class="block font-body text-xs text-bone-muted truncate">{appt.serviceName} · {formatDate(appt.date)}</span>
+                    </button>
+                  {/each}
+                </div>
+              {/if}
+            </div>
+          {/each}
+        </div>
+      </div>
+    </div>
+  {/if}
 {:else}
   <!-- Card List View -->
   {#if filteredAppointments.length === 0}
@@ -803,8 +1180,9 @@
 
                   <!-- Quick actions -->
                   {#if appt.status === 'confirmed'}
-                    <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div class="flex gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                       <button
+                        aria-label="Markeer als afgerond"
                         onclick={(e) => { e.stopPropagation(); updateStatus(appt.id, 'completed'); }}
                         onmouseenter={(e) => showTooltip(e, 'Markeer als afgerond')}
                         onmouseleave={hideTooltip}
@@ -815,6 +1193,7 @@
                         </svg>
                       </button>
                       <button
+                        aria-label="Niet verschenen"
                         onclick={(e) => { e.stopPropagation(); updateStatus(appt.id, 'no_show'); }}
                         onmouseenter={(e) => showTooltip(e, 'Niet verschenen')}
                         onmouseleave={hideTooltip}
@@ -825,6 +1204,7 @@
                         </svg>
                       </button>
                       <button
+                        aria-label="Annuleer afspraak"
                         onclick={(e) => { e.stopPropagation(); updateStatus(appt.id, 'cancelled'); }}
                         onmouseenter={(e) => showTooltip(e, 'Annuleer afspraak')}
                         onmouseleave={hideTooltip}
@@ -857,56 +1237,106 @@
 
 <!-- Detail modal -->
 {#if showDetailModal && selectedAppointment}
-  <div class="fixed inset-0 z-[1000] flex items-center justify-center bg-surface/80 backdrop-blur-sm">
-    <div class="bg-surface-base border border-white/10 p-8 max-w-md w-full mx-4">
+  <div class="fixed inset-0 z-[1000] flex items-center justify-center bg-surface/80 backdrop-blur-sm p-4">
+    <div class="bg-surface-base border border-white/10 p-5 sm:p-8 max-w-md w-full">
       <div class="flex justify-between items-start mb-6">
-        <h2 class="font-display text-subheading text-bone">Afspraak Details</h2>
-        <button onclick={closeDetail} onmouseenter={(e) => showTooltip(e, 'Sluiten')} onmouseleave={hideTooltip} class="text-bone-muted hover:text-bone text-xl">×</button>
+        <h2 class="font-display text-subheading text-bone">{editingAppointment ? 'Afspraak bewerken' : 'Afspraak details'}</h2>
+        <button onclick={closeDetail} aria-label="Sluiten" onmouseenter={(e) => showTooltip(e, 'Sluiten')} onmouseleave={hideTooltip} class="text-bone-muted hover:text-bone"><X size={20} /></button>
       </div>
 
+      {#if editingAppointment}
+        <form class="space-y-4" onsubmit={(event) => { event.preventDefault(); saveAppointmentEdit(); }}>
+          <label class="block">
+            <span class="mb-2 block font-body text-xs text-bone-muted">Behandeling</span>
+            <select bind:value={editServiceId} onchange={fetchEditAvailability} required class="w-full border border-white/10 bg-surface-low px-3 py-2.5 font-body text-sm text-bone focus:border-gold-500 focus:outline-none">
+              {#each treatmentServices as service}
+                <option value={service.id}>{service.name} ({service.duration} min)</option>
+              {/each}
+            </select>
+          </label>
+          <label class="block">
+            <span class="mb-2 block font-body text-xs text-bone-muted">Barber</span>
+            <select bind:value={editStaffId} onchange={fetchEditAvailability} required class="w-full border border-white/10 bg-surface-low px-3 py-2.5 font-body text-sm text-bone focus:border-gold-500 focus:outline-none">
+              <option value={null} disabled>Selecteer een barber</option>
+              {#each data.staff as member}
+                <option value={member.id}>{member.displayName}</option>
+              {/each}
+            </select>
+          </label>
+          <div class="grid gap-4 sm:grid-cols-2">
+            <label class="block">
+              <span class="mb-2 block font-body text-xs text-bone-muted">Datum</span>
+              <input type="date" bind:value={editDate} onchange={fetchEditAvailability} required class="w-full min-w-0 border border-white/10 bg-surface-low px-3 py-2.5 font-body text-sm text-bone focus:border-gold-500 focus:outline-none" />
+            </label>
+            <label class="block">
+              <span class="mb-2 block font-body text-xs text-bone-muted">Tijdstip</span>
+              <select bind:value={editTime} disabled={loadingEditSlots || editSlots.length === 0} required class="w-full border border-white/10 bg-surface-low px-3 py-2.5 font-body text-sm text-bone focus:border-gold-500 focus:outline-none disabled:opacity-50">
+                <option value="">{loadingEditSlots ? 'Laden...' : editSlots.length === 0 ? 'Geen tijden beschikbaar' : 'Selecteer een tijd'}</option>
+                {#each editSlots.filter((slot) => slot.available) as slot}
+                  <option value={slot.time}>{slot.time}</option>
+                {/each}
+              </select>
+            </label>
+          </div>
+
+          {#if editError}
+            <div class="flex items-start gap-2 border border-red-500/25 bg-red-500/10 p-3 font-body text-xs text-red-300"><AlertTriangle size={15} class="mt-0.5 shrink-0" /> {editError}</div>
+          {/if}
+
+          <div class="flex flex-wrap justify-end gap-3 border-t border-white/10 pt-5">
+            <button type="button" onclick={() => editingAppointment = false} class="px-4 py-2.5 font-body text-sm text-bone-muted hover:text-bone">Annuleren</button>
+            <button type="submit" disabled={savingEdit || !editTime} class="bg-gold-500 px-4 py-2.5 font-body text-sm text-surface hover:bg-gold-400 disabled:opacity-50">{savingEdit ? 'Opslaan...' : 'Wijzigingen opslaan'}</button>
+          </div>
+        </form>
+      {:else}
       <div class="space-y-4">
-        <div class="flex justify-between">
+        <div class="flex justify-between gap-4">
           <span class="font-body text-label text-bone-muted">Status</span>
           <span class="inline-block px-2 py-0.5 text-xs font-body border {statusBadgeBg[selectedAppointment.status] || 'bg-surface-low border-white/10'} {statusColors[selectedAppointment.status] || 'text-bone-muted'}">
             {statusLabels[selectedAppointment.status] || selectedAppointment.status}
           </span>
         </div>
-        <div class="flex justify-between">
+        <div class="flex justify-between gap-4">
           <span class="font-body text-label text-bone-muted">Datum</span>
-          <span class="font-body text-bone">{formatDate(selectedAppointment.date)} {selectedAppointment.timeSlot}</span>
+          <span class="font-body text-bone text-right break-words">{formatDate(selectedAppointment.date)} {selectedAppointment.timeSlot}</span>
         </div>
-        <div class="flex justify-between">
+        <div class="flex justify-between gap-4">
           <span class="font-body text-label text-bone-muted">Klant</span>
-          <span class="font-body text-bone">{selectedAppointment.clientName}</span>
+          <span class="font-body text-bone text-right break-words">{selectedAppointment.clientName}</span>
         </div>
         {#if selectedAppointment.clientEmail}
-          <div class="flex justify-between">
+          <div class="flex justify-between gap-4">
             <span class="font-body text-label text-bone-muted">E-mail</span>
-            <span class="font-body text-bone">{selectedAppointment.clientEmail}</span>
+            <span class="font-body text-bone text-right break-all min-w-0">{selectedAppointment.clientEmail}</span>
           </div>
         {/if}
         {#if selectedAppointment.clientPhone}
-          <div class="flex justify-between">
+          <div class="flex justify-between gap-4">
             <span class="font-body text-label text-bone-muted">Telefoon</span>
-            <span class="font-body text-bone">{selectedAppointment.clientPhone}</span>
+            <span class="font-body text-bone text-right">{selectedAppointment.clientPhone}</span>
           </div>
         {/if}
-        <div class="flex justify-between">
+        <div class="flex justify-between gap-4">
           <span class="font-body text-label text-bone-muted">Service</span>
-          <span class="font-body text-bone">{selectedAppointment.serviceName}</span>
+          <span class="font-body text-bone text-right break-words">{selectedAppointment.serviceName}</span>
         </div>
-        <div class="flex justify-between">
+        <div class="flex justify-between gap-4">
           <span class="font-body text-label text-bone-muted">Barber</span>
-          <span class="font-body text-bone">{selectedAppointment.barberName || 'Geen voorkeur'}</span>
+          <span class="font-body text-bone text-right break-words">{selectedAppointment.barberName || 'Geen voorkeur'}</span>
         </div>
       </div>
 
+      {#if canEditAppointments}
+        <button onclick={startEditingAppointment} class="mt-6 inline-flex w-full items-center justify-center gap-2 border border-gold-500/30 bg-gold-500/10 px-4 py-2.5 font-body text-sm text-gold-500 hover:bg-gold-500 hover:text-surface"><Pencil size={15} /> Afspraak bewerken</button>
+      {/if}
+
       {#if selectedAppointment.status === 'confirmed'}
-        <div class="flex gap-2 mt-8 pt-6 border-t border-white/10">
+        <div class="flex flex-wrap gap-2 mt-8 pt-6 border-t border-white/10">
           <button onclick={() => { updateStatus(selectedAppointment.id, 'completed'); closeDetail(); }} class="flex-1 px-3 py-2 bg-green-500/10 border border-green-500/20 text-green-500 text-xs font-body hover:bg-green-500/20 transition-colors">Afgerond</button>
           <button onclick={() => { updateStatus(selectedAppointment.id, 'cancelled'); closeDetail(); }} class="flex-1 px-3 py-2 bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-body hover:bg-red-500/20 transition-colors">Annuleren</button>
           <button onclick={() => { updateStatus(selectedAppointment.id, 'no_show'); closeDetail(); }} class="flex-1 px-3 py-2 bg-bone-muted/10 border border-bone-muted/20 text-bone-muted text-xs font-body hover:bg-bone-muted/20 transition-colors">Niet Verschenen</button>
         </div>
+      {/if}
       {/if}
     </div>
   </div>

@@ -1,13 +1,15 @@
 <script lang="ts">
+  import { browser } from '$app/environment';
   import {
     Check,
     CheckCircle2,
+    CalendarOff,
     Clock3,
     Phone,
-    Search,
     UserX,
     X
   } from 'lucide-svelte';
+  import { isMyAppointment } from '$lib/utils/appointments';
 
   let { data } = $props();
 
@@ -20,6 +22,7 @@
     serviceName: string;
     duration: number;
     barberName?: string | null;
+    staffId?: number | null;
     status: string;
   };
 
@@ -31,44 +34,46 @@
     no_show: 'Niet verschenen'
   };
 
-  let appointments = $state<Appointment[]>([]);
-  let selectedDay = $state<string>('');
+  // Initiële waarde direct uit serverdata — geen $effect nodig, SSR toont dan meteen juiste aantallen.
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  let appointments = $state<Appointment[]>(data.weekAppointments ?? []);
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  let selectedDay = $state<string>(data.weekDays?.[0]?.key ?? '');
   let selectedStatus = $state('all');
-  let searchQuery = $state('');
   let updatingId = $state<number | null>(null);
-  let initialized = $state(false);
 
+  // ── Alles / Mijn afspraken ──
+  // Staff zien altijd alleen hun eigen afspraken (backend-scope), dus de toggle
+  // is alleen zichtbaar voor owner/manager. "Mijn" = staffId === ingelogde user.
+  const currentUser = data.user;
+  const canToggleScope = Boolean(currentUser && currentUser.role !== 'staff');
+  let scope = $state<'all' | 'mine'>('all');
+
+  if (browser) {
+    const savedScope = sessionStorage.getItem('admin-appointment-scope');
+    if (savedScope === 'all' || savedScope === 'mine') scope = savedScope;
+  }
   $effect(() => {
-    if (!initialized) {
-      appointments = data.weekAppointments ?? [];
-      selectedDay = data.weekDays?.[0]?.key ?? '';
-      initialized = true;
-    }
+    if (browser) sessionStorage.setItem('admin-appointment-scope', scope);
   });
+
+  let scopedAppointments = $derived(
+    scope === 'mine'
+      ? appointments.filter((appt) => isMyAppointment(appt, currentUser?.id))
+      : appointments
+  );
 
   let selectedDayMeta = $derived(data.weekDays.find((day: { key: string }) => day.key === selectedDay));
   let selectedDayAppointments = $derived(
-    appointments.filter((appt) => appt.date === selectedDay)
+    scopedAppointments.filter((appt) => appt.date === selectedDay)
   );
   let visibleAppointments = $derived(
     selectedDayAppointments.filter((appt) => {
-      const matchesStatus = selectedStatus === 'all' || appt.status === selectedStatus;
-      const query = searchQuery.trim().toLowerCase();
-      if (!query) return matchesStatus;
-
-      const haystack = [
-        appt.clientName,
-        appt.clientPhone,
-        appt.serviceName,
-        appt.barberName,
-        appt.timeSlot
-      ].filter(Boolean).join(' ').toLowerCase();
-
-      return matchesStatus && haystack.includes(query);
+      return selectedStatus === 'all' || appt.status === selectedStatus;
     })
   );
   let activeAppointment = $derived(
-    appointments.find((appt) => appt.status === 'confirmed') ?? null
+    scopedAppointments.find((appt) => appt.status === 'confirmed') ?? null
   );
   let confirmedToday = $derived(selectedDayAppointments.filter((appt) => appt.status === 'confirmed').length);
   let completedToday = $derived(selectedDayAppointments.filter((appt) => appt.status === 'completed').length);
@@ -76,6 +81,18 @@
     selectedDayMeta?.label === 'Vandaag'
       ? 'Planning van vandaag'
       : `Planning voor ${selectedDayMeta?.label ?? 'deze dag'}`
+  );
+
+  // Radartellingen volgen de gekozen scope (Alles / Mijn afspraken)
+  let scopedDayCounts = $derived.by(() => {
+    const counts = new Map<string, number>();
+    for (const appt of scopedAppointments) {
+      counts.set(appt.date, (counts.get(appt.date) ?? 0) + 1);
+    }
+    return counts;
+  });
+  let scopedBusiestDayCount = $derived(
+    Math.max(0, ...data.weekDays.map((day: { key: string }) => scopedDayCounts.get(day.key) ?? 0))
   );
 
   function formatSlot(time: string) {
@@ -152,11 +169,11 @@
         <div class="grid gap-3 sm:grid-cols-3">
           <div class="border border-white/10 bg-surface/70 p-4">
             <span class="font-body text-xs text-bone-muted">Vandaag</span>
-            <strong class="mt-2 block font-display text-2xl text-bone tabular-nums">{data.todayCount}</strong>
+            <strong class="mt-2 block font-display text-2xl text-bone tabular-nums">{scopedDayCounts.get(data.weekDays?.[0]?.key ?? '') ?? 0}</strong>
           </div>
           <div class="border border-white/10 bg-surface/70 p-4">
             <span class="font-body text-xs text-bone-muted">Komende 7 dagen</span>
-            <strong class="mt-2 block font-display text-2xl text-bone tabular-nums">{data.weekCount}</strong>
+            <strong class="mt-2 block font-display text-2xl text-bone tabular-nums">{scopedAppointments.length}</strong>
           </div>
           <div class="border border-white/10 bg-surface/70 p-4">
             <span class="font-body text-xs text-bone-muted">Geselecteerde dag</span>
@@ -224,6 +241,26 @@
           </div>
         </div>
       </div>
+
+      {#if data.upcomingTimeOff?.length > 0}
+        <div class="border border-white/5 bg-surface-base p-5">
+          <div class="flex items-center justify-between gap-3">
+            <span class="font-body text-label text-bone-muted">AFWEZIG DEZE WEEK</span>
+            <CalendarOff size={18} class="text-amber-300" />
+          </div>
+          <div class="mt-4 space-y-2">
+            {#each data.upcomingTimeOff as entry}
+              <div class="border-l-2 border-amber-400/50 bg-amber-400/8 px-3 py-2">
+                <span class="block font-body text-sm text-bone">{entry.employeeName}</span>
+                <span class="block font-body text-xs text-bone-muted">
+                  {entry.startDate === entry.endDate ? entry.startDate : `${entry.startDate} - ${entry.endDate}`}
+                  {entry.reason ? ` - ${entry.reason}` : ''}
+                </span>
+              </div>
+            {/each}
+          </div>
+        </div>
+      {/if}
     </aside>
   </section>
 
@@ -234,10 +271,11 @@
         <h2 class="mt-2 font-display text-subheading text-bone">Afspraken per dag</h2>
       </div>
 
-      <div class="grid grid-cols-2 gap-px bg-white/5 sm:grid-cols-7 xl:grid-cols-1">
+      <div class="grid grid-cols-2 gap-px bg-white/5 sm:grid-cols-4 lg:grid-cols-7 xl:grid-cols-1">
         {#each data.weekDays as day}
+          {@const dayCount = scopedDayCounts.get(day.key) ?? 0}
           {@const isSelected = selectedDay === day.key}
-          {@const intensity = Math.min(day.count / Math.max(data.busiestDay?.count || 1, 1), 1)}
+          {@const intensity = Math.min(dayCount / Math.max(scopedBusiestDayCount, 1), 1)}
           <button
             onclick={() => selectedDay = day.key}
             class="bg-surface-base p-4 text-left transition-colors hover:bg-surface-high {isSelected ? 'bg-gold-500/10' : ''}"
@@ -247,11 +285,11 @@
               <span class="font-body text-xs text-bone-muted">{day.day}</span>
             </div>
             <div class="mt-4 flex items-end gap-3">
-              <span class="font-display text-3xl tabular-nums {isSelected ? 'text-gold-500' : 'text-bone'}">{day.count}</span>
+              <span class="font-display text-3xl tabular-nums {isSelected ? 'text-gold-500' : 'text-bone'}">{dayCount}</span>
               <div class="mb-2 h-8 flex-1 bg-surface-low">
                 <div
                   class="h-full bg-gold-500 transition-all"
-                  style={`width: ${Math.max(intensity * 100, day.count > 0 ? 12 : 0)}%`}
+                  style={`width: ${Math.max(intensity * 100, dayCount > 0 ? 12 : 0)}%`}
                 ></div>
               </div>
             </div>
@@ -268,15 +306,21 @@
             <h2 class="mt-2 font-display text-subheading text-bone">{scheduleTitle}</h2>
           </div>
 
-          <div class="flex flex-col gap-3 sm:flex-row">
-            <div class="relative">
-              <Search size={15} class="absolute left-3 top-1/2 -translate-y-1/2 text-bone-muted" />
-              <input
-                bind:value={searchQuery}
-                placeholder="Zoek klant, service..."
-                class="w-full bg-surface-low py-2.5 pl-9 pr-3 font-body text-sm text-bone outline-none ring-1 ring-white/10 transition focus:ring-gold-500/60 sm:w-56"
-              />
-            </div>
+          <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+            {#if canToggleScope}
+              <div class="flex bg-surface-low ring-1 ring-white/10 overflow-hidden self-start">
+                <button
+                  onclick={() => scope = 'all'}
+                  aria-pressed={scope === 'all'}
+                  class="px-3 py-2 text-xs font-body transition-colors {scope === 'all' ? 'bg-gold-500 text-surface' : 'text-bone-muted hover:text-bone'}"
+                >Alles</button>
+                <button
+                  onclick={() => scope = 'mine'}
+                  aria-pressed={scope === 'mine'}
+                  class="px-3 py-2 text-xs font-body transition-colors {scope === 'mine' ? 'bg-gold-500 text-surface' : 'text-bone-muted hover:text-bone'}"
+                >Mijn afspraken</button>
+              </div>
+            {/if}
 
             <select
               bind:value={selectedStatus}

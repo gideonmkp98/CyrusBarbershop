@@ -82,7 +82,8 @@ export async function validateSession(tokenOrSigned: string) {
     displayName: user.displayName,
     imageUrl: user.imageUrl,
     role: user.role,
-    isActive: user.isActive
+    isActive: user.isActive,
+    isBarber: user.isBarber
   };
 }
 

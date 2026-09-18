@@ -1,6 +1,7 @@
 import { db } from '$lib/server/db/index';
 import { openingHours, appointments, appointmentAddOns, blockedTimes, staffSchedules, users, services } from '$lib/server/db/schema';
 import { eq, and, ne, sql, inArray } from 'drizzle-orm';
+import { isStaffUnavailable } from '$lib/server/scheduling';
 import { generateDynamicSlots, timeToMinutes } from '$lib/server/availability-slots';
 import type { RequestHandler } from './$types';
 
@@ -16,12 +17,13 @@ function isWithinBookingWindow(date: Date): boolean {
   return date >= today && date <= maxDate;
 }
 
-export const GET: RequestHandler = async ({ url }) => {
+export const GET: RequestHandler = async ({ url, locals }) => {
   const dateStr = url.searchParams.get('date');
   const staffIdParam = url.searchParams.get('staffId');
   const allBarbersParam = url.searchParams.get('allBarbers');
   const serviceIdParam = url.searchParams.get('serviceId');
   const durationParam = url.searchParams.get('duration');
+  const excludeAppointmentParam = url.searchParams.get('excludeAppointmentId');
 
   if (!dateStr || !/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
     return new Response(JSON.stringify({ error: 'Ongeldig datumformaat' }), { status: 400 });
@@ -30,6 +32,10 @@ export const GET: RequestHandler = async ({ url }) => {
   const staffId = staffIdParam ? parseInt(staffIdParam, 10) : null;
   const combineAllBarbers = allBarbersParam === 'true';
   const serviceId = serviceIdParam ? parseInt(serviceIdParam, 10) : null;
+  const requestedExcludeId = excludeAppointmentParam ? parseInt(excludeAppointmentParam, 10) : null;
+  const excludeAppointmentId = locals.user && locals.user.role !== 'staff' && requestedExcludeId
+    ? requestedExcludeId
+    : null;
 
   const [year, month, day] = dateStr.split('-').map(Number);
   const date = new Date(year, month - 1, day);
@@ -108,6 +114,8 @@ export const GET: RequestHandler = async ({ url }) => {
     const slotAvailability = new Map<string, number[]>();
 
     for (const barberId of barberIds) {
+      if (await isStaffUnavailable(barberId, dateStr)) continue;
+
       const staffSchedule = await db
         .select()
         .from(staffSchedules)
@@ -138,6 +146,7 @@ export const GET: RequestHandler = async ({ url }) => {
         ne(appointments.status, 'cancelled'),
         eq(appointments.staffId, barberId)
       ];
+      if (excludeAppointmentId) bookingConditions.push(ne(appointments.id, excludeAppointmentId));
 
     const booked = await db
       .select({
@@ -149,7 +158,7 @@ export const GET: RequestHandler = async ({ url }) => {
         .where(and(...bookingConditions));
 
       // Get duration for each appointment
-      const appointmentsWithDuration = [];
+      const appointmentsWithDuration: { timeSlot: string; duration: number }[] = [];
       for (const booking of booked) {
         const serviceResult = await db
           .select({ duration: services.duration })
@@ -206,6 +215,12 @@ export const GET: RequestHandler = async ({ url }) => {
 
   // SINGLE BARBER MODE
   if (staffId) {
+    if (await isStaffUnavailable(staffId, dateStr)) {
+      return new Response(JSON.stringify({ date: dateStr, slots: [], unavailable: true }), {
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
     const staffSchedule = await db
       .select()
       .from(staffSchedules)
@@ -240,6 +255,7 @@ export const GET: RequestHandler = async ({ url }) => {
       ne(appointments.status, 'cancelled'),
       eq(appointments.staffId, staffId)
     ];
+    if (excludeAppointmentId) bookingConditions.push(ne(appointments.id, excludeAppointmentId));
 
       const booked = await db
         .select({
@@ -251,7 +267,7 @@ export const GET: RequestHandler = async ({ url }) => {
       .where(and(...bookingConditions));
 
     // Get duration for each appointment
-    const appointmentsWithDuration = [];
+    const appointmentsWithDuration: { timeSlot: string; duration: number }[] = [];
     for (const booking of booked) {
       const serviceResult = await db
         .select({ duration: services.duration })

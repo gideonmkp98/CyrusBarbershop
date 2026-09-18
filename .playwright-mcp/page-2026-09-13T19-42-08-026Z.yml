@@ -1,0 +1,93 @@
+- main [ref=f11e14]:
+  - generic [ref=f11e15]:
+    - generic [ref=f11e16]:
+      - link "Cyrus CYRUS BEHEER" [ref=f11e17] [cursor=pointer]:
+        - /url: /admin
+        - img "Cyrus" [ref=f11e18]
+        - generic [ref=f11e19]: CYRUS BEHEER
+      - button "Menu openen" [ref=f11e20]
+    - complementary [ref=f11e24]:
+      - link "Cyrus CYRUS BEHEER" [ref=f11e26] [cursor=pointer]:
+        - /url: /
+        - img "Cyrus" [ref=f11e27]
+        - generic [ref=f11e28]: CYRUS BEHEER
+      - navigation [ref=f11e29]:
+        - link "Dashboard" [ref=f11e30] [cursor=pointer]:
+          - /url: /admin
+        - link "Afspraken" [ref=f11e31] [cursor=pointer]:
+          - /url: /admin/appointments
+        - link "Behandelingen" [ref=f11e32] [cursor=pointer]:
+          - /url: /admin/services
+        - link "Gebruikers" [ref=f11e33] [cursor=pointer]:
+          - /url: /admin/users
+        - link "Openingstijden" [ref=f11e34] [cursor=pointer]:
+          - /url: /admin/opening-hours
+      - generic [ref=f11e35]:
+        - generic [ref=f11e36]:
+          - generic [ref=f11e37]: Account
+          - generic [ref=f11e38]: Admin
+        - link "Mijn Profiel" [ref=f11e39] [cursor=pointer]:
+          - /url: /admin/profile
+      - button "Afmelden" [ref=f11e41]
+    - main [ref=f11e42]:
+      - heading "Gebruikersbeheer" [level=1] [ref=f11e43]
+      - generic [ref=f11e44]:
+        - heading "Maak Personeelsgebruiker" [level=2] [ref=f11e45]
+        - generic [ref=f11e46]:
+          - generic [ref=f11e47]:
+            - textbox "Weergavenaam" [ref=f11e48]:
+              - /placeholder: " "
+            - generic: Weergavenaam
+          - generic [ref=f11e49]:
+            - textbox "E-mail" [ref=f11e50]:
+              - /placeholder: " "
+            - generic: E-mail
+          - generic [ref=f11e51]:
+            - textbox "Wachtwoord" [ref=f11e52]:
+              - /placeholder: " "
+            - generic: Wachtwoord
+          - generic [ref=f11e53]:
+            - checkbox "Dit personeelslid is een barber" [ref=f11e54]
+            - generic [ref=f11e55]: Dit personeelslid is een barber
+          - button "Gebruiker Aanmaken" [ref=f11e57] [cursor=pointer]
+      - table [ref=f11e59]:
+        - rowgroup [ref=f11e60]:
+          - row [ref=f11e61]:
+            - columnheader "Naam" [ref=f11e62]
+            - columnheader "E-mail" [ref=f11e63]
+            - columnheader "Rol" [ref=f11e64]
+            - columnheader "Barber" [ref=f11e65]
+            - columnheader "Foto" [ref=f11e66]
+            - columnheader "Status" [ref=f11e67]
+            - columnheader "Acties" [ref=f11e68]
+        - rowgroup [ref=f11e96]:
+          - row [ref=f11e97]:
+            - cell [ref=f11e98]:
+              - textbox "Naam van Admin" [ref=f11e99]: Admin
+            - cell "gideonmkp98@gmail.com" [ref=f11e100]
+            - cell "owner" [ref=f11e101]
+            - cell "✓ Barber" [ref=f11e103]
+            - cell [ref=f11e105]:
+              - img "Admin" [ref=f11e106]
+            - cell "Actief" [ref=f11e107]
+            - cell [ref=f11e109]:
+              - button "Acties voor Admin" [ref=f11e111]
+          - row [ref=f11e130]:
+            - cell [ref=f11e114]:
+              - textbox "Naam van hnkie" [ref=f11e115]: hnkie
+            - cell "jwj@live.nl" [ref=f11e116]
+            - cell "Medewerker" [ref=f11e117]
+            - cell "✓ Barber" [ref=f11e119]
+            - cell [ref=f11e121]:
+              - img "hnkie" [ref=f11e122]
+            - cell "Actief" [ref=f11e123]
+            - cell [ref=f11e131]:
+              - generic [ref=f11e126]:
+                - button "Acties voor hnkie" [expanded] [active] [ref=f11e127]
+                - generic [ref=f11e133]:
+                  - button "Geen barber" [ref=f11e134]
+                  - button "Werktijden" [ref=f11e136]
+                  - button "Upload foto" [ref=f11e138]
+                  - button "Rol wijzigen" [ref=f11e140]
+                  - button "Deactiveren" [ref=f11e142]
+                  - button "Verwijderen" [ref=f11e145]

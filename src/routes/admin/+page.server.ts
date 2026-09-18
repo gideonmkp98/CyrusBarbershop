@@ -1,9 +1,12 @@
 import { db } from '$lib/server/db/index';
-import { appointments, services, users } from '$lib/server/db/schema';
-import { eq, asc, sql } from 'drizzle-orm';
+import { appointments, services, staffTimeOff, users } from '$lib/server/db/schema';
+import { eq, asc, sql, and } from 'drizzle-orm';
+import { appointmentStaffScope } from '$lib/server/appointment-scope';
 import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async () => {
+export const load: PageServerLoad = async ({ locals }) => {
+  // Staff zien uitsluitend hun eigen afspraken (zelfde scope als op /admin/appointments).
+  const staffScope = appointmentStaffScope(locals.user);
   // Format dates as YYYY-MM-DD using local date, not UTC
   const todayDate = new Date();
   const today = `${todayDate.getFullYear()}-${String(todayDate.getMonth() + 1).padStart(2, '0')}-${String(todayDate.getDate()).padStart(2, '0')}`;
@@ -21,12 +24,13 @@ export const load: PageServerLoad = async () => {
       duration: services.duration,
       clientPhone: appointments.clientPhone,
       barberName: users.displayName,
+      staffId: appointments.staffId,
       status: appointments.status
     })
     .from(appointments)
     .innerJoin(services, eq(appointments.serviceId, services.id))
     .leftJoin(users, eq(appointments.staffId, users.id))
-    .where(sql`${appointments.date} = ${today}`)
+    .where(staffScope ? and(sql`${appointments.date} = ${today}`, staffScope) : sql`${appointments.date} = ${today}`)
     .orderBy(asc(appointments.timeSlot));
 
   const weekAppts = await db
@@ -39,12 +43,17 @@ export const load: PageServerLoad = async () => {
       duration: services.duration,
       clientPhone: appointments.clientPhone,
       barberName: users.displayName,
+      staffId: appointments.staffId,
       status: appointments.status
     })
     .from(appointments)
     .innerJoin(services, eq(appointments.serviceId, services.id))
     .leftJoin(users, eq(appointments.staffId, users.id))
-    .where(sql`${appointments.date} BETWEEN ${today} AND ${weekFromNow}`)
+    .where(
+      staffScope
+        ? and(sql`${appointments.date} BETWEEN ${today} AND ${weekFromNow}`, staffScope)
+        : sql`${appointments.date} BETWEEN ${today} AND ${weekFromNow}`
+    )
     .orderBy(asc(appointments.date), asc(appointments.timeSlot));
 
   const formatDateKey = (value: unknown) => {
@@ -71,11 +80,36 @@ export const load: PageServerLoad = async () => {
     };
   });
 
+  const timeOffConditions: any[] = [
+    eq(staffTimeOff.status, 'approved'),
+    sql`${staffTimeOff.startDate} <= ${weekFromNow}`,
+    sql`${staffTimeOff.endDate} >= ${today}`
+  ];
+  if (locals.user?.role === 'staff') timeOffConditions.push(eq(staffTimeOff.staffId, locals.user.id));
+  const upcomingTimeOff = await db
+    .select({
+      id: staffTimeOff.id,
+      staffId: staffTimeOff.staffId,
+      startDate: staffTimeOff.startDate,
+      endDate: staffTimeOff.endDate,
+      reason: staffTimeOff.reason,
+      employeeName: users.displayName
+    })
+    .from(staffTimeOff)
+    .innerJoin(users, eq(staffTimeOff.staffId, users.id))
+    .where(and(...timeOffConditions))
+    .orderBy(asc(staffTimeOff.startDate));
+
   return {
     todayCount: todayAppts.length,
     weekCount: weekAppts.length,
     busiestDay: weekDays.reduce((best, day) => day.count > best.count ? day : best, weekDays[0]),
     weekDays,
+    upcomingTimeOff: upcomingTimeOff.map((entry) => ({
+      ...entry,
+      startDate: formatDateKey(entry.startDate),
+      endDate: formatDateKey(entry.endDate)
+    })),
     nextAppointment: weekAppts.find((appt) => appt.status === 'confirmed') ?? null,
     weekAppointments: weekAppts.map((appt) => ({
       ...appt,

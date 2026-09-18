@@ -29,6 +29,13 @@
       "when": 1788793200000,
       "tag": "0003_add_user_image_url",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1789333444602,
+      "tag": "0004_tough_doomsday",
+      "breakpoints": true
     }
   ]
 }

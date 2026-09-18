@@ -1,40 +1,12 @@
 import { db } from '$lib/server/db/index';
-import { appointments, appointmentAddOns, blockedTimes, openingHours, services, staffSchedules, users } from '$lib/server/db/schema';
+import { appointments, appointmentAddOns } from '$lib/server/db/schema';
 import { appointmentSchema } from '$lib/utils/validation';
 import { sendBookingConfirmation } from '$lib/server/mail/sendBookingConfirmation';
 import { sendBookingNotification } from '$lib/server/mail/sendBookingNotification';
 import { rateLimit, getClientIp } from '$lib/server/rateLimit';
 import { PUBLIC_SITE_URL } from '$env/static/public';
-import { sql, ne, eq, and, isNull, inArray } from 'drizzle-orm';
+import { SchedulingError, validateAppointmentConfiguration } from '$lib/server/scheduling';
 import type { RequestHandler } from './$types';
-
-/** Calculate end time in minutes from a timeSlot string and duration in minutes */
-function timeToMinutes(time: string): number {
-  const [h, m] = time.split(':').map(Number);
-  return h * 60 + m;
-}
-
-/** Check if two time ranges overlap */
-function hasOverlap(start1: number, end1: number, start2: number, end2: number): boolean {
-  return start1 < end2 && start2 < end1;
-}
-
-function startOfLocalDay(date: Date): Date {
-  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
-}
-
-function parseLocalDate(date: string): Date {
-  const [year, month, day] = date.split('-').map(Number);
-  return new Date(year, month - 1, day);
-}
-
-function isWithinBookingWindow(date: Date): boolean {
-  const today = startOfLocalDay(new Date());
-  const maxDate = new Date(today);
-  maxDate.setDate(maxDate.getDate() + 10 * 7);
-
-  return date >= today && date <= maxDate;
-}
 
 // Public booking endpoint: 10 attempts / minute / IP.
 // Caps casual abuse (scripted attempts to find open slots) without affecting real users.
@@ -84,195 +56,28 @@ export const POST: RequestHandler = async ({ request }) => {
   }
 
   const { serviceId, staffId, date, timeSlot, clientName, clientEmail, clientPhone, notes, addOnIds } = parsed.data;
-
-  // Get details of the main service being booked
-  const serviceResult = await db
-    .select({ id: services.id, name: services.name, price: services.price, duration: services.duration, category: services.category })
-    .from(services)
-    .where(eq(services.id, serviceId));
-
-  if (serviceResult.length === 0) {
-    return new Response(JSON.stringify({ error: 'Service niet gevonden' }), {
-      status: 404,
-      headers: { 'Content-Type': 'application/json' }
-    });
-  }
-
-  const bookedService = serviceResult[0];
-
-  // Resolve add-ons (must be category 'extra' and active)
-  let resolvedAddOns: { id: number; name: string; price: string; duration: number }[] = [];
-  if (addOnIds && addOnIds.length > 0) {
-    const uniqueIds = Array.from(new Set(addOnIds));
-    const addOnResults = await db
-      .select({ id: services.id, name: services.name, price: services.price, duration: services.duration, category: services.category, isActive: services.isActive })
-      .from(services)
-      .where(inArray(services.id, uniqueIds));
-
-    if (addOnResults.length !== uniqueIds.length) {
-      return new Response(JSON.stringify({ error: 'Eén of meer extra behandelingen bestaan niet' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' }
-      });
-    }
-
-    const invalid = addOnResults.filter(a => a.category !== 'extra' || !a.isActive);
-    if (invalid.length > 0) {
-      return new Response(JSON.stringify({ error: 'Geselecteerde extra\'s zijn niet beschikbaar' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' }
-      });
-    }
-
-    resolvedAddOns = addOnResults.map(a => ({
-      id: a.id,
-      name: a.name,
-      price: a.price,
-      duration: a.duration
-    }));
-  }
-
-  const addOnTotalDuration = resolvedAddOns.reduce((sum, a) => sum + a.duration, 0);
-  const newServiceDuration = bookedService.duration + addOnTotalDuration;
-  const newStartMinutes = timeToMinutes(timeSlot);
-  const newEndMinutes = newStartMinutes + newServiceDuration;
-  const requestedDate = parseLocalDate(date);
-
-  if (!isWithinBookingWindow(requestedDate)) {
-    return new Response(JSON.stringify({ error: 'Boeken kan maximaal 10 weken vooruit' }), {
+  if (!clientEmail) {
+    return new Response(JSON.stringify({ error: 'E-mailadres is verplicht' }), {
       status: 400,
       headers: { 'Content-Type': 'application/json' }
     });
   }
 
-  const dayOfWeek = requestedDate.getDay() === 0 ? 7 : requestedDate.getDay();
-  const businessHours = await db
-    .select()
-    .from(openingHours)
-    .where(and(eq(openingHours.dayOfWeek, dayOfWeek), eq(openingHours.isActive, true)))
-    .limit(1);
-
-  if (businessHours.length === 0) {
-    return new Response(JSON.stringify({ error: 'De zaak is gesloten op deze dag' }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json' }
-    });
-  }
-
-  const businessOpen = timeToMinutes(businessHours[0].openTime);
-  const businessClose = timeToMinutes(businessHours[0].closeTime);
-  if (newStartMinutes < businessOpen || newEndMinutes > businessClose) {
-    return new Response(JSON.stringify({ error: 'Dit moment valt buiten de openingstijden' }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json' }
-    });
-  }
-
-  const blocked = await db
-    .select({ id: blockedTimes.id })
-    .from(blockedTimes)
-    .where(and(sql`${blockedTimes.date} = ${date}`, eq(blockedTimes.timeSlot, timeSlot)))
-    .limit(1);
-
-  if (blocked.length > 0) {
-    return new Response(JSON.stringify({ error: 'Dit moment is niet beschikbaar' }), {
-      status: 409,
-      headers: { 'Content-Type': 'application/json' }
-    });
-  }
-
-  if (staffId) {
-    const barber = await db
-      .select({ id: users.id })
-      .from(users)
-      .where(and(eq(users.id, staffId), eq(users.isBarber, true), eq(users.isActive, true)))
-      .limit(1);
-
-    if (barber.length === 0) {
-      return new Response(JSON.stringify({ error: 'Deze medewerker is niet beschikbaar voor boekingen' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' }
-      });
-    }
-
-    const schedule = await db
-      .select()
-      .from(staffSchedules)
-      .where(
-        and(
-          eq(staffSchedules.staffId, staffId),
-          eq(staffSchedules.dayOfWeek, dayOfWeek),
-          eq(staffSchedules.isActive, true)
-        )
-      )
-      .limit(1);
-
-    if (schedule.length === 0 || !schedule[0].openTime || !schedule[0].closeTime) {
-      return new Response(JSON.stringify({ error: 'Deze medewerker werkt niet op deze dag' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' }
-      });
-    }
-
-    const staffOpen = timeToMinutes(schedule[0].openTime);
-    const staffClose = timeToMinutes(schedule[0].closeTime);
-    if (newStartMinutes < staffOpen || newEndMinutes > staffClose) {
-      return new Response(JSON.stringify({ error: 'Dit moment valt buiten de werktijden van de medewerker' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' }
-      });
-    }
-  }
-
-  // The overlap check and insert run inside a single transaction so concurrent
-  // requests cannot both observe an empty slot and create double bookings.
+  let created: Awaited<ReturnType<typeof validateAppointmentConfiguration>>;
   let appointmentId: number;
   try {
-    appointmentId = await db.transaction(async (tx) => {
-      const txConditions = [
-        sql`${appointments.date} = ${date}`,
-        ne(appointments.status, 'cancelled')
-      ];
-
-      if (staffId) {
-        txConditions.push(eq(appointments.staffId, staffId));
-      } else {
-        txConditions.push(isNull(appointments.staffId));
-      }
-
-      const existingInTx = await tx
-        .select({
-          id: appointments.id,
-          timeSlot: appointments.timeSlot,
-          serviceId: appointments.serviceId
-        })
-        .from(appointments)
-        .where(and(...txConditions));
-
-      for (const appt of existingInTx) {
-        const durResult = await tx
-          .select({ duration: services.duration })
-          .from(services)
-          .where(eq(services.id, appt.serviceId));
-        const existingAddOns = await tx
-          .select({ duration: appointmentAddOns.duration })
-          .from(appointmentAddOns)
-          .where(eq(appointmentAddOns.appointmentId, appt.id));
-        const existingDuration =
-          (durResult.length > 0 ? durResult[0].duration : 30) +
-          existingAddOns.reduce((sum, addOn) => sum + addOn.duration, 0);
-        const existingStart = timeToMinutes(appt.timeSlot);
-        const existingEnd = existingStart + existingDuration;
-
-        if (hasOverlap(newStartMinutes, newEndMinutes, existingStart, existingEnd)) {
-          throw new Error('OVERLAP');
-        }
-      }
-
+    const result = await db.transaction(async (tx) => {
+      const configuration = await validateAppointmentConfiguration(tx, {
+        serviceId,
+        staffId: staffId ?? null,
+        date,
+        timeSlot,
+        addOnIds
+      }, { enforceBookingWindow: true });
       const insertResult = await tx.insert(appointments).values({
         serviceId,
-        staffId: staffId || null,
-        date: new Date(date + 'T00:00:00'),
+        staffId: configuration.resolvedStaffId,
+        date: configuration.appointmentDate,
         timeSlot,
         clientName,
         clientEmail,
@@ -282,27 +87,28 @@ export const POST: RequestHandler = async ({ request }) => {
 
       const newAppointmentId = insertResult[0].insertId;
 
-      if (resolvedAddOns.length > 0) {
+      if (configuration.addOns.length > 0) {
         await tx.insert(appointmentAddOns).values(
-          resolvedAddOns.map(a => ({
+          configuration.addOns.map((addOn) => ({
             appointmentId: newAppointmentId,
-            serviceId: a.id,
-            price: a.price,
-            duration: a.duration
+            serviceId: addOn.id,
+            price: addOn.price,
+            duration: addOn.duration
           }))
         );
       }
-
-      return newAppointmentId;
+      return { appointmentId: newAppointmentId, configuration };
     });
-  } catch (txError: any) {
-    if (txError?.message === 'OVERLAP') {
-      return new Response(JSON.stringify({ error: 'Dit moment overlapt met een bestaande afspraak' }), {
-        status: 409,
+    appointmentId = result.appointmentId;
+    created = result.configuration;
+  } catch (error) {
+    if (error instanceof SchedulingError) {
+      return new Response(JSON.stringify({ error: error.message, code: error.code }), {
+        status: error.status,
         headers: { 'Content-Type': 'application/json' }
       });
     }
-    console.error('[appointments] transaction error:', txError);
+    console.error('[appointments] transaction error:', error);
     return new Response(JSON.stringify({ error: 'Interne fout' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
@@ -312,29 +118,19 @@ export const POST: RequestHandler = async ({ request }) => {
   // Send confirmation email after the booking has been persisted.
   // Email failures are logged but never fail the booking itself.
   try {
-    let barberName: string | null = null;
-    if (staffId) {
-      const barberResult = await db
-        .select({ displayName: users.displayName })
-        .from(users)
-        .where(eq(users.id, staffId))
-        .limit(1);
-      barberName = barberResult[0]?.displayName ?? null;
-    }
-
     const mailResult = await sendBookingConfirmation({
       to: clientEmail,
       clientName,
-      serviceName: bookedService.name,
-      barberName,
+      serviceName: created.service.name,
+      barberName: created.barberName,
       date,
       time: timeSlot,
-      duration: bookedService.duration,
-      price: bookedService.price,
+      duration: created.service.duration,
+      price: created.service.price,
       notes: notes || null,
       siteUrl: PUBLIC_SITE_URL || 'https://cyrusbarbershop.nl',
       appointmentId,
-      addOns: resolvedAddOns.map(a => ({ name: a.name, price: a.price }))
+      addOns: created.addOns.map((addOn) => ({ name: addOn.name, price: addOn.price }))
     });
 
     if (!mailResult.ok) {
@@ -343,24 +139,24 @@ export const POST: RequestHandler = async ({ request }) => {
 
     // Notify the shop owner about the new booking. Independent of the
     // customer confirmation — a failure here never affects the booking.
-    const addOnTotalPrice = resolvedAddOns.reduce(
-      (sum, a) => sum + Number.parseFloat(a.price || '0'),
-      Number.parseFloat(bookedService.price || '0')
+    const addOnTotalPrice = created.addOns.reduce(
+      (sum, addOn) => sum + Number.parseFloat(addOn.price || '0'),
+      Number.parseFloat(created.service.price || '0')
     );
     const notifyResult = await sendBookingNotification({
       clientName,
       clientEmail,
       clientPhone: clientPhone || null,
-      serviceName: bookedService.name,
-      barberName,
+      serviceName: created.service.name,
+      barberName: created.barberName,
       date,
       time: timeSlot,
-      duration: newServiceDuration,
-      price: Number.isFinite(addOnTotalPrice) ? addOnTotalPrice : bookedService.price,
+      duration: created.totalDuration,
+      price: Number.isFinite(addOnTotalPrice) ? addOnTotalPrice : created.service.price,
       notes: notes || null,
       siteUrl: PUBLIC_SITE_URL || 'https://cyrusbarbershop.nl',
       appointmentId,
-      addOns: resolvedAddOns.map(a => ({ name: a.name, price: a.price }))
+      addOns: created.addOns.map((addOn) => ({ name: addOn.name, price: addOn.price }))
     });
 
     if (!notifyResult.ok) {

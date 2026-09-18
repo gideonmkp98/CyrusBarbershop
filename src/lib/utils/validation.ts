@@ -32,3 +32,29 @@ export const createUserSchema = z.object({
   password: z.string().min(8).regex(/[A-Z]/, 'Minimaal één hoofdletter').regex(/[a-z]/, 'Minimaal één kleine letter').regex(/[0-9]/, 'Minimaal één cijfer'),
   displayName: z.string().min(2).max(100)
 });
+
+const dateKeySchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Ongeldige datum');
+
+export const timeOffCreateSchema = z.object({
+  staffId: z.number().int().positive().optional(),
+  startDate: dateKeySchema,
+  endDate: dateKeySchema,
+  reason: z.string().trim().max(500).optional().default(''),
+  direct: z.boolean().optional().default(false),
+  confirmConflicts: z.boolean().optional().default(false)
+});
+
+export const timeOffReviewSchema = z.object({
+  id: z.number().int().positive(),
+  status: z.enum(['approved', 'rejected']),
+  reviewerNote: z.string().trim().max(500).optional().default(''),
+  confirmConflicts: z.boolean().optional().default(false)
+});
+
+export const appointmentRescheduleSchema = z.object({
+  id: z.number().int().positive(),
+  serviceId: z.number().int().positive(),
+  staffId: z.number().int().positive(),
+  date: dateKeySchema,
+  timeSlot: z.string().regex(/^\d{2}:\d{2}$/)
+});

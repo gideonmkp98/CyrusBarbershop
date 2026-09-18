@@ -1,12 +1,13 @@
 import { db } from '$lib/server/db/index';
-import { appointments, services, users } from '$lib/server/db/schema';
+import { appointments, services, staffTimeOff, users } from '$lib/server/db/schema';
 import { eq, desc, and, sql } from 'drizzle-orm';
+import { appointmentStaffScope } from '$lib/server/appointment-scope';
 import type { PageServerLoad, Actions } from './$types';
 
 const PAGE_SIZE = 50;
 
 export const load: PageServerLoad = async ({ locals }) => {
-  const staffScope = locals.user?.role === 'staff' ? eq(appointments.staffId, locals.user.id) : undefined;
+  const staffScope = appointmentStaffScope(locals.user);
 
   // Haal de meest recente afspraken (pagina 1)
   let appointmentsQuery = db
@@ -86,10 +87,30 @@ export const load: PageServerLoad = async ({ locals }) => {
 
   const allStaff = await staffQuery;
 
+  const timeOffConditions: any[] = [eq(staffTimeOff.status, 'approved')];
+  if (locals.user?.role === 'staff') timeOffConditions.push(eq(staffTimeOff.staffId, locals.user.id));
+  const approvedTimeOff = await db
+    .select({
+      id: staffTimeOff.id,
+      staffId: staffTimeOff.staffId,
+      startDate: staffTimeOff.startDate,
+      endDate: staffTimeOff.endDate,
+      reason: staffTimeOff.reason,
+      employeeName: users.displayName
+    })
+    .from(staffTimeOff)
+    .innerJoin(users, eq(staffTimeOff.staffId, users.id))
+    .where(and(...timeOffConditions));
+
   return {
     appointments: formattedAppointments,
     services: allServices,
     staff: allStaff,
+    timeOff: approvedTimeOff.map((entry) => ({
+      ...entry,
+      startDate: entry.startDate instanceof Date ? `${entry.startDate.getFullYear()}-${String(entry.startDate.getMonth() + 1).padStart(2, '0')}-${String(entry.startDate.getDate()).padStart(2, '0')}` : entry.startDate,
+      endDate: entry.endDate instanceof Date ? `${entry.endDate.getFullYear()}-${String(entry.endDate.getMonth() + 1).padStart(2, '0')}-${String(entry.endDate.getDate()).padStart(2, '0')}` : entry.endDate
+    })),
     nextCursor,
     hasMore
   };

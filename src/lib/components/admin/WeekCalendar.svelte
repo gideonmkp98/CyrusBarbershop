@@ -14,13 +14,14 @@
   interface Props {
     appointments: Appointment[];
     staff: { id: number; displayName: string }[];
+    timeOff?: { id: number; staffId: number; startDate: string; endDate: string; reason?: string | null; employeeName: string }[];
     onSelect: (appt: Appointment) => void;
     onStatusChange: (id: number, status: string) => void;
     onWeekChange?: (start: string, end: string) => void;
     isLoading?: boolean;
   }
 
-  let { appointments, staff, onSelect, onStatusChange, onWeekChange, isLoading = false }: Props = $props();
+  let { appointments, staff, timeOff = [], onSelect, onStatusChange, onWeekChange, isLoading = false }: Props = $props();
 
   // Tooltip state
   let tooltipText = $state('');
@@ -76,9 +77,10 @@
       const date = addDays(currentWeekStart, i);
       const dateKey = formatDateKey(date);
       const dayAppointments = appointments.filter(a => isSameDay(a.date, date));
+      const dayTimeOff = timeOff.filter((entry) => entry.startDate <= dateKey && entry.endDate >= dateKey);
       // Sort by time
       dayAppointments.sort((a, b) => a.timeSlot.localeCompare(b.timeSlot));
-      return { date, dateKey, dayName: dayNames[i], appointments: dayAppointments };
+      return { date, dateKey, dayName: dayNames[i], appointments: dayAppointments, timeOff: dayTimeOff };
     })
   );
 
@@ -129,7 +131,7 @@
 
 <div class="space-y-4">
   <!-- Week navigation -->
-  <div class="flex items-center justify-between">
+  <div class="flex flex-wrap items-center justify-between gap-3">
     <div class="flex items-center gap-2">
       <button
         onclick={prevWeek}
@@ -167,9 +169,11 @@
     </span>
   </div>
 
-  <!-- Calendar grid -->
-  <div class="grid grid-cols-7 gap-2">
-    {#each weekDays as { date, dayName, appointments: dayAppointments }}
+  <!-- Calendar grid: horizontally scrollable on narrow screens so the
+       7-day columns stay usable instead of collapsing -->
+  <div class="overflow-x-auto -mx-1 px-1">
+    <div class="grid grid-cols-7 gap-2 min-w-[680px]">
+    {#each weekDays as { date, dayName, appointments: dayAppointments, timeOff: dayTimeOff }}
       <div class="min-h-[400px] bg-surface-base border border-white/5 flex flex-col">
         <!-- Day header -->
         <div class="p-3 border-b border-white/5 text-center {isToday(date) ? 'bg-gold-500/10' : ''}">
@@ -179,7 +183,14 @@
 
         <!-- Appointments -->
         <div class="flex-1 p-2 space-y-2 overflow-y-auto">
-          {#if dayAppointments.length === 0}
+          {#each dayTimeOff as entry (entry.id)}
+            <div class="border border-amber-400/20 bg-amber-400/8 p-2">
+              <div class="font-body text-[11px] uppercase text-amber-300">Afwezig</div>
+              <div class="mt-0.5 truncate font-body text-xs text-bone">{entry.employeeName}</div>
+              {#if entry.reason}<div class="truncate font-body text-[11px] text-bone-muted">{entry.reason}</div>{/if}
+            </div>
+          {/each}
+          {#if dayAppointments.length === 0 && dayTimeOff.length === 0}
             <div class="text-center py-8 text-bone-muted/40 text-xs font-body">Geen afspraken</div>
           {:else}
             {#each dayAppointments as appt}
@@ -199,6 +210,7 @@
         </div>
       </div>
     {/each}
+  </div>
   </div>
 
   <!-- Custom Tooltip -->
