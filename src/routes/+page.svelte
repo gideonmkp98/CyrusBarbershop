@@ -50,8 +50,8 @@
 </script>
 
 <svelte:head>
-  <title>Cyrus Kapsalon - Precision Cuts, Timeless Style</title>
-  <meta name="description" content="Cyrus Kapsalon — Vakwerk sinds 1994. Boek een afspraak voor haarsneden, skin fades, warme scheerbeurt en exclusieve grooming services." />
+  <title>Cyrus Barbershop - Precision Cuts, Timeless Style</title>
+  <meta name="description" content="Cyrus Barbershop — Vakwerk sinds 1994. Boek een afspraak voor haarsneden, skin fades, warme scheerbeurt en exclusieve grooming services." />
   <link rel="preload" as="image" href="/images/storefrombehind.jpeg" />
   <link rel="preload" as="image" href="/images/logo.jpeg" />
 </svelte:head>

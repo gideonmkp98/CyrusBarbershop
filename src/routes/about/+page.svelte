@@ -5,7 +5,7 @@
 </script>
 
 <svelte:head>
-  <title>Over — Cyrus Kapsalon</title>
+  <title>Over — Cyrus Barbershop</title>
 </svelte:head>
 
 <HeritageSection />

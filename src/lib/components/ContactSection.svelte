@@ -164,8 +164,17 @@
               <Phone size={24} />
             </div>
             <div>
-              <span class="block font-body text-label text-bone-muted mb-1">Telefoon</span>
-              <a href="tel:+31629231030" class="font-display text-subheading text-gold-500 hover:text-bone transition-colors" style="font-size: clamp(1.25rem, 2vw, 1.5rem); line-height: 1.3; font-weight: 500;">06 29 23 10 30</a>
+              <span class="block font-body text-label text-bone-muted mb-2">Telefoon</span>
+              <div class="flex flex-col gap-1.5">
+                <a href="tel:+31629231030" class="font-display text-gold-500 hover:text-bone transition-colors inline-flex items-center gap-2.5 group/phone" style="font-size: clamp(1.15rem, 2vw, 1.35rem); line-height: 1.3; font-weight: 500;">
+                  <span class="font-body text-[0.65rem] tracking-[0.15em] uppercase text-bone-muted/70 group-hover/phone:text-gold-500/80 transition-colors">Mobiel</span>
+                  06 29 23 10 30
+                </a>
+                <a href="tel:+31712400707" class="font-display text-gold-500 hover:text-bone transition-colors inline-flex items-center gap-2.5 group/phone-2" style="font-size: clamp(1.15rem, 2vw, 1.35rem); line-height: 1.3; font-weight: 500;">
+                  <span class="font-body text-[0.65rem] tracking-[0.15em] uppercase text-bone-muted/70 group-hover/phone-2:text-gold-500/80 transition-colors">Vast</span>
+                  071 240 07 07
+                </a>
+              </div>
             </div>
           </div>
           <div class="flex gap-5 items-start">
@@ -198,7 +207,7 @@
             </div>
             <div>
               <span class="block font-body text-label text-bone-muted mb-1">Locatie</span>
-              <p class="font-display text-subheading text-bone" style="font-size: clamp(1.25rem, 2vw, 1.5rem); line-height: 1.3; font-weight: 500;">Kennedylaan 9e<br/>2324ER, Leiden</p>
+              <a href="https://www.google.com/maps/search/?api=1&query=Cyrus+Barbershop+Kennedylaan+9e+2324+ER+Leiden" target="_blank" rel="noopener noreferrer" aria-label="Open adres in Google Maps" class="font-display text-subheading text-bone hover:text-gold-500 transition-colors" style="font-size: clamp(1.25rem, 2vw, 1.5rem); line-height: 1.3; font-weight: 500;">Kennedylaan 9e<br/>2324ER, Leiden</a>
             </div>
           </div>
         </div>
