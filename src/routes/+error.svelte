@@ -3,7 +3,7 @@
 </script>
 
 <svelte:head>
-  <title>{page.status} — Cyrus Kapsalon</title>
+  <title>{page.status} — Cyrus Barbershop</title>
 </svelte:head>
 
 <div class="min-h-[80vh] flex items-center justify-center px-6">

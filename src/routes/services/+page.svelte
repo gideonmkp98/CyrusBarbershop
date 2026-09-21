@@ -7,7 +7,7 @@
 </script>
 
 <svelte:head>
-  <title>Behandelingen — Cyrus Kapsalon</title>
+  <title>Behandelingen — Cyrus Barbershop</title>
 </svelte:head>
 
 <ServicesSection services={data.services} />
