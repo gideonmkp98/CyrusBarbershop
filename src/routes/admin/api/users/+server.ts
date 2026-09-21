@@ -2,7 +2,7 @@ import { db } from '$lib/server/db/index';
 import { users } from '$lib/server/db/schema';
 import { hashPassword } from '$lib/server/auth';
 import { createUserSchema } from '$lib/utils/validation';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, ne } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 
 function jsonResponse(body: unknown, status = 200): Response {
@@ -73,6 +73,58 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     if (denied) return denied;
 
     await db.update(users).set({ isBarber: body.isBarber }).where(eq(users.id, body.id));
+    return jsonResponse({ success: true });
+  }
+
+  // Handle editing a staff member's details (name, email and/or new password).
+  // Owner and manager may edit, but a manager cannot edit another manager (enforced by canModifyTarget).
+  if (body.edit === true && body.id !== undefined) {
+    const targetId = parseInt(String(body.id), 10);
+    if (!targetId) {
+      return jsonResponse({ error: 'Ongeldige gebruiker' }, 400);
+    }
+
+    const denied = await canModifyTarget(userRole, targetId);
+    if (denied) return denied;
+
+    const updates: Partial<typeof users.$inferInsert> = {};
+
+    if (body.displayName !== undefined) {
+      const displayName = String(body.displayName).trim();
+      if (displayName.length < 2 || displayName.length > 100) {
+        return jsonResponse({ error: 'Naam moet tussen 2 en 100 tekens zijn' }, 400);
+      }
+      updates.displayName = displayName;
+    }
+
+    if (body.email !== undefined) {
+      const email = String(body.email).trim();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        return jsonResponse({ error: 'Ongeldig e-mailadres' }, 400);
+      }
+      const existing = await db.select({ id: users.id }).from(users)
+        .where(and(eq(users.email, email), ne(users.id, targetId)))
+        .limit(1);
+      if (existing[0]) {
+        return jsonResponse({ error: 'Dit e-mailadres is al in gebruik' }, 409);
+      }
+      updates.email = email;
+    }
+
+    if (body.password !== undefined && String(body.password).length > 0) {
+      const parsedPassword = createUserSchema.shape.password.safeParse(String(body.password));
+      if (!parsedPassword.success) {
+        const errorMessage = parsedPassword.error.issues.map(e => e.message).join(', ');
+        return jsonResponse({ error: errorMessage }, 400);
+      }
+      updates.passwordHash = await hashPassword(parsedPassword.data);
+    }
+
+    if (Object.keys(updates).length === 0) {
+      return jsonResponse({ error: 'Geen wijzigingen opgegeven' }, 400);
+    }
+
+    await db.update(users).set(updates).where(eq(users.id, targetId));
     return jsonResponse({ success: true });
   }
 

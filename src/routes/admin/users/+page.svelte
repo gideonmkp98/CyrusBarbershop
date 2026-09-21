@@ -1,6 +1,6 @@
 <script lang="ts">
   // @ts-nocheck - lucide-svelte has type definition issues in this   build
-  import { Camera, Clock, MoreVertical, Scissors, Trash2, UserCog, UserX } from 'lucide-svelte';
+  import { Camera, Clock, MoreVertical, PenLine, Scissors, Trash2, UserCog, UserX } from 'lucide-svelte';
   let { data } = $props();
 
   // Tooltip state
@@ -59,6 +59,93 @@
   // Delete confirmation modal state
   let showDeleteModal = $state(false);
   let userToDelete = $state<{ id: number; displayName: string } | null>(null);
+
+  // Edit staff modal state
+  let showEditModal = $state(false);
+  let userToEdit = $state<User | null>(null);
+  let editName = $state('');
+  let editEmail = $state('');
+  let editPassword = $state('');
+  let editError = $state('');
+  let savingEdit = $state(false);
+
+  function openEditModal(user: User) {
+    userToEdit = user;
+    editName = user.displayName;
+    editEmail = user.email;
+    editPassword = '';
+    editError = '';
+    showEditModal = true;
+    openActionMenuId = null;
+  }
+
+  function closeEditModal() {
+    showEditModal = false;
+    userToEdit = null;
+    editName = '';
+    editEmail = '';
+    editPassword = '';
+    editError = '';
+    savingEdit = false;
+  }
+
+  async function confirmEdit() {
+    if (!userToEdit) return;
+    editError = '';
+
+    const name = editName.trim();
+    const email = editEmail.trim();
+
+    if (name.length < 2) {
+      editError = 'Naam moet minimaal 2 tekens zijn.';
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      editError = 'Vul een geldig e-mailadres in.';
+      return;
+    }
+    if (editPassword && editPassword.length > 0) {
+      if (editPassword.length < 8 || !/[A-Z]/.test(editPassword) || !/[a-z]/.test(editPassword) || !/[0-9]/.test(editPassword)) {
+        editError = 'Wachtwoord: minimaal 8 tekens, met hoofdletter, kleine letter en cijfer.';
+        return;
+      }
+    }
+
+    savingEdit = true;
+
+    try {
+      const payload: Record<string, unknown> = {
+        edit: true,
+        id: userToEdit.id,
+        displayName: name,
+        email
+      };
+      if (editPassword) payload.password = editPassword;
+
+      const res = await fetch('/admin/api/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const result = await res.json();
+
+      if (res.ok) {
+        const user = users.find(u => u.id === userToEdit!.id);
+        if (user) {
+          user.displayName = name;
+          user.email = email;
+        }
+        closeEditModal();
+      } else {
+        editError = result.error || 'Opslaan mislukt.';
+      }
+    } catch {
+      editError = 'Netwerkfout. Probeer opnieuw.';
+    }
+
+    savingEdit = false;
+  }
 
   // Role change modal state
   let showRoleModal = $state(false);
@@ -652,6 +739,19 @@
                       style="top: {actionMenuPos.top}px; right: {actionMenuPos.right}px;"
                     >
                       <div class="py-2">
+                        {#if user.role !== 'owner'}
+                          <button
+                            type="button"
+                            class="flex w-full items-center gap-3 px-4 py-3 text-left font-body text-sm text-gold-400 hover:bg-white/5"
+                            onclick={() => { openActionMenuId = null; openEditModal(user); }}
+                          >
+                            <PenLine size={16} />
+                            Bewerk medewerker
+                          </button>
+
+                          <div class="my-2 border-t border-white/10"></div>
+                        {/if}
+
                         <button
                           type="button"
                           class="flex w-full items-center gap-3 px-4 py-3 text-left font-body text-sm text-bone hover:bg-white/5"
@@ -836,6 +936,62 @@
             Opslaan
           </button>
         </div>
+      </div>
+    </div>
+  {/if}
+
+  <!-- Edit Staff Modal -->
+  {#if showEditModal}
+    <div class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 w-full p-4" role="button" tabindex="0" aria-label="Modal sluiten" onclick={closeEditModal} onkeydown={(e) => e.key === 'Enter' && closeEditModal()}>
+      <div class="bg-surface-base p-5 sm:p-8 rounded-lg border border-white/10 max-w-md w-full shadow-2xl max-h-[90vh] overflow-y-auto" onclick={e => e.stopPropagation()} onkeydown={(e) => e.key === 'Escape' && closeEditModal()} role="dialog" aria-modal="true" tabindex="-1">
+        <div class="text-center mb-6">
+          <div class="w-16 h-16 rounded-full bg-gold-500/10 flex items-center justify-center mx-auto mb-4">
+            <PenLine class="text-gold-500" size={30} />
+          </div>
+          <h3 class="font-display text-subheading text-bone mb-2">Bewerk Medewerker</h3>
+          <p class="font-body text-body text-bone-muted">
+            Pas de gegevens aan van <span class="text-bone font-semibold">{userToEdit?.displayName}</span>
+          </p>
+        </div>
+
+        <form onsubmit={(e) => { e.preventDefault(); confirmEdit(); }} class="space-y-4">
+          <div class="field-group">
+            <input type="text" id="editName" bind:value={editName} placeholder=" " required />
+            <label for="editName">Weergavenaam</label>
+          </div>
+          <div class="field-group">
+            <input type="email" id="editEmail" bind:value={editEmail} placeholder=" " required />
+            <label for="editEmail">E-mail</label>
+          </div>
+          <div class="field-group">
+            <input type="password" id="editPassword" bind:value={editPassword} placeholder=" " autocomplete="new-password" />
+            <label for="editPassword">Nieuw wachtwoord</label>
+          </div>
+          <p class="font-body text-xs text-bone-muted">Laat wachtwoord leeg om ongewijzigd te laten. Minimaal 8 tekens met hoofdletter, kleine letter en cijfer.</p>
+
+          {#if editError}
+            <div class="bg-red-900/20 border border-red-500/30 rounded-lg p-3">
+              <p class="text-sm text-red-400 font-body">{editError}</p>
+            </div>
+          {/if}
+
+          <div class="flex gap-4 pt-2">
+            <button
+              type="button"
+              onclick={closeEditModal}
+              class="flex-1 btn-outline py-3 border-bone-muted/30 text-bone-muted hover:border-bone-muted/50"
+            >
+              Annuleren
+            </button>
+            <button
+              type="submit"
+              disabled={savingEdit}
+              class="flex-1 btn-primary py-3 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {savingEdit ? 'Opslaan…' : 'Opslaan'}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   {/if}
