@@ -84,7 +84,7 @@
           <span class="font-display text-lg tracking-[0.1em] text-gold-500">CYRUS BARBERSHOP</span>
         </div>
         <p class="font-display text-caption text-bone-muted">
-          &copy; 2025 CYRUS BARBERSHOP.
+          &copy; {new Date().getFullYear()} CYRUS BARBERSHOP.
         </p>
       </div>
 
