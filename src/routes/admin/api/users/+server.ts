@@ -1,8 +1,9 @@
+import { changeUserLifecycle, UserLifecycleError } from '$lib/server/user-lifecycle';
 import { db } from '$lib/server/db/index';
 import { users } from '$lib/server/db/schema';
 import { hashPassword } from '$lib/server/auth';
 import { createUserSchema } from '$lib/utils/validation';
-import { eq, and, ne } from 'drizzle-orm';
+import { eq, and, ne, isNull } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 
 function jsonResponse(body: unknown, status = 200): Response {
@@ -13,7 +14,7 @@ function jsonResponse(body: unknown, status = 200): Response {
 }
 
 async function canModifyTarget(currentRole: App.Locals['user']['role'], targetId: number): Promise<Response | null> {
-  const target = await db.select({ role: users.role }).from(users).where(eq(users.id, targetId)).limit(1);
+  const target = await db.select({ role: users.role }).from(users).where(and(eq(users.id, targetId), isNull(users.deletedAt))).limit(1);
 
   if (!target[0]) {
     return jsonResponse({ error: 'Gebruiker niet gevonden' }, 404);
@@ -31,7 +32,7 @@ async function canModifyTarget(currentRole: App.Locals['user']['role'], targetId
 }
 
 async function canUpdateBarberStatus(currentRole: App.Locals['user']['role'], targetId: number): Promise<Response | null> {
-  const target = await db.select({ role: users.role }).from(users).where(eq(users.id, targetId)).limit(1);
+  const target = await db.select({ role: users.role }).from(users).where(and(eq(users.id, targetId), isNull(users.deletedAt))).limit(1);
 
   if (!target[0]) {
     return jsonResponse({ error: 'Gebruiker niet gevonden' }, 404);
@@ -55,15 +56,20 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   }
 
   const body = await request.json();
+  if (body.id !== undefined && (!Number.isSafeInteger(Number(body.id)) || Number(body.id) <= 0)) {
+    return jsonResponse({ error: 'Ongeldige gebruiker' }, 400);
+  }
+  if (body.id !== undefined) body.id = Number(body.id);
+  if (body.id !== undefined && body.delete !== true) {
+    const [target] = await db.select({ id: users.id }).from(users)
+      .where(and(eq(users.id, Number(body.id)), isNull(users.deletedAt))).limit(1);
+    if (!target) return jsonResponse({ error: 'Gebruiker niet gevonden' }, 404);
+  }
 
   // Handle toggle active
   if (body.id !== undefined && body.isActive !== undefined) {
-    const targetId = parseInt(String(body.id), 10);
-    const denied = await canModifyTarget(userRole, targetId);
-    if (denied) return denied;
-
-    await db.update(users).set({ isActive: body.isActive }).where(eq(users.id, body.id));
-    return jsonResponse({ success: true });
+    if (typeof body.isActive !== 'boolean') return jsonResponse({ error: 'Ongeldige status' }, 400);
+    return lifecycleResponse(userRole, body.id, body.isActive ? 'activate' : 'deactivate');
   }
 
   // Handle toggle isBarber
@@ -72,7 +78,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     const denied = await canUpdateBarberStatus(userRole, targetId);
     if (denied) return denied;
 
-    await db.update(users).set({ isBarber: body.isBarber }).where(eq(users.id, body.id));
+    await db.update(users).set({ isBarber: body.isBarber }).where(and(eq(users.id, body.id), isNull(users.deletedAt)));
     return jsonResponse({ success: true });
   }
 
@@ -124,7 +130,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       return jsonResponse({ error: 'Geen wijzigingen opgegeven' }, 400);
     }
 
-    await db.update(users).set(updates).where(eq(users.id, targetId));
+    await db.update(users).set(updates).where(and(eq(users.id, targetId), isNull(users.deletedAt)));
     return jsonResponse({ success: true });
   }
 
@@ -144,13 +150,16 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       return jsonResponse({ error: 'Naam moet tussen 2 en 100 tekens zijn' }, 400);
     }
 
-    await db.update(users).set({ displayName }).where(eq(users.id, targetId));
+    await db.update(users).set({ displayName }).where(and(eq(users.id, targetId), isNull(users.deletedAt)));
     return jsonResponse({ success: true });
   }
 
   // Handle role change
   if (body.id !== undefined && body.role !== undefined) {
-    const userToChange = await db.select({ role: users.role }).from(users).where(eq(users.id, body.id)).limit(1);
+    const denied = await canModifyTarget(userRole, Number(body.id));
+    if (denied) return denied;
+    if (body.role !== 'staff' && body.role !== 'manager') return jsonResponse({ error: 'Ongeldige rol' }, 400);
+    const userToChange = await db.select({ role: users.role }).from(users).where(and(eq(users.id, body.id), isNull(users.deletedAt))).limit(1);
     const targetRole = userToChange[0]?.role;
 
     // Prevent changing owner account (only owner can change owner, and only to staff/manager)
@@ -166,25 +175,13 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       return jsonResponse({ error: 'Alleen owner kan gebruikers promoveren tot manager' }, 403);
     }
 
-    await db.update(users).set({ role: body.role }).where(eq(users.id, body.id));
+    await db.update(users).set({ role: body.role }).where(and(eq(users.id, body.id), isNull(users.deletedAt)));
     return jsonResponse({ success: true });
   }
 
   // Handle delete user
   if (body.id !== undefined && body.delete === true) {
-    const userToDelete = await db.select({ role: users.role }).from(users).where(eq(users.id, body.id)).limit(1);
-
-    // Prevent deleting owner account
-    if (userToDelete[0]?.role === 'owner') {
-      return jsonResponse({ error: 'Owner account kan niet verwijderd worden' }, 403);
-    }
-    // Manager cannot delete other managers
-    if (userRole === 'manager' && userToDelete[0]?.role === 'manager') {
-      return jsonResponse({ error: 'Alleen owner kan managers verwijderen' }, 403);
-    }
-
-    await db.delete(users).where(eq(users.id, body.id));
-    return jsonResponse({ success: true });
+    return lifecycleResponse(userRole, body.id, 'delete');
   }
 
   // Handle create user
@@ -207,7 +204,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
     return jsonResponse({ success: true, id: userId });
   } catch (e: any) {
-    if (e.code === 'ER_DUP_ENTRY') {
+    if (e.code === 'ER_DUP_ENTRY' || e.cause?.code === 'ER_DUP_ENTRY') {
       return jsonResponse({ error: 'Dit e-mailadres is al in gebruik' }, 409);
     }
     console.error('[users] INSERT error:', e);
@@ -223,22 +220,16 @@ export const DELETE: RequestHandler = async ({ request, locals }) => {
 
   const body = await request.json();
 
-  const userToDelete = await db.select({ role: users.role }).from(users).where(eq(users.id, body.id)).limit(1);
-
-  // Prevent deleting owner account
-  if (userToDelete[0]?.role === 'owner') {
-    return jsonResponse({ error: 'Owner account kan niet verwijderd worden' }, 403);
-  }
-  // Manager cannot delete other managers
-  if (userRole === 'manager' && userToDelete[0]?.role === 'manager') {
-    return jsonResponse({ error: 'Alleen owner kan managers verwijderen' }, 403);
-  }
-
-  try {
-    await db.delete(users).where(eq(users.id, body.id));
-    return jsonResponse({ success: true });
-  } catch (e: any) {
-    console.error('[users] DELETE error:', e);
-    return jsonResponse({ error: 'Interne fout' }, 500);
-  }
+  return lifecycleResponse(userRole, body.id, 'delete');
 };
+
+async function lifecycleResponse(role: string, id: unknown, action: 'delete' | 'activate' | 'deactivate') {
+  try {
+    await changeUserLifecycle(role, id, action);
+    return jsonResponse({ success: true });
+  } catch (error) {
+    if (error instanceof UserLifecycleError) return jsonResponse({ error: error.message }, error.status);
+    console.error('[users] lifecycle error:', error);
+    return jsonResponse({ error: 'Wijziging mislukt. Probeer opnieuw.' }, 500);
+  }
+}

@@ -2,7 +2,7 @@ import { db } from '$lib/server/db/index';
 import { users } from '$lib/server/db/schema';
 import { verifyPassword, createSession, signSessionToken } from '$lib/server/auth';
 import { loginSchema } from '$lib/utils/validation';
-import { eq } from 'drizzle-orm';
+import { eq, and, isNull } from 'drizzle-orm';
 import { fail, redirect } from '@sveltejs/kit';
 import { dev } from '$app/environment';
 import { PUBLIC_SITE_URL } from '$env/static/public';
@@ -26,7 +26,7 @@ export const actions: Actions = {
       return fail(400, { error: 'Ongeldig e-mailadres of wachtwoord' });
     }
 
-    const result = await db.select().from(users).where(eq(users.email, email)).limit(1);
+    const result = await db.select().from(users).where(and(eq(users.email, email), isNull(users.deletedAt))).limit(1);
     if (result.length === 0) {
       // Same error as below to avoid email enumeration.
       return fail(401, { error: 'Ongeldig e-mailadres of wachtwoord' });

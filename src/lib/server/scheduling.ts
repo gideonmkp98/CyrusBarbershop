@@ -1,4 +1,4 @@
-import { and, eq, inArray, ne, sql } from 'drizzle-orm';
+import { and, eq, inArray, ne, sql, isNull } from 'drizzle-orm';
 import { db } from '$lib/server/db';
 import {
   appointments,
@@ -141,8 +141,8 @@ async function validateStaffSlot(
   const barber = await database
     .select({ id: users.id, displayName: users.displayName })
     .from(users)
-    .where(and(eq(users.id, staffId), eq(users.isBarber, true), eq(users.isActive, true)))
-    .limit(1);
+    .where(and(eq(users.id, staffId), eq(users.isBarber, true), eq(users.isActive, true), isNull(users.deletedAt)))
+    .limit(1).for('update');
   if (!barber[0]) throw new SchedulingError('Deze medewerker is niet beschikbaar voor boekingen', 400, 'INVALID_STAFF');
 
   if (await isStaffUnavailable(staffId, date, database)) {
@@ -284,7 +284,7 @@ export async function validateAppointmentConfiguration(
     const candidates = await database
       .select({ id: users.id })
       .from(users)
-      .where(and(eq(users.isBarber, true), eq(users.isActive, true)));
+      .where(and(eq(users.isBarber, true), eq(users.isActive, true), isNull(users.deletedAt)));
     for (const candidate of candidates) {
       try {
         barberName = await validateStaffSlot(
