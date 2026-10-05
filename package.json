@@ -16,7 +16,8 @@
     "db:reset-admin-password": "tsx src/lib/server/db/reset-admin-password.ts",
     "test:email": "tsx scripts/test-email.ts",
     "test:scheduling": "tsx --test src/lib/server/availability-slots.test.ts && tsx scripts/test-scheduling-integration.ts",
-    "vercel-build": "node scripts/vercel-deploy.js && npm run build"
+    "vercel-build": "node scripts/vercel-deploy.js && npm run build",
+    "test:users": "tsx scripts/test-user-lifecycle.ts"
   },
   "type": "module",
   "devDependencies": {

@@ -13,6 +13,7 @@ const database = {
       from() { return query; },
       where() { return query; },
       limit() { return query; },
+      for() { return query; },
       then(onResult: (rows: unknown[]) => unknown) { return Promise.resolve(result).then(onResult); }
     };
     return query;
@@ -54,6 +55,7 @@ try {
     console.log(`PASS ${name}`);
   }
   async function availability(params: string) {
+    if (params.includes('staffId=')) responses.unshift([{ id: 1 }]);
     const response = await GET({ url: new URL(`http://localhost/api/availability?date=${date}&serviceId=1&${params}`), locals: {} });
     assert.equal(response.status, 200);
     const body = await response.json();
@@ -93,6 +95,15 @@ try {
   });
   const input = { serviceId: 1, staffId: 1, date, timeSlot: '10:30' };
   const staff = [{ id: 1, displayName: 'Barber' }];
+  await check('API exposes no availability for an inactive or deleted employee', async () => {
+    responses = [[]];
+    const response = await GET({ url: new URL(`http://localhost/api/availability?date=${date}&serviceId=1&staffId=12`), locals: {} });
+    assert.deepEqual((await response.json()).slots, []);
+  });
+  await check('save validation rejects an inactive or deleted employee', async () => {
+    responses = [[service], hours, [], []];
+    await assert.rejects(validateAppointmentConfiguration(database, input), { code: 'INVALID_STAFF' });
+  });
   await check('save validation accepts 10:30 with a full 45-minute duration', async () => {
     responses = [[service], hours, [], staff, [], hours, booked, [{ duration: 45 }], []];
     const result = await validateAppointmentConfiguration(database, input);

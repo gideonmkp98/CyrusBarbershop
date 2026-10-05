@@ -1,6 +1,6 @@
 import { db } from '$lib/server/db/index';
-import { staffSchedules, openingHours } from '$lib/server/db/schema';
-import { eq, and } from 'drizzle-orm';
+import { staffSchedules, openingHours, users } from '$lib/server/db/schema';
+import { eq, and, isNull } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 
 function timeToMinutes(time: string): number {
@@ -53,6 +53,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   }
 
   const staffIdNum = parseInt(staffId, 10);
+  const [target] = await db.select({ id: users.id }).from(users)
+    .where(and(eq(users.id, staffIdNum), isNull(users.deletedAt))).limit(1);
+  if (!target) return new Response(JSON.stringify({ error: 'Gebruiker niet gevonden' }), { status: 404 });
   const dayOfWeekNum = parseInt(dayOfWeek, 10);
   const scheduleIsActive = isActive === true || isActive === 'true';
 

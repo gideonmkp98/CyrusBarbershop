@@ -1,6 +1,6 @@
 import { db } from '$lib/server/db/index';
 import { openingHours, appointments, appointmentAddOns, blockedTimes, staffSchedules, users, services } from '$lib/server/db/schema';
-import { eq, and, ne, sql, inArray } from 'drizzle-orm';
+import { eq, and, ne, sql, inArray, isNull } from 'drizzle-orm';
 import { isStaffUnavailable } from '$lib/server/scheduling';
 import { generateDynamicSlots, timeToMinutes } from '$lib/server/availability-slots';
 import type { RequestHandler } from './$types';
@@ -36,6 +36,12 @@ export const GET: RequestHandler = async ({ url, locals }) => {
   const excludeAppointmentId = locals.user && locals.user.role !== 'staff' && requestedExcludeId
     ? requestedExcludeId
     : null;
+
+  if (staffId) {
+    const [staff] = await db.select({ id: users.id }).from(users)
+      .where(and(eq(users.id, staffId), eq(users.isBarber, true), eq(users.isActive, true), isNull(users.deletedAt))).limit(1);
+    if (!staff) return new Response(JSON.stringify({ slots: [] }), { headers: { 'Content-Type': 'application/json' } });
+  }
 
   const [year, month, day] = dateStr.split('-').map(Number);
   const date = new Date(year, month - 1, day);
@@ -102,7 +108,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
     const allBarbers = await db
       .select({ id: users.id })
       .from(users)
-      .where(and(inArray(users.role, ['owner', 'manager', 'staff']), eq(users.isBarber, true), eq(users.isActive, true)));
+      .where(and(inArray(users.role, ['owner', 'manager', 'staff']), eq(users.isBarber, true), eq(users.isActive, true), isNull(users.deletedAt)));
 
     if (allBarbers.length === 0) {
       return new Response(JSON.stringify({ date: dateStr, slots: [] }), {

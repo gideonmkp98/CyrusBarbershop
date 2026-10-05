@@ -53,6 +53,7 @@ export const users = mysqlTable('users', {
   role: mysqlEnum('role', ['owner', 'manager', 'staff']).notNull().default('staff'),
   isBarber: boolean('is_barber').notNull().default(false),
   isActive: boolean('is_active').notNull().default(true),
+  deletedAt: timestamp('deleted_at'),
   createdAt: timestamp('created_at').notNull().defaultNow()
 });
 

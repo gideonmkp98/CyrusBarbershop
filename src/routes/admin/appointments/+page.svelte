@@ -249,6 +249,19 @@
       timeOff: allTimeOff.filter((entry: any) => entry.staffId === s.id && entry.startDate <= personRange.end && entry.endDate >= personRange.start)
     }));
 
+    // Former employees are absent from booking selectors, but their historical
+    // appointments must still have a column when browsing an earlier period.
+    for (const appointment of filteredAppointments.filter(inRange)) {
+      if (appointment.staffId == null || columns.some(column => column.id === appointment.staffId)) continue;
+      columns.push({
+        id: appointment.staffId,
+        name: appointment.barberName || 'Voormalige medewerker',
+        role: 'voormalig',
+        appointments: filteredAppointments.filter(a => a.staffId === appointment.staffId && inRange(a)).sort(byTime),
+        timeOff: []
+      });
+    }
+
     const unassigned = filteredAppointments
       .filter((a: any) => (a.staffId === null || a.staffId === undefined) && inRange(a))
       .sort(byTime);

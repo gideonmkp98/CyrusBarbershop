@@ -1,5 +1,5 @@
 import { json } from '@sveltejs/kit';
-import { and, desc, eq, inArray, sql } from 'drizzle-orm';
+import { and, desc, eq, inArray, sql, isNull } from 'drizzle-orm';
 import { db } from '$lib/server/db';
 import { staffTimeOff, users } from '$lib/server/db/schema';
 import { findTimeOffConflicts, formatDateKey, SchedulingError, validateDateRange } from '$lib/server/scheduling';
@@ -13,7 +13,7 @@ async function assertBarber(staffId: number) {
   const target = await db
     .select({ id: users.id, displayName: users.displayName })
     .from(users)
-    .where(and(eq(users.id, staffId), eq(users.isBarber, true), eq(users.isActive, true)))
+    .where(and(eq(users.id, staffId), eq(users.isBarber, true), eq(users.isActive, true), isNull(users.deletedAt)))
     .limit(1);
   if (!target[0]) throw new SchedulingError('Medewerker is geen actieve barber', 400);
   return target[0];
