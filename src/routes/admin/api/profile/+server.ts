@@ -2,7 +2,7 @@ import bcrypt from 'bcryptjs';
 import { db } from '$lib/server/db/index';
 import { users } from '$lib/server/db/schema';
 import { hashPassword } from '$lib/server/auth';
-import { eq } from 'drizzle-orm';
+import { eq, and, isNull } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = async ({ request, locals }) => {
@@ -26,7 +26,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       });
     }
 
-    await db.update(users).set({ displayName }).where(eq(users.id, userId));
+    await db.update(users).set({ displayName }).where(and(eq(users.id, userId), isNull(users.deletedAt)));
     return new Response(JSON.stringify({ success: true, message: 'Naam bijgewerkt' }), {
       headers: { 'Content-Type': 'application/json' }
     });
@@ -51,7 +51,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       });
     }
 
-    await db.update(users).set({ email }).where(eq(users.id, userId));
+    await db.update(users).set({ email }).where(and(eq(users.id, userId), isNull(users.deletedAt)));
     return new Response(JSON.stringify({ success: true, message: 'E-mailadres bijgewerkt' }), {
       headers: { 'Content-Type': 'application/json' }
     });
@@ -76,7 +76,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     }
 
     // Verify current password
-    const user = await db.select({ passwordHash: users.passwordHash }).from(users).where(eq(users.id, userId)).limit(1);
+    const user = await db.select({ passwordHash: users.passwordHash }).from(users).where(and(eq(users.id, userId), isNull(users.deletedAt))).limit(1);
     if (!user[0]) {
       return new Response(JSON.stringify({ error: 'Gebruiker niet gevonden' }), {
         status: 404,
@@ -93,7 +93,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     }
 
     const newPasswordHash = await hashPassword(newPassword);
-    await db.update(users).set({ passwordHash: newPasswordHash }).where(eq(users.id, userId));
+    await db.update(users).set({ passwordHash: newPasswordHash }).where(and(eq(users.id, userId), isNull(users.deletedAt)));
     return new Response(JSON.stringify({ success: true, message: 'Wachtwoord bijgewerkt' }), {
       headers: { 'Content-Type': 'application/json' }
     });

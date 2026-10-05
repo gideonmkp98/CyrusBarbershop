@@ -58,6 +58,8 @@
 
   // Delete confirmation modal state
   let showDeleteModal = $state(false);
+  let deletingUser = $state(false);
+  let deleteError = $state('');
   let userToDelete = $state<{ id: number; displayName: string } | null>(null);
 
   // Edit staff modal state
@@ -160,19 +162,17 @@
   let uploadingAvatar = $state(false);
 
   async function toggleActive(id: number, isActive: boolean) {
-    const res = await fetch('/admin/api/users', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id, isActive: !isActive })
-    });
-
-    if (res.ok) {
-      // Update the user in the list without refresh
+    error = '';
+    try {
+      const res = await fetch('/admin/api/users', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, isActive: !isActive })
+      });
+      const result = await res.json();
+      if (!res.ok) { error = result.error || 'Status wijzigen mislukt.'; return; }
       const user = users.find(u => u.id === id);
-      if (user) {
-        user.isActive = !isActive;
-      }
-    }
+      if (user) user.isActive = !isActive;
+    } catch { error = 'Netwerkfout. Probeer opnieuw.'; }
   }
 
   async function toggleBarber(id: number, isBarber: boolean) {
@@ -510,34 +510,40 @@
   const dayNames = ['Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za', 'Zo'];
 
   function openDeleteModal(id: number, displayName: string) {
+    deleteError = '';
     userToDelete = { id, displayName };
     showDeleteModal = true;
   }
 
   function closeDeleteModal() {
+    if (deletingUser) return;
     showDeleteModal = false;
     userToDelete = null;
   }
 
   async function confirmDelete() {
-    if (!userToDelete) return;
-
-    const res = await fetch('/admin/api/users', {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: userToDelete.id })
-    });
-
-    if (res.ok) {
-      // Remove user from the list without refresh
-      const index = users.findIndex(u => u.id === userToDelete!.id);
-      if (index !== -1) {
-        users.splice(index, 1);
-      }
-      closeDeleteModal();
-    } else {
+    if (!userToDelete || deletingUser) return;
+    const id = userToDelete.id;
+    deletingUser = true;
+    deleteError = '';
+    try {
+      const res = await fetch('/admin/api/users', {
+        method: 'DELETE', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id })
+      });
       const result = await res.json();
-      alert(result.error || 'Verwijderen mislukt.');
+      if (res.ok) {
+        users = users.filter(user => user.id !== id);
+        deletingUser = false;
+        closeDeleteModal();
+        success = 'De gebruiker is verwijderd.';
+      } else {
+        deleteError = result.error || 'Verwijderen mislukt.';
+      }
+    } catch {
+      deleteError = 'Netwerkfout. Probeer opnieuw.';
+    } finally {
+      deletingUser = false;
     }
   }
 
@@ -1006,21 +1012,27 @@
           </div>
           <h3 class="font-display text-subheading text-bone mb-2">Gebruiker Verwijderen</h3>
           <p class="font-body text-body text-bone-muted">
-            Weet je zeker dat je <span class="text-bone font-semibold">{userToDelete?.displayName}</span> wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.
+            Weet je zeker dat je <span class="text-bone font-semibold">{userToDelete?.displayName}</span> wilt verwijderen? De gebruiker verliest toegang en verdwijnt uit het gebruikersbeheer. Eerdere afspraken blijven bewaard. Het e-mailadres kan voor een nieuw account worden gebruikt. Herstellen via het gebruikersbeheer is niet mogelijk.
           </p>
         </div>
+        {#if deleteError}
+          <p role="alert" class="mb-4 text-red-400">{deleteError}</p>
+          <a href="/admin/appointments" class="mb-4 block text-gold-500 underline">Afspraken bekijken</a>
+        {/if}
         <div class="flex gap-4">
           <button
+            disabled={deletingUser}
             onclick={closeDeleteModal}
             class="flex-1 btn-outline py-3 border-bone-muted/30 text-bone-muted hover:border-bone-muted/50"
           >
             Annuleren
           </button>
           <button
+            disabled={deletingUser}
             onclick={confirmDelete}
             class="flex-1 btn-primary py-3 bg-red-500 hover:bg-red-600 text-white"
           >
-            Verwijderen
+            {deletingUser ? 'Verwijderen…' : 'Verwijderen'}
           </button>
         </div>
       </div>

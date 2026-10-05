@@ -1,4 +1,4 @@
-import { and, desc, eq } from 'drizzle-orm';
+import { and, desc, eq, isNull } from 'drizzle-orm';
 import { db } from '$lib/server/db';
 import { staffTimeOff, users } from '$lib/server/db/schema';
 import { findTimeOffConflicts, formatDateKey } from '$lib/server/scheduling';
@@ -16,7 +16,7 @@ export const load: PageServerLoad = async ({ locals }) => {
   const staff = await db
     .select({ id: users.id, displayName: users.displayName, role: users.role })
     .from(users)
-    .where(and(eq(users.isBarber, true), eq(users.isActive, true)))
+    .where(and(eq(users.isBarber, true), eq(users.isActive, true), isNull(users.deletedAt)))
     .orderBy(users.displayName);
   const names = new Map(staff.map((member) => [member.id, member.displayName]));
 

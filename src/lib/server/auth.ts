@@ -74,7 +74,7 @@ export async function validateSession(tokenOrSigned: string) {
   if (result.length === 0) return null;
 
   const { user, session } = result[0];
-  if (!user.isActive) return null;
+  if (!user.isActive || user.deletedAt) return null;
 
   return {
     id: user.id,

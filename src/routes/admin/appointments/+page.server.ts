@@ -1,6 +1,6 @@
 import { db } from '$lib/server/db/index';
 import { appointments, services, staffTimeOff, users } from '$lib/server/db/schema';
-import { eq, desc, and, sql } from 'drizzle-orm';
+import { eq, desc, and, sql, isNull } from 'drizzle-orm';
 import { appointmentStaffScope } from '$lib/server/appointment-scope';
 import type { PageServerLoad, Actions } from './$types';
 
@@ -81,8 +81,8 @@ export const load: PageServerLoad = async ({ locals }) => {
 
   staffQuery = staffQuery.where(
     locals.user?.role === 'staff'
-      ? and(eq(users.isBarber, true), eq(users.id, locals.user.id))
-      : eq(users.isBarber, true)
+      ? and(eq(users.isBarber, true), eq(users.id, locals.user.id), isNull(users.deletedAt))
+      : and(eq(users.isBarber, true), isNull(users.deletedAt))
   );
 
   const allStaff = await staffQuery;

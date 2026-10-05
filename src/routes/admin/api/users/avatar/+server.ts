@@ -3,7 +3,7 @@ import path from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { db } from '$lib/server/db/index';
 import { users } from '$lib/server/db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, and, isNull } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 
 const MAX_FILE_SIZE = 2 * 1024 * 1024;
@@ -49,7 +49,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   const targetUser = await db
     .select({ id: users.id, isBarber: users.isBarber })
     .from(users)
-    .where(eq(users.id, userId))
+    .where(and(eq(users.id, userId), isNull(users.deletedAt)))
     .limit(1);
 
   if (!targetUser[0]) {
@@ -69,7 +69,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
   const buffer = Buffer.from(await file.arrayBuffer());
   await writeFile(diskPath, buffer);
-  await db.update(users).set({ imageUrl }).where(eq(users.id, userId));
+  await db.update(users).set({ imageUrl }).where(and(eq(users.id, userId), isNull(users.deletedAt)));
 
   return jsonResponse({ success: true, imageUrl });
 };
@@ -86,7 +86,7 @@ export const DELETE: RequestHandler = async ({ request, locals }) => {
     return jsonResponse({ error: 'Ongeldige gebruiker' }, 400);
   }
 
-  await db.update(users).set({ imageUrl: null }).where(eq(users.id, userId));
+  await db.update(users).set({ imageUrl: null }).where(and(eq(users.id, userId), isNull(users.deletedAt)));
 
   return jsonResponse({ success: true, imageUrl: null });
 };

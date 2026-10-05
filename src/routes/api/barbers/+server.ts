@@ -1,6 +1,6 @@
 import { db } from '$lib/server/db/index';
 import { users } from '$lib/server/db/schema';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, isNull } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async () => {
@@ -12,7 +12,7 @@ export const GET: RequestHandler = async () => {
       imageUrl: users.imageUrl
     })
     .from(users)
-    .where(and(eq(users.isBarber, true), eq(users.isActive, true)));
+    .where(and(eq(users.isBarber, true), eq(users.isActive, true), isNull(users.deletedAt)));
 
   return new Response(JSON.stringify({ barbers }), {
     headers: { 'Content-Type': 'application/json' }
